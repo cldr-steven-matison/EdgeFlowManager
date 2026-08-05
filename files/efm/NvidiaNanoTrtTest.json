@@ -1,0 +1,476 @@
+{
+    "flowMetadata": {
+        "identifier": "dd7e3230-17b6-4b39-8927-f68a301ca035",
+        "agentClass": "NvidiaNanoTrtTest",
+        "rootProcessGroupIdentifier": "c6f115da-7a93-4797-aeed-b3b4ad710cea",
+        "created": 1785719346352,
+        "updated": 1785719436386,
+        "undoEnabled": false,
+        "redoEnabled": false
+    },
+    "flowContent": {
+        "identifier": "c6f115da-7a93-4797-aeed-b3b4ad710cea",
+        "instanceIdentifier": "12de17f1-250d-425e-9318-897af822a1e7",
+        "name": "root",
+        "comments": null,
+        "position": {
+            "x": 0.0,
+            "y": 0.0
+        },
+        "processGroups": [],
+        "remoteProcessGroups": [],
+        "processors": [
+            {
+                "identifier": "215ccb99-c2bd-46d3-88be-58e39e54422f",
+                "instanceIdentifier": "a8de22be-cfb7-430a-a2f4-3e15aabf7155",
+                "name": "LogAttribute-TrtTest",
+                "comments": "",
+                "position": {
+                    "x": 0.0,
+                    "y": 600.0
+                },
+                "type": "org.apache.nifi.minifi.processors.LogAttribute",
+                "bundle": {
+                    "group": "org.apache.nifi.minifi",
+                    "artifact": "minifi-standard-processors",
+                    "version": "1.26.02"
+                },
+                "properties": {
+                    "FlowFiles To Log": "1",
+                    "Log Level": "info",
+                    "Attributes to Ignore": null,
+                    "Attributes to Log": "inference.label,inference.confidence,inference.model,inference.ms,inference.error",
+                    "Log Payload": "false",
+                    "Log Prefix": null,
+                    "Hexencode Payload": "false",
+                    "Maximum Payload Line Length": "0"
+                },
+                "propertyDescriptors": {
+                    "FlowFiles To Log": {
+                        "name": "FlowFiles To Log",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Log Level": {
+                        "name": "Log Level",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Attributes to Ignore": {
+                        "name": "Attributes to Ignore",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Attributes to Log": {
+                        "name": "Attributes to Log",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Log Payload": {
+                        "name": "Log Payload",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Log Prefix": {
+                        "name": "Log Prefix",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Hexencode Payload": {
+                        "name": "Hexencode Payload",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Maximum Payload Line Length": {
+                        "name": "Maximum Payload Line Length",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    }
+                },
+                "style": {},
+                "annotationData": null,
+                "schedulingPeriod": "1000 ms",
+                "schedulingStrategy": "TIMER_DRIVEN",
+                "executionNode": "ALL",
+                "penaltyDuration": "30000 ms",
+                "yieldDuration": "1000 ms",
+                "bulletinLevel": "WARN",
+                "runDurationMillis": 0,
+                "concurrentlySchedulableTaskCount": 1,
+                "autoTerminatedRelationships": [
+                    "success"
+                ],
+                "scheduledState": null,
+                "retryCount": null,
+                "retriedRelationships": null,
+                "backoffMechanism": null,
+                "maxBackoffPeriod": null,
+                "componentType": "PROCESSOR",
+                "groupIdentifier": "c6f115da-7a93-4797-aeed-b3b4ad710cea"
+            },
+            {
+                "identifier": "d462e04f-3bbc-4338-961a-f5da1938f34a",
+                "instanceIdentifier": "c42b54ec-832e-45b4-a216-c19caf19d08f",
+                "name": "ClassifyImageTensorRT",
+                "comments": "",
+                "position": {
+                    "x": 0.0,
+                    "y": 300.0
+                },
+                "type": "org.apache.nifi.minifi.processors.ClassifyImageTensorRT",
+                "bundle": {
+                    "group": "org.apache.nifi.minifi",
+                    "artifact": "ClassifyImageTensorRT.py",
+                    "version": "1.26.02"
+                },
+                "properties": {
+                    "Top K": "3",
+                    "Inference Endpoint": "http://127.0.0.1:5910/classify",
+                    "Request Timeout": "10",
+                    "Image Source": "flowfile"
+                },
+                "propertyDescriptors": {
+                    "Top K": {
+                        "name": "Top K",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Inference Endpoint": {
+                        "name": "Inference Endpoint",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Request Timeout": {
+                        "name": "Request Timeout",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Image Source": {
+                        "name": "Image Source",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    }
+                },
+                "style": {},
+                "annotationData": null,
+                "schedulingPeriod": "1000 ms",
+                "schedulingStrategy": "TIMER_DRIVEN",
+                "executionNode": "ALL",
+                "penaltyDuration": "30000 ms",
+                "yieldDuration": "1000 ms",
+                "bulletinLevel": "WARN",
+                "runDurationMillis": 0,
+                "concurrentlySchedulableTaskCount": 1,
+                "autoTerminatedRelationships": [
+                    "original"
+                ],
+                "scheduledState": null,
+                "retryCount": null,
+                "retriedRelationships": null,
+                "backoffMechanism": null,
+                "maxBackoffPeriod": null,
+                "componentType": "PROCESSOR",
+                "groupIdentifier": "c6f115da-7a93-4797-aeed-b3b4ad710cea"
+            },
+            {
+                "identifier": "7b2140a8-0c5c-471a-b562-c6456cd5561b",
+                "instanceIdentifier": "923af6d5-d5e6-4c49-a0bc-6a7c2c1dca5e",
+                "name": "ListenHTTP-TrtTest",
+                "comments": "",
+                "position": {
+                    "x": 0.0,
+                    "y": 0.0
+                },
+                "type": "org.apache.nifi.minifi.processors.ListenHTTP",
+                "bundle": {
+                    "group": "org.apache.nifi.minifi",
+                    "artifact": "minifi-civet-extensions",
+                    "version": "1.26.02"
+                },
+                "properties": {
+                    "Base Path": "classify",
+                    "SSL Verify Peer": "no",
+                    "Batch Size": "1",
+                    "SSL Minimum Version": "TLS1.2",
+                    "Buffer Size": "1",
+                    "Listening Port": "9096",
+                    "SSL Certificate": null,
+                    "HTTP Headers to receive as Attributes (Regex)": null,
+                    "Authorized DN Pattern": ".*",
+                    "SSL Certificate Authority": null
+                },
+                "propertyDescriptors": {
+                    "Base Path": {
+                        "name": "Base Path",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "SSL Verify Peer": {
+                        "name": "SSL Verify Peer",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Batch Size": {
+                        "name": "Batch Size",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "SSL Minimum Version": {
+                        "name": "SSL Minimum Version",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Buffer Size": {
+                        "name": "Buffer Size",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Listening Port": {
+                        "name": "Listening Port",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "SSL Certificate": {
+                        "name": "SSL Certificate",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "HTTP Headers to receive as Attributes (Regex)": {
+                        "name": "HTTP Headers to receive as Attributes (Regex)",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Authorized DN Pattern": {
+                        "name": "Authorized DN Pattern",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "SSL Certificate Authority": {
+                        "name": "SSL Certificate Authority",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    }
+                },
+                "style": {},
+                "annotationData": null,
+                "schedulingPeriod": "1000 ms",
+                "schedulingStrategy": "TIMER_DRIVEN",
+                "executionNode": "ALL",
+                "penaltyDuration": "30000 ms",
+                "yieldDuration": "1000 ms",
+                "bulletinLevel": "WARN",
+                "runDurationMillis": 0,
+                "concurrentlySchedulableTaskCount": 1,
+                "autoTerminatedRelationships": [],
+                "scheduledState": null,
+                "retryCount": null,
+                "retriedRelationships": null,
+                "backoffMechanism": null,
+                "maxBackoffPeriod": null,
+                "componentType": "PROCESSOR",
+                "groupIdentifier": "c6f115da-7a93-4797-aeed-b3b4ad710cea"
+            }
+        ],
+        "inputPorts": [],
+        "outputPorts": [],
+        "connections": [
+            {
+                "identifier": "2ed6d519-745b-46aa-822f-d4fb985097ad",
+                "instanceIdentifier": "f9b357e0-ad9f-46b1-b0fa-51a05056e382",
+                "name": "ClassifyImageTensorRT/failure/LogAttribute-TrtTest",
+                "comments": null,
+                "position": {
+                    "x": 0.0,
+                    "y": 0.0
+                },
+                "source": {
+                    "id": "d462e04f-3bbc-4338-961a-f5da1938f34a",
+                    "type": "PROCESSOR",
+                    "groupId": "c6f115da-7a93-4797-aeed-b3b4ad710cea",
+                    "name": "ClassifyImageTensorRT",
+                    "comments": null,
+                    "instanceIdentifier": "c42b54ec-832e-45b4-a216-c19caf19d08f"
+                },
+                "destination": {
+                    "id": "215ccb99-c2bd-46d3-88be-58e39e54422f",
+                    "type": "PROCESSOR",
+                    "groupId": "c6f115da-7a93-4797-aeed-b3b4ad710cea",
+                    "name": "LogAttribute-TrtTest",
+                    "comments": null,
+                    "instanceIdentifier": "a8de22be-cfb7-430a-a2f4-3e15aabf7155"
+                },
+                "labelIndex": 1,
+                "zIndex": 0,
+                "selectedRelationships": [
+                    "failure"
+                ],
+                "backPressureObjectThreshold": 2000,
+                "backPressureDataSizeThreshold": "100 MB",
+                "flowFileExpiration": "0 seconds",
+                "prioritizers": [],
+                "bends": [],
+                "loadBalanceStrategy": null,
+                "partitioningAttribute": null,
+                "loadBalanceCompression": null,
+                "componentType": "CONNECTION",
+                "groupIdentifier": "c6f115da-7a93-4797-aeed-b3b4ad710cea"
+            },
+            {
+                "identifier": "9364fd0c-9c49-4866-a06c-03e09354b193",
+                "instanceIdentifier": "78510cfe-2012-4f03-ae06-cbfdefeb352c",
+                "name": "ListenHTTP-TrtTest/success/ClassifyImageTensorRT",
+                "comments": null,
+                "position": {
+                    "x": 0.0,
+                    "y": 0.0
+                },
+                "source": {
+                    "id": "7b2140a8-0c5c-471a-b562-c6456cd5561b",
+                    "type": "PROCESSOR",
+                    "groupId": "c6f115da-7a93-4797-aeed-b3b4ad710cea",
+                    "name": "ListenHTTP-TrtTest",
+                    "comments": null,
+                    "instanceIdentifier": "923af6d5-d5e6-4c49-a0bc-6a7c2c1dca5e"
+                },
+                "destination": {
+                    "id": "d462e04f-3bbc-4338-961a-f5da1938f34a",
+                    "type": "PROCESSOR",
+                    "groupId": "c6f115da-7a93-4797-aeed-b3b4ad710cea",
+                    "name": "ClassifyImageTensorRT",
+                    "comments": null,
+                    "instanceIdentifier": "c42b54ec-832e-45b4-a216-c19caf19d08f"
+                },
+                "labelIndex": 1,
+                "zIndex": 0,
+                "selectedRelationships": [
+                    "success"
+                ],
+                "backPressureObjectThreshold": 2000,
+                "backPressureDataSizeThreshold": "100 MB",
+                "flowFileExpiration": "0 seconds",
+                "prioritizers": [],
+                "bends": [],
+                "loadBalanceStrategy": null,
+                "partitioningAttribute": null,
+                "loadBalanceCompression": null,
+                "componentType": "CONNECTION",
+                "groupIdentifier": "c6f115da-7a93-4797-aeed-b3b4ad710cea"
+            },
+            {
+                "identifier": "9d1ab2b4-9bc9-45bf-9e4e-85a424fe4f8a",
+                "instanceIdentifier": "f7ddc86d-f37e-4c84-afe7-8b963bb43467",
+                "name": "ClassifyImageTensorRT/success/LogAttribute-TrtTest",
+                "comments": null,
+                "position": {
+                    "x": 0.0,
+                    "y": 0.0
+                },
+                "source": {
+                    "id": "d462e04f-3bbc-4338-961a-f5da1938f34a",
+                    "type": "PROCESSOR",
+                    "groupId": "c6f115da-7a93-4797-aeed-b3b4ad710cea",
+                    "name": "ClassifyImageTensorRT",
+                    "comments": null,
+                    "instanceIdentifier": "c42b54ec-832e-45b4-a216-c19caf19d08f"
+                },
+                "destination": {
+                    "id": "215ccb99-c2bd-46d3-88be-58e39e54422f",
+                    "type": "PROCESSOR",
+                    "groupId": "c6f115da-7a93-4797-aeed-b3b4ad710cea",
+                    "name": "LogAttribute-TrtTest",
+                    "comments": null,
+                    "instanceIdentifier": "a8de22be-cfb7-430a-a2f4-3e15aabf7155"
+                },
+                "labelIndex": 1,
+                "zIndex": 0,
+                "selectedRelationships": [
+                    "success"
+                ],
+                "backPressureObjectThreshold": 2000,
+                "backPressureDataSizeThreshold": "100 MB",
+                "flowFileExpiration": "0 seconds",
+                "prioritizers": [],
+                "bends": [],
+                "loadBalanceStrategy": null,
+                "partitioningAttribute": null,
+                "loadBalanceCompression": null,
+                "componentType": "CONNECTION",
+                "groupIdentifier": "c6f115da-7a93-4797-aeed-b3b4ad710cea"
+            }
+        ],
+        "labels": [],
+        "funnels": [],
+        "controllerServices": [],
+        "versionedFlowCoordinates": null,
+        "variables": {},
+        "parameterContextName": "ba1518f0-afb5-4285-964f-c0111b3918a8",
+        "defaultFlowFileExpiration": null,
+        "defaultBackPressureObjectThreshold": null,
+        "defaultBackPressureDataSizeThreshold": null,
+        "logFileSuffix": null,
+        "flowFileConcurrency": null,
+        "flowFileOutboundPolicy": null,
+        "componentType": "PROCESS_GROUP",
+        "groupIdentifier": null
+    },
+    "parameterContexts": [
+        {
+            "id": "ba1518f0-afb5-4285-964f-c0111b3918a8",
+            "name": "ba1518f0-afb5-4285-964f-c0111b3918a8",
+            "parameters": [],
+            "usage": null
+        }
+    ],
+    "versionInfo": {
+        "flowVersion": 1,
+        "lastPublished": 1785719436281,
+        "lastPublishedBy": "anonymous",
+        "dirty": false,
+        "localChanges": false
+    },
+    "localFlowRevision": 7
+}

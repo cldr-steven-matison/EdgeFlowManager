@@ -1,0 +1,9 @@
+apiVersion: cfm.cloudera.com/v1alpha1
+kind: User
+metadata: {name: minifi-s2s, namespace: cfm-streaming}
+spec:
+  identity: "minifi-s2s"
+  instanceTarget: {kind: Nifi, name: nifi, namespace: cfm-streaming}
+  accessPolicies:
+    - {actions: [write], resources: [/data-transfer/input-ports/ce8874a8-019f-1000-ffff-ffff8f4a3e19]}
+    - {actions: [read], resources: [/site-to-site]}

@@ -1,0 +1,30 @@
+# systemd *user* unit for NvidiaNano's resident TensorRT inference daemon.
+#
+# User-level (not system-level) for the same reasons as
+# mpv-stream-launcher.service: this device already runs its user manager with
+# Linger=yes, the lofi-idle-watcher/zellij units set the convention, and it
+# avoids needing root to install or restart it. It also means the model can be
+# reloaded without ever going near the MiNiFi agent or sudo.
+#
+# Install:
+#   cp files/trt-infer.service ~/.config/systemd/user/
+#   systemctl --user daemon-reload
+#   systemctl --user enable --now trt-infer
+#
+# The engine it loads is built on this box and is not in git — see the rebuild
+# command in files/trt_infer_server.py.
+#
+# Unlike mpv-stream-launcher.service, the default KillMode is correct here:
+# this service has no children that are meant to outlive it.
+
+[Unit]
+Description=TensorRT inference daemon (MobileNetV2 FP16, loopback :5910)
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/python3 %h/DesktopShare/files/trt_infer_server.py
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=default.target

@@ -1,0 +1,112 @@
+{
+  "flowEncodingVersion": "1.0",
+  "parameterContexts": {},
+  "flowContents": {
+    "identifier": "efm-root-canvas-group",
+    "name": "MiNiFi Baseline Flow",
+    "comments": "Cloudera EFM Validated Template",
+    "componentType": "PROCESS_GROUP",
+    "position": {
+      "x": 0.0,
+      "y": 0.0
+    },
+    "processors": [
+      {
+        "identifier": "http-listener-processor-id",
+        "name": "ListenHTTP",
+        "type": "org.apache.nifi.processors.standard.ListenHTTP",
+        "componentType": "PROCESSOR",
+        "position": {
+          "x": 300.0,
+          "y": 100.0
+        },
+        "properties": {
+          "Listening Port": "8080"
+        },
+        "propertyDescriptors": {
+          "Listening Port": {
+            "name": "Listening Port",
+            "identifiesControllerService": false,
+            "sensitive": false
+          }
+        },
+        "schedulingPeriod": "0 sec",
+        "schedulingStrategy": "TIMER_DRIVEN",
+        "executionNode": "ALL",
+        "penaltyDuration": "30 sec",
+        "yieldDuration": "1 sec",
+        "bulletinLevel": "WARN",
+        "runDurationMillis": 0,
+        "concurrentlySchedulableTaskCount": 1,
+        "autoTerminatedRelationships": []
+      },
+      {
+        "identifier": "file-sink-processor-id",
+        "name": "PutFile",
+        "type": "org.apache.nifi.processors.standard.PutFile",
+        "componentType": "PROCESSOR",
+        "position": {
+          "x": 300.0,
+          "y": 350.0
+        },
+        "properties": {
+          "Directory": "/tmp/minifi-test-output"
+        },
+        "propertyDescriptors": {
+          "Directory": {
+            "name": "Directory",
+            "identifiesControllerService": false,
+            "sensitive": false
+          }
+        },
+        "schedulingPeriod": "0 sec",
+        "schedulingStrategy": "TIMER_DRIVEN",
+        "executionNode": "ALL",
+        "penaltyDuration": "30 sec",
+        "yieldDuration": "1 sec",
+        "bulletinLevel": "WARN",
+        "runDurationMillis": 0,
+        "concurrentlySchedulableTaskCount": 1,
+        "autoTerminatedRelationships": [
+          "success",
+          "failure"
+        ]
+      }
+    ],
+    "connections": [
+      {
+        "identifier": "http-to-file-connection-id",
+        "name": "success",
+        "componentType": "CONNECTION",
+        "source": {
+          "id": "http-listener-processor-id",
+          "type": "PROCESSOR",
+          "groupId": "efm-root-canvas-group",
+          "name": "ListenHTTP"
+        },
+        "destination": {
+          "id": "file-sink-processor-id",
+          "type": "PROCESSOR",
+          "groupId": "efm-root-canvas-group",
+          "name": "PutFile"
+        },
+        "selectedRelationships": [
+          "success"
+        ],
+        "backPressureObjectThreshold": 10000,
+        "backPressureDataSizeThreshold": "1 GB",
+        "flowFileExpiration": "0 sec",
+        "prioritizers": [],
+        "bends": [],
+        "loadBalanceStrategy": "DO_NOT_LOAD_BALANCE"
+      }
+    ],
+    "processGroups": [],
+    "remoteProcessGroups": [],
+    "funnels": [],
+    "inputPorts": [],
+    "outputPorts": [],
+    "labels": [],
+    "controllerServices": []
+  }
+}

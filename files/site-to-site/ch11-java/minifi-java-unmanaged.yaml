@@ -1,0 +1,32 @@
+# Unmanaged MiNiFi Java agent — plain Deployment, no EFM deployer.
+# Client keystore (private key) mounted from the minifi-s2s-keystore secret; the
+# public CA truststore + flow + fixed bootstrap.conf are baked into the image.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: minifi-java-unmanaged
+  namespace: cld-streaming
+  labels:
+    app: minifi-java-unmanaged
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: minifi-java-unmanaged
+  template:
+    metadata:
+      labels:
+        app: minifi-java-unmanaged
+    spec:
+      containers:
+        - name: minifi
+          image: minifi-java-s2s:2.24.08.0-19
+          imagePullPolicy: IfNotPresent   # image lives in the local minikube docker daemon
+          volumeMounts:
+            - name: s2s-ks
+              mountPath: /certs-ks
+              readOnly: true
+      volumes:
+        - name: s2s-ks
+          secret:
+            secretName: minifi-s2s-keystore   # keystore.p12 (client identity minifi-s2s)

@@ -1,0 +1,661 @@
+{
+    "flowMetadata": {
+        "identifier": "3ecf7a83-fba3-41d9-88e4-8df0886eb0e3",
+        "agentClass": "NvidiaNanoAI",
+        "rootProcessGroupIdentifier": "c1dc2537-f41e-48b9-bd90-53e807a98c28",
+        "created": 1785522864065,
+        "updated": 1785522882759,
+        "undoEnabled": false,
+        "redoEnabled": false
+    },
+    "flowContent": {
+        "identifier": "c1dc2537-f41e-48b9-bd90-53e807a98c28",
+        "instanceIdentifier": "0ef32917-395a-4866-80f2-f5f0110bd0bf",
+        "name": "root",
+        "comments": null,
+        "position": {
+            "x": 0.0,
+            "y": 0.0
+        },
+        "processGroups": [],
+        "remoteProcessGroups": [],
+        "processors": [
+            {
+                "identifier": "a05080a1-1bc9-489a-99f5-b60fd0be8935",
+                "instanceIdentifier": "9ecbcbd5-3fdd-4ada-9789-ead746118db4",
+                "name": "ListenHTTP",
+                "comments": "",
+                "position": {
+                    "x": 0.0,
+                    "y": 0.0
+                },
+                "type": "org.apache.nifi.minifi.processors.ListenHTTP",
+                "bundle": {
+                    "group": "org.apache.nifi.minifi",
+                    "artifact": "minifi-civet-extensions",
+                    "version": "1.26.02"
+                },
+                "properties": {
+                    "Base Path": "aiRouter",
+                    "SSL Verify Peer": "no",
+                    "Batch Size": "5",
+                    "SSL Minimum Version": "TLS1.2",
+                    "Buffer Size": "5",
+                    "Listening Port": "8081",
+                    "SSL Certificate": null,
+                    "HTTP Headers to receive as Attributes (Regex)": null,
+                    "Authorized DN Pattern": ".*",
+                    "SSL Certificate Authority": null
+                },
+                "propertyDescriptors": {
+                    "Base Path": {
+                        "name": "Base Path",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "SSL Verify Peer": {
+                        "name": "SSL Verify Peer",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Batch Size": {
+                        "name": "Batch Size",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "SSL Minimum Version": {
+                        "name": "SSL Minimum Version",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Buffer Size": {
+                        "name": "Buffer Size",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Listening Port": {
+                        "name": "Listening Port",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "SSL Certificate": {
+                        "name": "SSL Certificate",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "HTTP Headers to receive as Attributes (Regex)": {
+                        "name": "HTTP Headers to receive as Attributes (Regex)",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Authorized DN Pattern": {
+                        "name": "Authorized DN Pattern",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "SSL Certificate Authority": {
+                        "name": "SSL Certificate Authority",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    }
+                },
+                "style": {},
+                "annotationData": null,
+                "schedulingPeriod": "1000 ms",
+                "schedulingStrategy": "TIMER_DRIVEN",
+                "executionNode": "ALL",
+                "penaltyDuration": "30000 ms",
+                "yieldDuration": "1000 ms",
+                "bulletinLevel": "WARN",
+                "runDurationMillis": 0,
+                "concurrentlySchedulableTaskCount": 1,
+                "autoTerminatedRelationships": [],
+                "scheduledState": null,
+                "retryCount": null,
+                "retriedRelationships": null,
+                "backoffMechanism": null,
+                "maxBackoffPeriod": null,
+                "componentType": "PROCESSOR",
+                "groupIdentifier": "c1dc2537-f41e-48b9-bd90-53e807a98c28"
+            },
+            {
+                "identifier": "6b7eee02-36c1-48f0-8a5c-3ac7b349e2b9",
+                "instanceIdentifier": "8cadba7b-4d62-40bf-bd51-5659fc9568ad",
+                "name": "ExecuteScript",
+                "comments": "",
+                "position": {
+                    "x": 0.0,
+                    "y": 300.0
+                },
+                "type": "org.apache.nifi.minifi.processors.ExecuteScript",
+                "bundle": {
+                    "group": "org.apache.nifi.minifi",
+                    "artifact": "minifi-script-extension",
+                    "version": "1.26.02"
+                },
+                "properties": {
+                    "Script File": "/home/tunastreet/nifi-minifi-cpp-1.26.02/asset/gpu_nifi_tensorRT-3.py",
+                    "Script Engine": "python",
+                    "Script Body": null,
+                    "Module Directory": null
+                },
+                "propertyDescriptors": {
+                    "Script File": {
+                        "name": "Script File",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Script Engine": {
+                        "name": "Script Engine",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Script Body": {
+                        "name": "Script Body",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Module Directory": {
+                        "name": "Module Directory",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    }
+                },
+                "style": {},
+                "annotationData": null,
+                "schedulingPeriod": "1000 ms",
+                "schedulingStrategy": "TIMER_DRIVEN",
+                "executionNode": "ALL",
+                "penaltyDuration": "30000 ms",
+                "yieldDuration": "1000 ms",
+                "bulletinLevel": "WARN",
+                "runDurationMillis": 0,
+                "concurrentlySchedulableTaskCount": 1,
+                "autoTerminatedRelationships": [
+                    "original"
+                ],
+                "scheduledState": null,
+                "retryCount": null,
+                "retriedRelationships": null,
+                "backoffMechanism": null,
+                "maxBackoffPeriod": null,
+                "componentType": "PROCESSOR",
+                "groupIdentifier": "c1dc2537-f41e-48b9-bd90-53e807a98c28"
+            },
+            {
+                "identifier": "03cae9be-8379-444c-a9f0-138301128ccc",
+                "instanceIdentifier": "429133c8-7308-4039-87cd-4d853b8b0cfe",
+                "name": "PublishKafka",
+                "comments": "",
+                "position": {
+                    "x": 0.0,
+                    "y": 600.0
+                },
+                "type": "org.apache.nifi.minifi.processors.PublishKafka",
+                "bundle": {
+                    "group": "org.apache.nifi.minifi",
+                    "artifact": "minifi-rdkafka-extensions",
+                    "version": "1.26.02"
+                },
+                "properties": {
+                    "Max Request Size": null,
+                    "Client Name": "minifi-agent",
+                    "Request Timeout": "120 sec",
+                    "Target Batch Payload Size": "512 KB",
+                    "Compress Codec": "none",
+                    "SASL Mechanism": "GSSAPI",
+                    "Topic Name": "agent-nvidia-ai-router",
+                    "Delivery Guarantee": "1",
+                    "Attributes to Send as Headers": null,
+                    "Security CA": null,
+                    "Security Pass Phrase": null,
+                    "Kerberos Principal": null,
+                    "Known Brokers": "my-cluster-kafka-bootstrap.cld-streaming.svc:9092",
+                    "Security Cert": null,
+                    "Kerberos Keytab Path": null,
+                    "Debug contexts": null,
+                    "Password": null,
+                    "Message Timeout": "2 min",
+                    "Queue Max Buffer Size": "1 MB",
+                    "Kerberos Service Name": null,
+                    "Queue Max Message": "1000",
+                    "Security Private Key": null,
+                    "Security Protocol": "plaintext",
+                    "Max Flow Segment Size": "0 B",
+                    "SSL Context Service": null,
+                    "Kafka Key": null,
+                    "Username": null,
+                    "Fail empty flow files": "true",
+                    "Queue Buffering Max Time": "5 millis",
+                    "Batch Size": "10",
+                    "Message Key Field": null
+                },
+                "propertyDescriptors": {
+                    "Max Request Size": {
+                        "name": "Max Request Size",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Client Name": {
+                        "name": "Client Name",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Request Timeout": {
+                        "name": "Request Timeout",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Target Batch Payload Size": {
+                        "name": "Target Batch Payload Size",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Compress Codec": {
+                        "name": "Compress Codec",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "SASL Mechanism": {
+                        "name": "SASL Mechanism",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Topic Name": {
+                        "name": "Topic Name",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Delivery Guarantee": {
+                        "name": "Delivery Guarantee",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Attributes to Send as Headers": {
+                        "name": "Attributes to Send as Headers",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Security CA": {
+                        "name": "Security CA",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Security Pass Phrase": {
+                        "name": "Security Pass Phrase",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": true,
+                        "resourceDefinition": null
+                    },
+                    "Kerberos Principal": {
+                        "name": "Kerberos Principal",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Known Brokers": {
+                        "name": "Known Brokers",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Security Cert": {
+                        "name": "Security Cert",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Kerberos Keytab Path": {
+                        "name": "Kerberos Keytab Path",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Debug contexts": {
+                        "name": "Debug contexts",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Password": {
+                        "name": "Password",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": true,
+                        "resourceDefinition": null
+                    },
+                    "Message Timeout": {
+                        "name": "Message Timeout",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Queue Max Buffer Size": {
+                        "name": "Queue Max Buffer Size",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Kerberos Service Name": {
+                        "name": "Kerberos Service Name",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Queue Max Message": {
+                        "name": "Queue Max Message",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Security Private Key": {
+                        "name": "Security Private Key",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Security Protocol": {
+                        "name": "Security Protocol",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Max Flow Segment Size": {
+                        "name": "Max Flow Segment Size",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "SSL Context Service": {
+                        "name": "SSL Context Service",
+                        "displayName": null,
+                        "identifiesControllerService": true,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Kafka Key": {
+                        "name": "Kafka Key",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Username": {
+                        "name": "Username",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Fail empty flow files": {
+                        "name": "Fail empty flow files",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Queue Buffering Max Time": {
+                        "name": "Queue Buffering Max Time",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Batch Size": {
+                        "name": "Batch Size",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Message Key Field": {
+                        "name": "Message Key Field",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    }
+                },
+                "style": {},
+                "annotationData": null,
+                "schedulingPeriod": "1000 ms",
+                "schedulingStrategy": "TIMER_DRIVEN",
+                "executionNode": "ALL",
+                "penaltyDuration": "30000 ms",
+                "yieldDuration": "1000 ms",
+                "bulletinLevel": "WARN",
+                "runDurationMillis": 2000,
+                "concurrentlySchedulableTaskCount": 8,
+                "autoTerminatedRelationships": [
+                    "success",
+                    "failure"
+                ],
+                "scheduledState": null,
+                "retryCount": null,
+                "retriedRelationships": null,
+                "backoffMechanism": null,
+                "maxBackoffPeriod": null,
+                "componentType": "PROCESSOR",
+                "groupIdentifier": "c1dc2537-f41e-48b9-bd90-53e807a98c28"
+            }
+        ],
+        "inputPorts": [],
+        "outputPorts": [],
+        "connections": [
+            {
+                "identifier": "66c7fdbb-d403-4fbf-902f-a4ccd57e93dd",
+                "instanceIdentifier": "184622af-4a99-4b39-8be7-210a21896f85",
+                "name": "ListenHTTP/success/ExecuteScript",
+                "comments": null,
+                "position": {
+                    "x": 0.0,
+                    "y": 0.0
+                },
+                "source": {
+                    "id": "a05080a1-1bc9-489a-99f5-b60fd0be8935",
+                    "type": "PROCESSOR",
+                    "groupId": "c1dc2537-f41e-48b9-bd90-53e807a98c28",
+                    "name": "ListenHTTP",
+                    "comments": null,
+                    "instanceIdentifier": "9ecbcbd5-3fdd-4ada-9789-ead746118db4"
+                },
+                "destination": {
+                    "id": "6b7eee02-36c1-48f0-8a5c-3ac7b349e2b9",
+                    "type": "PROCESSOR",
+                    "groupId": "c1dc2537-f41e-48b9-bd90-53e807a98c28",
+                    "name": "ExecuteScript",
+                    "comments": null,
+                    "instanceIdentifier": "8cadba7b-4d62-40bf-bd51-5659fc9568ad"
+                },
+                "labelIndex": 1,
+                "zIndex": 0,
+                "selectedRelationships": [
+                    "success"
+                ],
+                "backPressureObjectThreshold": 2000,
+                "backPressureDataSizeThreshold": "100 MB",
+                "flowFileExpiration": "0 seconds",
+                "prioritizers": [],
+                "bends": [],
+                "loadBalanceStrategy": null,
+                "partitioningAttribute": null,
+                "loadBalanceCompression": null,
+                "componentType": "CONNECTION",
+                "groupIdentifier": "c1dc2537-f41e-48b9-bd90-53e807a98c28"
+            },
+            {
+                "identifier": "3d908162-bc70-4aec-853b-b69b419498fd",
+                "instanceIdentifier": "e1824da8-e5b3-43cd-85af-c57cfba1462c",
+                "name": "ExecuteScript/success/PublishKafka",
+                "comments": null,
+                "position": {
+                    "x": 0.0,
+                    "y": 0.0
+                },
+                "source": {
+                    "id": "6b7eee02-36c1-48f0-8a5c-3ac7b349e2b9",
+                    "type": "PROCESSOR",
+                    "groupId": "c1dc2537-f41e-48b9-bd90-53e807a98c28",
+                    "name": "ExecuteScript",
+                    "comments": null,
+                    "instanceIdentifier": "8cadba7b-4d62-40bf-bd51-5659fc9568ad"
+                },
+                "destination": {
+                    "id": "03cae9be-8379-444c-a9f0-138301128ccc",
+                    "type": "PROCESSOR",
+                    "groupId": "c1dc2537-f41e-48b9-bd90-53e807a98c28",
+                    "name": "PublishKafka",
+                    "comments": null,
+                    "instanceIdentifier": "429133c8-7308-4039-87cd-4d853b8b0cfe"
+                },
+                "labelIndex": 1,
+                "zIndex": 0,
+                "selectedRelationships": [
+                    "success"
+                ],
+                "backPressureObjectThreshold": 2000,
+                "backPressureDataSizeThreshold": "100 MB",
+                "flowFileExpiration": "0 seconds",
+                "prioritizers": [],
+                "bends": [],
+                "loadBalanceStrategy": null,
+                "partitioningAttribute": null,
+                "loadBalanceCompression": null,
+                "componentType": "CONNECTION",
+                "groupIdentifier": "c1dc2537-f41e-48b9-bd90-53e807a98c28"
+            },
+            {
+                "identifier": "b83bc8e4-c4df-4a8e-a1f4-9c88bc0deff3",
+                "instanceIdentifier": "c25948be-773a-413e-ba0c-ed4272c5bf8e",
+                "name": "ExecuteScript/failure/PublishKafka",
+                "comments": null,
+                "position": {
+                    "x": 0.0,
+                    "y": 0.0
+                },
+                "source": {
+                    "id": "6b7eee02-36c1-48f0-8a5c-3ac7b349e2b9",
+                    "type": "PROCESSOR",
+                    "groupId": "c1dc2537-f41e-48b9-bd90-53e807a98c28",
+                    "name": "ExecuteScript",
+                    "comments": null,
+                    "instanceIdentifier": "8cadba7b-4d62-40bf-bd51-5659fc9568ad"
+                },
+                "destination": {
+                    "id": "03cae9be-8379-444c-a9f0-138301128ccc",
+                    "type": "PROCESSOR",
+                    "groupId": "c1dc2537-f41e-48b9-bd90-53e807a98c28",
+                    "name": "PublishKafka",
+                    "comments": null,
+                    "instanceIdentifier": "429133c8-7308-4039-87cd-4d853b8b0cfe"
+                },
+                "labelIndex": 1,
+                "zIndex": 0,
+                "selectedRelationships": [
+                    "failure"
+                ],
+                "backPressureObjectThreshold": 2000,
+                "backPressureDataSizeThreshold": "100 MB",
+                "flowFileExpiration": "0 seconds",
+                "prioritizers": [],
+                "bends": [],
+                "loadBalanceStrategy": null,
+                "partitioningAttribute": null,
+                "loadBalanceCompression": null,
+                "componentType": "CONNECTION",
+                "groupIdentifier": "c1dc2537-f41e-48b9-bd90-53e807a98c28"
+            }
+        ],
+        "labels": [],
+        "funnels": [],
+        "controllerServices": [],
+        "versionedFlowCoordinates": null,
+        "variables": {},
+        "parameterContextName": "f44faeb8-e31a-4fa1-8fa6-09e9e979ec58",
+        "defaultFlowFileExpiration": null,
+        "defaultBackPressureObjectThreshold": null,
+        "defaultBackPressureDataSizeThreshold": null,
+        "logFileSuffix": null,
+        "flowFileConcurrency": null,
+        "flowFileOutboundPolicy": null,
+        "componentType": "PROCESS_GROUP",
+        "groupIdentifier": null
+    },
+    "parameterContexts": [
+        {
+            "id": "f44faeb8-e31a-4fa1-8fa6-09e9e979ec58",
+            "name": "f44faeb8-e31a-4fa1-8fa6-09e9e979ec58",
+            "parameters": [],
+            "usage": null
+        }
+    ],
+    "versionInfo": {
+        "flowVersion": 1,
+        "lastPublished": 1785522882365,
+        "lastPublishedBy": "anonymous",
+        "dirty": false,
+        "localChanges": false
+    },
+    "localFlowRevision": 1
+}

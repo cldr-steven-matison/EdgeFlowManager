@@ -1,0 +1,11 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata: {name: minifi-s2s, namespace: cld-streaming}
+spec:
+  secretName: minifi-s2s-cert
+  duration: 8760h
+  isCA: false
+  usages: [client auth, digital signature, key encipherment]
+  commonName: minifi-s2s
+  dnsNames: [minifi-s2s]
+  issuerRef: {name: cfm-operator-ca-issuer-signed, kind: ClusterIssuer, group: cert-manager.io}

@@ -1,0 +1,19 @@
+# Live keys captured from minifi-agent-k8s-pytest (agentClass KubernetesPodPyTest,
+# agentIdentifier b9a52853-b058-44c6-b216-3940235042e9), issue #10, x86_64 C++ leg,
+# 2026-07-29. nifi.python.processor.dir was changed from its default
+# (${MINIFI_HOME}/minifi-python/) to ${MINIFI_HOME}/asset for the crux test -- that's
+# the one deliberate override; everything else is the deployer's stock config.
+
+nifi.c2.enable=true
+nifi.c2.rest.path.base=http://efm.cld-streaming.svc:10090/efm/api
+nifi.c2.rest.url=http://efm.cld-streaming.svc:10090/efm/api/c2-protocol/heartbeat
+nifi.c2.rest.url.ack=http://efm.cld-streaming.svc:10090/efm/api/c2-protocol/acknowledge
+nifi.c2.root.classes=DeviceInfoNode,AgentInformation,FlowInformation,AssetInformation
+nifi.c2.agent.class=KubernetesPodPyTest
+nifi.c2.agent.identifier=b9a52853-b058-44c6-b216-3940235042e9
+nifi.asset.directory=${MINIFI_HOME}/asset
+nifi.python.processor.dir=${MINIFI_HOME}/asset
+nifi.python.virtualenv.directory=${MINIFI_HOME}/minifi-python-env
+nifi.python.install.packages.automatically=true
+nifi.c2.rest.path.acknowledge=/c2-protocol/acknowledge
+nifi.c2.rest.path.heartbeat=/c2-protocol/heartbeat

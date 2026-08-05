@@ -1,0 +1,20 @@
+# Live keys captured from WindowsDesktopCppPyTest (agent 5ba72ca1-8eec-4f52-ba05-d81730006ef5,
+# process-mode agent at C:\minifi-pytest\nifi-minifi-cpp, real Windows MSI 1.26.02 build),
+# issue #4 item 2, 2026-07-29. nifi.python.processor.dir changed from its default
+# (${MINIFI_HOME}/minifi-python/) to ${MINIFI_HOME}/asset for the crux test -- identical override
+# to the k8s x86_64 leg (issue #10).
+nifi.c2.enable=true
+nifi.c2.root.classes=DeviceInfoNode,AgentInformation,FlowInformation,AssetInformation
+nifi.c2.full.heartbeat=false
+nifi.asset.directory=${MINIFI_HOME}/asset
+nifi.python.processor.dir=${MINIFI_HOME}/asset
+nifi.python.virtualenv.directory=${MINIFI_HOME}/minifi-python-env
+nifi.python.install.packages.automatically=true
+nifi.c2.agent.class=WindowsDesktopCppPyTest
+nifi.c2.agent.identifier=5ba72ca1-8eec-4f52-ba05-d81730006ef5
+nifi.c2.agent.heartbeat.period=5000
+nifi.c2.rest.path.base=http://127.0.0.1:10090/efm/api
+nifi.c2.rest.url=http://127.0.0.1:10090/efm/api/c2-protocol/heartbeat
+nifi.c2.rest.url.ack=http://127.0.0.1:10090/efm/api/c2-protocol/acknowledge
+nifi.c2.rest.path.heartbeat=/c2-protocol/heartbeat
+nifi.c2.rest.path.acknowledge=/c2-protocol/acknowledge

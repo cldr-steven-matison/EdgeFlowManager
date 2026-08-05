@@ -1,0 +1,53 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: minifi-java-agent
+  namespace: cld-streaming
+  labels: {app: minifi-java-agent}
+spec:
+  containers:
+  - name: minifi
+    image: ubuntu:22.04
+    imagePullPolicy: IfNotPresent
+    command: ["/bin/bash","-c"]
+    args:
+    - |
+      set -e
+      export DEBIAN_FRONTEND=noninteractive
+      apt-get update && apt-get install -y curl tar sudo passwd openjdk-21-jre-headless
+      AID=$(cat /proc/sys/kernel/random/uuid)
+      echo "agentIdentifier=$AID"
+      curl -sL \
+       -d agentClass=MinikubeMacJava -d agentIdentifier=$AID -d agentType=java \
+       -d agentVersion=2.24.08.0-19 -d autoConfigureSecurity=false \
+       -d baseUrl=http%3A%2F%2Fefm.cld-streaming.svc%3A10090%2Fefm%2Fapi \
+       -d hbPeriod=5000 -d osArch=linux -d serviceName=minifi -d serviceUser=minifi \
+       -d trustSelfSignedCertificates=false \
+       http://efm.cld-streaming.svc:10090/efm/api/agent-deployer/script | bash -
+      MHOME=$(ls -d /minifi-2.24.08.0-19)
+      echo "=== stopping minifi to inject S2S SSL props ==="
+      sudo -u minifi $MHOME/bin/minifi.sh stop || true
+      sleep 4
+      sed -i \
+        -e 's#^nifi.security.keystore=.*#nifi.security.keystore=/certs-ks/keystore.p12#' \
+        -e 's#^nifi.security.keystoreType=.*#nifi.security.keystoreType=PKCS12#' \
+        -e 's#^nifi.security.keystorePasswd=.*#nifi.security.keystorePasswd=changeit#' \
+        -e 's#^nifi.security.keyPasswd=.*#nifi.security.keyPasswd=changeit#' \
+        -e 's#^nifi.security.truststore=.*#nifi.security.truststore=/certs-ks/truststore.p12#' \
+        -e 's#^nifi.security.truststoreType=.*#nifi.security.truststoreType=PKCS12#' \
+        -e 's#^nifi.security.truststorePasswd=.*#nifi.security.truststorePasswd=changeit#' \
+        -e 's#^nifi.minifi.flow.use.parent.ssl=.*#nifi.minifi.flow.use.parent.ssl=true#' \
+        $MHOME/conf/minifi.properties
+      echo "=== injected security props: ==="
+      grep -E "nifi.security.(keystore|truststore)=|use.parent.ssl" $MHOME/conf/minifi.properties
+      echo "=== restarting minifi ==="
+      sudo -u minifi $MHOME/bin/minifi.sh start
+      sleep 5
+      echo "=== minifi restarted with S2S SSL; tailing ==="
+      tail -f /dev/null
+    volumeMounts:
+    - {name: s2s-cert, mountPath: /certs}
+    - {name: s2s-ks, mountPath: /certs-ks}
+  volumes:
+  - {name: s2s-cert, secret: {secretName: minifi-s2s-cert}}
+  - {name: s2s-ks, secret: {secretName: minifi-s2s-keystore}}

@@ -1,0 +1,412 @@
+{
+    "flowMetadata": {
+        "identifier": "551bf5a9-6a1f-44cf-98b0-2c60c34d4e5b",
+        "agentClass": "NvidiaNanoPyTest",
+        "rootProcessGroupIdentifier": "1928b790-082e-49f3-98dd-d2251b99c1be",
+        "created": 1785595975526,
+        "updated": 1785597146376,
+        "undoEnabled": false,
+        "redoEnabled": false
+    },
+    "flowContent": {
+        "identifier": "1928b790-082e-49f3-98dd-d2251b99c1be",
+        "instanceIdentifier": "bb55e6ec-e372-4a71-b004-4137f157a1af",
+        "name": "root",
+        "comments": null,
+        "position": {
+            "x": 0.0,
+            "y": 0.0
+        },
+        "processGroups": [],
+        "remoteProcessGroups": [],
+        "processors": [
+            {
+                "identifier": "28b88510-2822-49bd-a305-c350cb21d734",
+                "instanceIdentifier": "bd6d4bae-d120-402c-8986-a770f6e3ce7d",
+                "name": "EdgeTagger",
+                "comments": "",
+                "position": {
+                    "x": 400.0,
+                    "y": 0.0
+                },
+                "type": "org.apache.nifi.minifi.processors.EdgeTagger",
+                "bundle": {
+                    "group": "org.apache.nifi.minifi",
+                    "artifact": "EdgeTagger.py",
+                    "version": "1.26.02"
+                },
+                "properties": {
+                    "Tag Value": "jetson-aarch64-realHW-field-test"
+                },
+                "propertyDescriptors": {
+                    "Tag Value": {
+                        "name": "Tag Value",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    }
+                },
+                "style": {},
+                "annotationData": null,
+                "schedulingPeriod": "1000 ms",
+                "schedulingStrategy": "TIMER_DRIVEN",
+                "executionNode": "ALL",
+                "penaltyDuration": "30000 ms",
+                "yieldDuration": "1000 ms",
+                "bulletinLevel": "WARN",
+                "runDurationMillis": 0,
+                "concurrentlySchedulableTaskCount": 1,
+                "autoTerminatedRelationships": [
+                    "original",
+                    "failure"
+                ],
+                "scheduledState": null,
+                "retryCount": null,
+                "retriedRelationships": null,
+                "backoffMechanism": null,
+                "maxBackoffPeriod": null,
+                "componentType": "PROCESSOR",
+                "groupIdentifier": "1928b790-082e-49f3-98dd-d2251b99c1be"
+            },
+            {
+                "identifier": "fe7b4bd1-10a0-43e3-bce2-5d744f3f5e6c",
+                "instanceIdentifier": "b5de9505-115c-4f7b-811c-91887a3cf90c",
+                "name": "LogAttribute-EdgeTaggerTest",
+                "comments": "",
+                "position": {
+                    "x": 800.0,
+                    "y": 0.0
+                },
+                "type": "org.apache.nifi.minifi.processors.LogAttribute",
+                "bundle": {
+                    "group": "org.apache.nifi.minifi",
+                    "artifact": "minifi-standard-processors",
+                    "version": "1.26.02"
+                },
+                "properties": {
+                    "FlowFiles To Log": "1",
+                    "Log Level": null,
+                    "Attributes to Ignore": null,
+                    "Attributes to Log": null,
+                    "Log Payload": "true",
+                    "Log Prefix": null,
+                    "Hexencode Payload": "false",
+                    "Maximum Payload Line Length": "0"
+                },
+                "propertyDescriptors": {
+                    "FlowFiles To Log": {
+                        "name": "FlowFiles To Log",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Log Level": {
+                        "name": "Log Level",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Attributes to Ignore": {
+                        "name": "Attributes to Ignore",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Attributes to Log": {
+                        "name": "Attributes to Log",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Log Payload": {
+                        "name": "Log Payload",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Log Prefix": {
+                        "name": "Log Prefix",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Hexencode Payload": {
+                        "name": "Hexencode Payload",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Maximum Payload Line Length": {
+                        "name": "Maximum Payload Line Length",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    }
+                },
+                "style": {},
+                "annotationData": null,
+                "schedulingPeriod": "1000 ms",
+                "schedulingStrategy": "TIMER_DRIVEN",
+                "executionNode": "ALL",
+                "penaltyDuration": "30000 ms",
+                "yieldDuration": "1000 ms",
+                "bulletinLevel": "WARN",
+                "runDurationMillis": 0,
+                "concurrentlySchedulableTaskCount": 1,
+                "autoTerminatedRelationships": [
+                    "success"
+                ],
+                "scheduledState": null,
+                "retryCount": null,
+                "retriedRelationships": null,
+                "backoffMechanism": null,
+                "maxBackoffPeriod": null,
+                "componentType": "PROCESSOR",
+                "groupIdentifier": "1928b790-082e-49f3-98dd-d2251b99c1be"
+            },
+            {
+                "identifier": "a3ef5898-601e-4cd5-878b-147340b24c9e",
+                "instanceIdentifier": "c12a6067-94ce-4111-862f-0658bbd113fb",
+                "name": "ListenHTTP-EdgeTaggerTest",
+                "comments": "",
+                "position": {
+                    "x": 0.0,
+                    "y": 0.0
+                },
+                "type": "org.apache.nifi.minifi.processors.ListenHTTP",
+                "bundle": {
+                    "group": "org.apache.nifi.minifi",
+                    "artifact": "minifi-civet-extensions",
+                    "version": "1.26.02"
+                },
+                "properties": {
+                    "Base Path": "edgetagger-test",
+                    "SSL Verify Peer": "no",
+                    "Batch Size": "5",
+                    "SSL Minimum Version": "TLS1.2",
+                    "Buffer Size": "5",
+                    "Listening Port": "9095",
+                    "SSL Certificate": null,
+                    "HTTP Headers to receive as Attributes (Regex)": null,
+                    "Authorized DN Pattern": ".*",
+                    "SSL Certificate Authority": null
+                },
+                "propertyDescriptors": {
+                    "Base Path": {
+                        "name": "Base Path",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "SSL Verify Peer": {
+                        "name": "SSL Verify Peer",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Batch Size": {
+                        "name": "Batch Size",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "SSL Minimum Version": {
+                        "name": "SSL Minimum Version",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Buffer Size": {
+                        "name": "Buffer Size",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Listening Port": {
+                        "name": "Listening Port",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "SSL Certificate": {
+                        "name": "SSL Certificate",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "HTTP Headers to receive as Attributes (Regex)": {
+                        "name": "HTTP Headers to receive as Attributes (Regex)",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Authorized DN Pattern": {
+                        "name": "Authorized DN Pattern",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "SSL Certificate Authority": {
+                        "name": "SSL Certificate Authority",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    }
+                },
+                "style": {},
+                "annotationData": null,
+                "schedulingPeriod": "1000 ms",
+                "schedulingStrategy": "TIMER_DRIVEN",
+                "executionNode": "ALL",
+                "penaltyDuration": "30000 ms",
+                "yieldDuration": "1000 ms",
+                "bulletinLevel": "WARN",
+                "runDurationMillis": 0,
+                "concurrentlySchedulableTaskCount": 1,
+                "autoTerminatedRelationships": [],
+                "scheduledState": null,
+                "retryCount": null,
+                "retriedRelationships": null,
+                "backoffMechanism": null,
+                "maxBackoffPeriod": null,
+                "componentType": "PROCESSOR",
+                "groupIdentifier": "1928b790-082e-49f3-98dd-d2251b99c1be"
+            }
+        ],
+        "inputPorts": [],
+        "outputPorts": [],
+        "connections": [
+            {
+                "identifier": "d8ed4625-bd0d-4014-ae79-200ed1d47abe",
+                "instanceIdentifier": "6fdd22bf-026e-4ca9-9221-2e26449d19e8",
+                "name": "EdgeTagger/success/LogAttribute-EdgeTaggerTest",
+                "comments": null,
+                "position": {
+                    "x": 0.0,
+                    "y": 0.0
+                },
+                "source": {
+                    "id": "28b88510-2822-49bd-a305-c350cb21d734",
+                    "type": "PROCESSOR",
+                    "groupId": "1928b790-082e-49f3-98dd-d2251b99c1be",
+                    "name": "EdgeTagger",
+                    "comments": null,
+                    "instanceIdentifier": "bd6d4bae-d120-402c-8986-a770f6e3ce7d"
+                },
+                "destination": {
+                    "id": "fe7b4bd1-10a0-43e3-bce2-5d744f3f5e6c",
+                    "type": "PROCESSOR",
+                    "groupId": "1928b790-082e-49f3-98dd-d2251b99c1be",
+                    "name": "LogAttribute-EdgeTaggerTest",
+                    "comments": null,
+                    "instanceIdentifier": "b5de9505-115c-4f7b-811c-91887a3cf90c"
+                },
+                "labelIndex": 1,
+                "zIndex": 0,
+                "selectedRelationships": [
+                    "success"
+                ],
+                "backPressureObjectThreshold": 2000,
+                "backPressureDataSizeThreshold": "100 MB",
+                "flowFileExpiration": "0 seconds",
+                "prioritizers": [],
+                "bends": [],
+                "loadBalanceStrategy": null,
+                "partitioningAttribute": null,
+                "loadBalanceCompression": null,
+                "componentType": "CONNECTION",
+                "groupIdentifier": "1928b790-082e-49f3-98dd-d2251b99c1be"
+            },
+            {
+                "identifier": "9d158e31-396c-4a52-87e1-615cfdfd62d4",
+                "instanceIdentifier": "dba0abaf-f501-42d3-a877-981ae3a4caf1",
+                "name": "ListenHTTP-EdgeTaggerTest/success/EdgeTagger",
+                "comments": null,
+                "position": {
+                    "x": 0.0,
+                    "y": 0.0
+                },
+                "source": {
+                    "id": "a3ef5898-601e-4cd5-878b-147340b24c9e",
+                    "type": "PROCESSOR",
+                    "groupId": "1928b790-082e-49f3-98dd-d2251b99c1be",
+                    "name": "ListenHTTP-EdgeTaggerTest",
+                    "comments": null,
+                    "instanceIdentifier": "c12a6067-94ce-4111-862f-0658bbd113fb"
+                },
+                "destination": {
+                    "id": "28b88510-2822-49bd-a305-c350cb21d734",
+                    "type": "PROCESSOR",
+                    "groupId": "1928b790-082e-49f3-98dd-d2251b99c1be",
+                    "name": "EdgeTagger",
+                    "comments": null,
+                    "instanceIdentifier": "bd6d4bae-d120-402c-8986-a770f6e3ce7d"
+                },
+                "labelIndex": 1,
+                "zIndex": 0,
+                "selectedRelationships": [
+                    "success"
+                ],
+                "backPressureObjectThreshold": 2000,
+                "backPressureDataSizeThreshold": "100 MB",
+                "flowFileExpiration": "0 seconds",
+                "prioritizers": [],
+                "bends": [],
+                "loadBalanceStrategy": null,
+                "partitioningAttribute": null,
+                "loadBalanceCompression": null,
+                "componentType": "CONNECTION",
+                "groupIdentifier": "1928b790-082e-49f3-98dd-d2251b99c1be"
+            }
+        ],
+        "labels": [],
+        "funnels": [],
+        "controllerServices": [],
+        "versionedFlowCoordinates": null,
+        "variables": {},
+        "parameterContextName": "7008e047-39ba-4ed7-b3c9-6bc2d9e3ef84",
+        "defaultFlowFileExpiration": null,
+        "defaultBackPressureObjectThreshold": null,
+        "defaultBackPressureDataSizeThreshold": null,
+        "logFileSuffix": null,
+        "flowFileConcurrency": null,
+        "flowFileOutboundPolicy": null,
+        "componentType": "PROCESS_GROUP",
+        "groupIdentifier": null
+    },
+    "parameterContexts": [
+        {
+            "id": "7008e047-39ba-4ed7-b3c9-6bc2d9e3ef84",
+            "name": "7008e047-39ba-4ed7-b3c9-6bc2d9e3ef84",
+            "parameters": [],
+            "usage": null
+        }
+    ],
+    "versionInfo": {
+        "flowVersion": 1,
+        "lastPublished": 1785597146210,
+        "lastPublishedBy": "anonymous",
+        "dirty": false,
+        "localChanges": false
+    },
+    "localFlowRevision": 11
+}

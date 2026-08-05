@@ -1,0 +1,48 @@
+{
+  "group": null,
+  "artifact": null,
+  "version": null,
+  "type": "org.apache.nifi.minifi.processors.EdgeTagger",
+  "typeDescription": "Stamps every FlowFile with a fixed 'edge.tag' attribute. Field-validation processor delivered via EFM Resources (asset directory).",
+  "buildInfo": null,
+  "providedApiImplementations": null,
+  "tags": null,
+  "deprecated": null,
+  "deprecationReason": null,
+  "propertyDescriptors": {
+    "Tag Value": {
+      "name": "Tag Value",
+      "displayName": null,
+      "description": "Value written to the edge.tag attribute on each FlowFile",
+      "allowableValues": null,
+      "defaultValue": "efm-resource-arm64",
+      "required": false,
+      "sensitive": false,
+      "expressionLanguageScope": "NONE",
+      "expressionLanguageScopeDescription": "Not Supported",
+      "typeProvidedByValue": null,
+      "validRegex": null,
+      "validator": "VALID",
+      "dynamic": false,
+      "dependencies": null
+    }
+  },
+  "supportsDynamicProperties": false,
+  "supportsEventDriven": false,
+  "inputRequirement": "INPUT_ALLOWED",
+  "supportedRelationships": [
+    {
+      "name": "success",
+      "description": "Script succeeds"
+    },
+    {
+      "name": "failure",
+      "description": "Script fails"
+    },
+    {
+      "name": "original",
+      "description": "Original flow file"
+    }
+  ],
+  "supportsDynamicRelationships": false
+}

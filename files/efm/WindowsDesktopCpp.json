@@ -1,0 +1,1543 @@
+{
+    "flowMetadata": {
+        "identifier": "e6e73d8e-83e2-4aa5-9f48-770eed4bf1cd",
+        "agentClass": "WindowsDesktopCpp",
+        "rootProcessGroupIdentifier": "df6b12fa-3efc-4d4c-929a-93f8d03c6fec",
+        "created": 1785163520089,
+        "updated": 1785538225722,
+        "undoEnabled": false,
+        "redoEnabled": false
+    },
+    "flowContent": {
+        "identifier": "df6b12fa-3efc-4d4c-929a-93f8d03c6fec",
+        "instanceIdentifier": "1a09a3ae-c044-4a0d-9848-f3dbf48f1d09",
+        "name": "root",
+        "comments": null,
+        "position": {
+            "x": 0.0,
+            "y": 0.0
+        },
+        "processGroups": [],
+        "remoteProcessGroups": [],
+        "processors": [
+            {
+                "identifier": "8b9851fd-4a7e-402f-95d4-2e8d3a38f223",
+                "instanceIdentifier": "c76a33df-99dc-4e43-866e-76344fe33968",
+                "name": "ListenHTTP-Smoke",
+                "comments": "",
+                "position": {
+                    "x": 0.0,
+                    "y": 0.0
+                },
+                "type": "org.apache.nifi.minifi.processors.ListenHTTP",
+                "bundle": {
+                    "group": "org.apache.nifi.minifi",
+                    "artifact": "minifi-civet-extensions",
+                    "version": "1.26.02"
+                },
+                "properties": {
+                    "Base Path": "contentListener",
+                    "SSL Verify Peer": "no",
+                    "Batch Size": "1",
+                    "SSL Minimum Version": "TLS1.2",
+                    "Buffer Size": "1",
+                    "Listening Port": "18080",
+                    "SSL Certificate": null,
+                    "HTTP Headers to receive as Attributes (Regex)": null,
+                    "Authorized DN Pattern": ".*",
+                    "SSL Certificate Authority": null
+                },
+                "propertyDescriptors": {
+                    "Base Path": {
+                        "name": "Base Path",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "SSL Verify Peer": {
+                        "name": "SSL Verify Peer",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Batch Size": {
+                        "name": "Batch Size",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "SSL Minimum Version": {
+                        "name": "SSL Minimum Version",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Buffer Size": {
+                        "name": "Buffer Size",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Listening Port": {
+                        "name": "Listening Port",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "SSL Certificate": {
+                        "name": "SSL Certificate",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "HTTP Headers to receive as Attributes (Regex)": {
+                        "name": "HTTP Headers to receive as Attributes (Regex)",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Authorized DN Pattern": {
+                        "name": "Authorized DN Pattern",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "SSL Certificate Authority": {
+                        "name": "SSL Certificate Authority",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    }
+                },
+                "style": {},
+                "annotationData": null,
+                "schedulingPeriod": "1000 ms",
+                "schedulingStrategy": "TIMER_DRIVEN",
+                "executionNode": "ALL",
+                "penaltyDuration": "30000 ms",
+                "yieldDuration": "1000 ms",
+                "bulletinLevel": "WARN",
+                "runDurationMillis": 0,
+                "concurrentlySchedulableTaskCount": 1,
+                "autoTerminatedRelationships": [],
+                "scheduledState": null,
+                "retryCount": null,
+                "retriedRelationships": null,
+                "backoffMechanism": null,
+                "maxBackoffPeriod": null,
+                "componentType": "PROCESSOR",
+                "groupIdentifier": "df6b12fa-3efc-4d4c-929a-93f8d03c6fec"
+            },
+            {
+                "identifier": "97136837-c2f7-4e69-99b8-e4bf78ff7367",
+                "instanceIdentifier": "b931a048-110d-4f03-904e-04339a7015a9",
+                "name": "ListenHTTP-LoadWindows",
+                "comments": "",
+                "position": {
+                    "x": 715.0,
+                    "y": 0.0
+                },
+                "type": "org.apache.nifi.minifi.processors.ListenHTTP",
+                "bundle": {
+                    "group": "org.apache.nifi.minifi",
+                    "artifact": "minifi-civet-extensions",
+                    "version": "1.26.02"
+                },
+                "properties": {
+                    "Base Path": "loadWindows",
+                    "SSL Verify Peer": "no",
+                    "Batch Size": "1",
+                    "SSL Minimum Version": "TLS1.2",
+                    "Buffer Size": "1",
+                    "Listening Port": "18081",
+                    "SSL Certificate": null,
+                    "HTTP Headers to receive as Attributes (Regex)": null,
+                    "Authorized DN Pattern": ".*",
+                    "SSL Certificate Authority": null
+                },
+                "propertyDescriptors": {
+                    "Base Path": {
+                        "name": "Base Path",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "SSL Verify Peer": {
+                        "name": "SSL Verify Peer",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Batch Size": {
+                        "name": "Batch Size",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "SSL Minimum Version": {
+                        "name": "SSL Minimum Version",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Buffer Size": {
+                        "name": "Buffer Size",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Listening Port": {
+                        "name": "Listening Port",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "SSL Certificate": {
+                        "name": "SSL Certificate",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "HTTP Headers to receive as Attributes (Regex)": {
+                        "name": "HTTP Headers to receive as Attributes (Regex)",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Authorized DN Pattern": {
+                        "name": "Authorized DN Pattern",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "SSL Certificate Authority": {
+                        "name": "SSL Certificate Authority",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    }
+                },
+                "style": {},
+                "annotationData": null,
+                "schedulingPeriod": "1000 ms",
+                "schedulingStrategy": "TIMER_DRIVEN",
+                "executionNode": "ALL",
+                "penaltyDuration": "30000 ms",
+                "yieldDuration": "1000 ms",
+                "bulletinLevel": "WARN",
+                "runDurationMillis": 0,
+                "concurrentlySchedulableTaskCount": 1,
+                "autoTerminatedRelationships": [],
+                "scheduledState": null,
+                "retryCount": null,
+                "retriedRelationships": null,
+                "backoffMechanism": null,
+                "maxBackoffPeriod": null,
+                "componentType": "PROCESSOR",
+                "groupIdentifier": "df6b12fa-3efc-4d4c-929a-93f8d03c6fec"
+            },
+            {
+                "identifier": "c017f3ab-361c-4f87-b188-857b6963bb6a",
+                "instanceIdentifier": "bcd5b95a-8feb-4afa-9b7e-f7ec377ba6fa",
+                "name": "ListenHTTP-EdgeTagger",
+                "comments": "",
+                "position": {
+                    "x": 2145.0,
+                    "y": 0.0
+                },
+                "type": "org.apache.nifi.minifi.processors.ListenHTTP",
+                "bundle": {
+                    "group": "org.apache.nifi.minifi",
+                    "artifact": "minifi-civet-extensions",
+                    "version": "1.26.02"
+                },
+                "properties": {
+                    "Base Path": "edgeTagger",
+                    "SSL Verify Peer": "no",
+                    "Batch Size": "1",
+                    "SSL Minimum Version": "TLS1.2",
+                    "Buffer Size": "1",
+                    "Listening Port": "18083",
+                    "SSL Certificate": null,
+                    "HTTP Headers to receive as Attributes (Regex)": null,
+                    "Authorized DN Pattern": ".*",
+                    "SSL Certificate Authority": null
+                },
+                "propertyDescriptors": {
+                    "Base Path": {
+                        "name": "Base Path",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "SSL Verify Peer": {
+                        "name": "SSL Verify Peer",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Batch Size": {
+                        "name": "Batch Size",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "SSL Minimum Version": {
+                        "name": "SSL Minimum Version",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Buffer Size": {
+                        "name": "Buffer Size",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Listening Port": {
+                        "name": "Listening Port",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "SSL Certificate": {
+                        "name": "SSL Certificate",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "HTTP Headers to receive as Attributes (Regex)": {
+                        "name": "HTTP Headers to receive as Attributes (Regex)",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Authorized DN Pattern": {
+                        "name": "Authorized DN Pattern",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "SSL Certificate Authority": {
+                        "name": "SSL Certificate Authority",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    }
+                },
+                "style": {},
+                "annotationData": null,
+                "schedulingPeriod": "1000 ms",
+                "schedulingStrategy": "TIMER_DRIVEN",
+                "executionNode": "ALL",
+                "penaltyDuration": "30000 ms",
+                "yieldDuration": "1000 ms",
+                "bulletinLevel": "WARN",
+                "runDurationMillis": 0,
+                "concurrentlySchedulableTaskCount": 1,
+                "autoTerminatedRelationships": [],
+                "scheduledState": null,
+                "retryCount": null,
+                "retriedRelationships": null,
+                "backoffMechanism": null,
+                "maxBackoffPeriod": null,
+                "componentType": "PROCESSOR",
+                "groupIdentifier": "df6b12fa-3efc-4d4c-929a-93f8d03c6fec"
+            },
+            {
+                "identifier": "34cc3f9a-0603-48e0-9b2d-f3942dd52b12",
+                "instanceIdentifier": "5a953bbc-e6dd-4bb8-b77e-f377cfc8772c",
+                "name": "LogAttribute-EdgeTagger",
+                "comments": "",
+                "position": {
+                    "x": 2145.0,
+                    "y": 600.0
+                },
+                "type": "org.apache.nifi.minifi.processors.LogAttribute",
+                "bundle": {
+                    "group": "org.apache.nifi.minifi",
+                    "artifact": "minifi-standard-processors",
+                    "version": "1.26.02"
+                },
+                "properties": {
+                    "FlowFiles To Log": "0",
+                    "Log Level": "info",
+                    "Attributes to Ignore": null,
+                    "Attributes to Log": null,
+                    "Log Payload": "true",
+                    "Log Prefix": null,
+                    "Hexencode Payload": "false",
+                    "Maximum Payload Line Length": "0"
+                },
+                "propertyDescriptors": {
+                    "FlowFiles To Log": {
+                        "name": "FlowFiles To Log",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Log Level": {
+                        "name": "Log Level",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Attributes to Ignore": {
+                        "name": "Attributes to Ignore",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Attributes to Log": {
+                        "name": "Attributes to Log",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Log Payload": {
+                        "name": "Log Payload",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Log Prefix": {
+                        "name": "Log Prefix",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Hexencode Payload": {
+                        "name": "Hexencode Payload",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Maximum Payload Line Length": {
+                        "name": "Maximum Payload Line Length",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    }
+                },
+                "style": {},
+                "annotationData": null,
+                "schedulingPeriod": "1000 ms",
+                "schedulingStrategy": "TIMER_DRIVEN",
+                "executionNode": "ALL",
+                "penaltyDuration": "30000 ms",
+                "yieldDuration": "1000 ms",
+                "bulletinLevel": "WARN",
+                "runDurationMillis": 0,
+                "concurrentlySchedulableTaskCount": 1,
+                "autoTerminatedRelationships": [
+                    "success"
+                ],
+                "scheduledState": null,
+                "retryCount": null,
+                "retriedRelationships": null,
+                "backoffMechanism": null,
+                "maxBackoffPeriod": null,
+                "componentType": "PROCESSOR",
+                "groupIdentifier": "df6b12fa-3efc-4d4c-929a-93f8d03c6fec"
+            },
+            {
+                "identifier": "6a90a798-d790-4f60-898f-b2a7d6cdd0f5",
+                "instanceIdentifier": "52e6a3cd-a0ef-443f-8b29-e3cac44da0cd",
+                "name": "ListenHTTP-MatrixWindows",
+                "comments": "",
+                "position": {
+                    "x": 1430.0,
+                    "y": 0.0
+                },
+                "type": "org.apache.nifi.minifi.processors.ListenHTTP",
+                "bundle": {
+                    "group": "org.apache.nifi.minifi",
+                    "artifact": "minifi-civet-extensions",
+                    "version": "1.26.02"
+                },
+                "properties": {
+                    "Base Path": "matrixWindows",
+                    "SSL Verify Peer": "no",
+                    "Batch Size": "1",
+                    "SSL Minimum Version": "TLS1.2",
+                    "Buffer Size": "1",
+                    "Listening Port": "18082",
+                    "SSL Certificate": null,
+                    "HTTP Headers to receive as Attributes (Regex)": null,
+                    "Authorized DN Pattern": ".*",
+                    "SSL Certificate Authority": null
+                },
+                "propertyDescriptors": {
+                    "Base Path": {
+                        "name": "Base Path",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "SSL Verify Peer": {
+                        "name": "SSL Verify Peer",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Batch Size": {
+                        "name": "Batch Size",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "SSL Minimum Version": {
+                        "name": "SSL Minimum Version",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Buffer Size": {
+                        "name": "Buffer Size",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Listening Port": {
+                        "name": "Listening Port",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "SSL Certificate": {
+                        "name": "SSL Certificate",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "HTTP Headers to receive as Attributes (Regex)": {
+                        "name": "HTTP Headers to receive as Attributes (Regex)",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Authorized DN Pattern": {
+                        "name": "Authorized DN Pattern",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "SSL Certificate Authority": {
+                        "name": "SSL Certificate Authority",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    }
+                },
+                "style": {},
+                "annotationData": null,
+                "schedulingPeriod": "1000 ms",
+                "schedulingStrategy": "TIMER_DRIVEN",
+                "executionNode": "ALL",
+                "penaltyDuration": "30000 ms",
+                "yieldDuration": "1000 ms",
+                "bulletinLevel": "WARN",
+                "runDurationMillis": 0,
+                "concurrentlySchedulableTaskCount": 1,
+                "autoTerminatedRelationships": [],
+                "scheduledState": null,
+                "retryCount": null,
+                "retriedRelationships": null,
+                "backoffMechanism": null,
+                "maxBackoffPeriod": null,
+                "componentType": "PROCESSOR",
+                "groupIdentifier": "df6b12fa-3efc-4d4c-929a-93f8d03c6fec"
+            },
+            {
+                "identifier": "91d14764-0e1e-43d8-8531-51d54eac0b91",
+                "instanceIdentifier": "ffcec41c-519b-464b-b55f-b101db462694",
+                "name": "ExecuteScript-MatrixWindows",
+                "comments": "",
+                "position": {
+                    "x": 1430.0,
+                    "y": 300.0
+                },
+                "type": "org.apache.nifi.minifi.processors.ExecuteScript",
+                "bundle": {
+                    "group": "org.apache.nifi.minifi",
+                    "artifact": "minifi-script-extension",
+                    "version": "1.26.02"
+                },
+                "properties": {
+                    "Script File": null,
+                    "Script Engine": "python",
+                    "Script Body": "# windesktop-launch_matrix.py\n#\n# ExecuteScript (Script Engine: python) Script Body for the WindowsDesktopCpp agent class's\n# !matrix flow \u2014 issue #4 companion to windesktop-launch_stream.py. Adapted from\n# agent-NvidiaNano-launch_matrix.py (kill-relaunch + local file:// HTML + forced fullscreen),\n# ported to Windows chrome.exe + windesktop-reposition_chrome.ps1 instead of chromium/wmctrl.\n#\n# Fixed action, no payload needed (matches agent-NvidiaNano-launch_matrix.py / gaming-pc's\n# matrix flow \u2014 \"on\" is the only mode). Loads windesktop-matrix-screensaver.html via a\n# file:// URL. Same profile dir and target monitor as windesktop-launch_stream.py so the two\n# share window-kill scoping and never collide with each other or with screen2.\n#\n# Paste this whole file's onTrigger function as the ExecuteScript processor's Script Body.\n\nimport subprocess\nimport os\nimport time\n\nPROFILE_DIR = r\"C:\\minifi-windesktop\\chrome-profile-v2\"\nREPOSITION_SCRIPT = r\"C:\\minifi-windesktop\\reposition_chrome.ps1\"\nMATRIX_HTML = r\"C:\\minifi-windesktop\\matrix-screensaver.html\"\nTARGET_X, TARGET_Y, TARGET_W, TARGET_H = -1920, 0, 1280, 720\nCHROME_PATHS = [\n    r\"C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe\",\n    r\"C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe\",\n]\n\n\ndef find_chrome():\n    for p in CHROME_PATHS:\n        if os.path.exists(p):\n            return p\n    return \"chrome.exe\"\n\n\n# This is the exact entrypoint MiNiFi C++ calls on every loop execution\ndef onTrigger(context, session):\n    flow_file = session.get()\n    if not flow_file:\n        return\n\n    try:\n        url = \"file:///\" + MATRIX_HTML.replace(\"\\\\\", \"/\")\n\n        subprocess.run(\n            [\"powershell.exe\", \"-NoProfile\", \"-Command\",\n             \"Get-CimInstance Win32_Process -Filter \\\"Name='chrome.exe'\\\" | \"\n             f\"Where-Object {{ $_.CommandLine -and $_.CommandLine -like '*{PROFILE_DIR}*' }} | \"\n             \"ForEach-Object { Stop-Process -Id $_.ProcessId -Force }\"],\n            capture_output=True,\n        )\n        time.sleep(1.0)\n\n        chrome = find_chrome()\n        subprocess.Popen(\n            [chrome, \"--new-window\", f\"--user-data-dir={PROFILE_DIR}\",\n             f\"--window-position={TARGET_X},{TARGET_Y}\",\n             f\"--window-size={TARGET_W},{TARGET_H}\", url],\n            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,\n        )\n\n        # No -SiteFullscreenKey here: a local canvas page has no site chrome to hide beyond\n        # Chrome's own toolbar, so F11 alone (reposition_chrome.ps1's default) is enough \u2014\n        # unlike Twitch, there's no in-page Fullscreen API hotkey to also simulate.\n        result = subprocess.run(\n            [\"powershell.exe\", \"-NoProfile\", \"-ExecutionPolicy\", \"Bypass\", \"-File\", REPOSITION_SCRIPT,\n             \"-X\", str(TARGET_X), \"-Y\", str(TARGET_Y),\n             \"-W\", str(TARGET_W), \"-H\", str(TARGET_H),\n             \"-ProfileDir\", PROFILE_DIR,\n             \"-TimeoutSeconds\", \"10\"],\n            capture_output=True, text=True,\n        )\n        out = (result.stdout or \"\").strip()\n        err = (result.stderr or \"\").strip()\n\n        if out.startswith(\"OK\"):\n            session.putAttribute(flow_file, \"python.matrix.status\", \"Success\")\n            session.putAttribute(flow_file, \"python.matrix.reposition\", out)\n        else:\n            session.putAttribute(flow_file, \"python.matrix.status\", \"RepositionFailed\")\n            session.putAttribute(flow_file, \"python.matrix.reposition\", out or err)\n        session.transfer(flow_file, REL_SUCCESS)\n\n    except Exception as e:\n        session.putAttribute(flow_file, \"python.error\", str(e))\n        session.transfer(flow_file, REL_FAILURE)\n",
+                    "Module Directory": null
+                },
+                "propertyDescriptors": {
+                    "Script File": {
+                        "name": "Script File",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Script Engine": {
+                        "name": "Script Engine",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Script Body": {
+                        "name": "Script Body",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Module Directory": {
+                        "name": "Module Directory",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    }
+                },
+                "style": {},
+                "annotationData": null,
+                "schedulingPeriod": "1000 ms",
+                "schedulingStrategy": "TIMER_DRIVEN",
+                "executionNode": "ALL",
+                "penaltyDuration": "30000 ms",
+                "yieldDuration": "1000 ms",
+                "bulletinLevel": "WARN",
+                "runDurationMillis": 0,
+                "concurrentlySchedulableTaskCount": 1,
+                "autoTerminatedRelationships": [
+                    "original",
+                    "failure"
+                ],
+                "scheduledState": null,
+                "retryCount": null,
+                "retriedRelationships": null,
+                "backoffMechanism": null,
+                "maxBackoffPeriod": null,
+                "componentType": "PROCESSOR",
+                "groupIdentifier": "df6b12fa-3efc-4d4c-929a-93f8d03c6fec"
+            },
+            {
+                "identifier": "937286a4-87f4-479f-aee7-e0f544216de5",
+                "instanceIdentifier": "0c90c123-1113-4f03-9bf0-05df34312036",
+                "name": "ExecuteScript-PythonSmoke",
+                "comments": "",
+                "position": {
+                    "x": 0.0,
+                    "y": 300.0
+                },
+                "type": "org.apache.nifi.minifi.processors.ExecuteScript",
+                "bundle": {
+                    "group": "org.apache.nifi.minifi",
+                    "artifact": "minifi-script-extension",
+                    "version": "1.26.02"
+                },
+                "properties": {
+                    "Script File": null,
+                    "Script Engine": "python",
+                    "Script Body": "def onTrigger(context, session):\n    flow_file = session.get()\n    if flow_file:\n        session.putAttribute(flow_file, \"python.smoke\", \"windows-cpp-executescript-ok\")\n        session.transfer(flow_file, REL_SUCCESS)\n",
+                    "Module Directory": null
+                },
+                "propertyDescriptors": {
+                    "Script File": {
+                        "name": "Script File",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Script Engine": {
+                        "name": "Script Engine",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Script Body": {
+                        "name": "Script Body",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Module Directory": {
+                        "name": "Module Directory",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    }
+                },
+                "style": {},
+                "annotationData": null,
+                "schedulingPeriod": "1000 ms",
+                "schedulingStrategy": "TIMER_DRIVEN",
+                "executionNode": "ALL",
+                "penaltyDuration": "30000 ms",
+                "yieldDuration": "1000 ms",
+                "bulletinLevel": "WARN",
+                "runDurationMillis": 0,
+                "concurrentlySchedulableTaskCount": 1,
+                "autoTerminatedRelationships": [
+                    "original",
+                    "failure"
+                ],
+                "scheduledState": null,
+                "retryCount": null,
+                "retriedRelationships": null,
+                "backoffMechanism": null,
+                "maxBackoffPeriod": null,
+                "componentType": "PROCESSOR",
+                "groupIdentifier": "df6b12fa-3efc-4d4c-929a-93f8d03c6fec"
+            },
+            {
+                "identifier": "21b99949-5ee5-42c5-a6b0-4258fbf26496",
+                "instanceIdentifier": "bd8d3813-dfaa-4ec3-a99b-6941805fc02b",
+                "name": "ExecuteScript-LoadWindows",
+                "comments": "",
+                "position": {
+                    "x": 715.0,
+                    "y": 300.0
+                },
+                "type": "org.apache.nifi.minifi.processors.ExecuteScript",
+                "bundle": {
+                    "group": "org.apache.nifi.minifi",
+                    "artifact": "minifi-script-extension",
+                    "version": "1.26.02"
+                },
+                "properties": {
+                    "Script File": null,
+                    "Script Engine": "python",
+                    "Script Body": "# windesktop-launch_stream.py\n#\n# ExecuteScript (Script Engine: python) Script Body for the WindowsDesktopCpp agent class's\n# !load flow \u2014 issue #4 (Test a Windows Python Processor for TwitchChatListener). Adapted from\n# agent-NvidiaNano-launch_stream.py (Chrome/chromium kill-relaunch pattern) and\n# browser_launcher.py (Windows chrome.exe path + reposition_chrome.ps1 handoff), ported to run\n# *inside* the MiNiFi agent process itself instead of behind a separate always-on listener\n# service like browser_launcher.py's :5901 \u2014 that's the whole point of this test.\n#\n# Own port (:18081 /loadWindows), own Chrome profile dir (C:\\minifi-windesktop\\chrome-profile-v2),\n# own reposition script (windesktop-reposition_chrome.ps1) \u2014 does not touch screen2's\n# C:\\minifi-manual\\chrome-kiosk-profile or the :5901/:18080 listeners already in production.\n#\n# Target monitor: DISPLAY1, the gaming PC's left/non-primary monitor (-1920,0,1280x720),\n# confirmed via [System.Windows.Forms.Screen]::AllScreens to be the one NOT already claimed by\n# the production screen2 flow (which owns DISPLAY2, the primary 1920x1080 monitor at 0,0).\n#\n# Paste this whole file's onTrigger function as the ExecuteScript processor's Script Body.\n\nimport subprocess\nimport os\nimport time\nimport json\n\n\nclass ReadContentCallback:\n    def __init__(self):\n        self.content = \"\"\n    def process(self, input_stream):\n        self.content = input_stream.read().decode('utf-8')\n        return len(self.content)\n\n\nPROFILE_DIR = r\"C:\\minifi-windesktop\\chrome-profile-v2\"\nREPOSITION_SCRIPT = r\"C:\\minifi-windesktop\\reposition_chrome.ps1\"\nTARGET_X, TARGET_Y, TARGET_W, TARGET_H = -1920, 0, 1280, 720\nCHROME_PATHS = [\n    r\"C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe\",\n    r\"C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe\",\n]\n\n\ndef find_chrome():\n    for p in CHROME_PATHS:\n        if os.path.exists(p):\n            return p\n    return \"chrome.exe\"\n\n\n# This is the exact entrypoint MiNiFi C++ calls on every loop execution\ndef onTrigger(context, session):\n    flow_file = session.get()\n    if not flow_file:\n        return\n\n    try:\n        reader = ReadContentCallback()\n        session.read(flow_file, reader)\n        payload = json.loads(reader.content) if reader.content.strip() else {}\n        streamer = payload.get(\"streamer\")\n        if not streamer:\n            raise ValueError(\"payload missing 'streamer' field\")\n\n        url = f\"https://www.twitch.tv/{streamer}\"\n\n        # Kill only chrome.exe processes running with OUR profile dir \u2014 scoped via\n        # Get-CimInstance's CommandLine match so screen2's browser_launcher.py chrome\n        # (a different --user-data-dir) is never touched, unlike a blanket\n        # `taskkill /IM chrome.exe /F` which would hit every chrome window on the box.\n        subprocess.run(\n            [\"powershell.exe\", \"-NoProfile\", \"-Command\",\n             \"Get-CimInstance Win32_Process -Filter \\\"Name='chrome.exe'\\\" | \"\n             f\"Where-Object {{ $_.CommandLine -and $_.CommandLine -like '*{PROFILE_DIR}*' }} | \"\n             \"ForEach-Object { Stop-Process -Id $_.ProcessId -Force }\"],\n            capture_output=True,\n        )\n        time.sleep(1.0)\n\n        chrome = find_chrome()\n        proc = subprocess.Popen(\n            [chrome, \"--new-window\", f\"--user-data-dir={PROFILE_DIR}\",\n             f\"--window-position={TARGET_X},{TARGET_Y}\",\n             f\"--window-size={TARGET_W},{TARGET_H}\", url],\n            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,\n        )\n\n        # No --kiosk on launch, same reasoning as browser_launcher.py: kiosk fullscreen\n        # locks to whichever monitor the cursor is on at launch and MoveWindow afterward\n        # only relocates the frame, not the composited pixels. Launch windowed, reposition,\n        # THEN fullscreen \u2014 reposition_chrome.ps1 does the F11 + Twitch 'f' hotkey.\n        # -ExecutionPolicy Bypass is required here: when the agent runs as the\n        # \"Apache NiFi MiNiFi\" Windows service (LocalSystem), that account's effective\n        # policy is Restricted (no CurrentUser RemoteSigned override the way an\n        # interactive user profile has), so a bare `-File script.ps1` is refused with\n        # \"running scripts is disabled on this system\" \u2014 confirmed live 2026-07-28.\n        # Bypass sidesteps that regardless of caller identity. It does NOT, by itself,\n        # fix the deeper Session-0 issue below.\n        result = subprocess.run(\n            [\"powershell.exe\", \"-NoProfile\", \"-ExecutionPolicy\", \"Bypass\", \"-File\", REPOSITION_SCRIPT,\n             \"-X\", str(TARGET_X), \"-Y\", str(TARGET_Y),\n             \"-W\", str(TARGET_W), \"-H\", str(TARGET_H),\n             \"-ProfileDir\", PROFILE_DIR,\n             \"-SiteFullscreenKey\", \"f\",\n             \"-TimeoutSeconds\", \"10\"],\n            capture_output=True, text=True,\n        )\n        out = (result.stdout or \"\").strip()\n        err = (result.stderr or \"\").strip()\n\n        session.putAttribute(flow_file, \"python.load.streamer\", streamer)\n        if out.startswith(\"OK\"):\n            session.putAttribute(flow_file, \"python.load.status\", \"Success\")\n            session.putAttribute(flow_file, \"python.load.reposition\", out)\n            session.transfer(flow_file, REL_SUCCESS)\n        else:\n            session.putAttribute(flow_file, \"python.load.status\", \"RepositionFailed\")\n            session.putAttribute(flow_file, \"python.load.reposition\", out or err)\n            session.transfer(flow_file, REL_SUCCESS)  # chrome did launch; reposition is best-effort\n\n    except Exception as e:\n        session.putAttribute(flow_file, \"python.error\", str(e))\n        session.transfer(flow_file, REL_FAILURE)\n",
+                    "Module Directory": null
+                },
+                "propertyDescriptors": {
+                    "Script File": {
+                        "name": "Script File",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Script Engine": {
+                        "name": "Script Engine",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Script Body": {
+                        "name": "Script Body",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Module Directory": {
+                        "name": "Module Directory",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    }
+                },
+                "style": {},
+                "annotationData": null,
+                "schedulingPeriod": "1000 ms",
+                "schedulingStrategy": "TIMER_DRIVEN",
+                "executionNode": "ALL",
+                "penaltyDuration": "30000 ms",
+                "yieldDuration": "1000 ms",
+                "bulletinLevel": "WARN",
+                "runDurationMillis": 0,
+                "concurrentlySchedulableTaskCount": 1,
+                "autoTerminatedRelationships": [
+                    "original",
+                    "failure"
+                ],
+                "scheduledState": null,
+                "retryCount": null,
+                "retriedRelationships": null,
+                "backoffMechanism": null,
+                "maxBackoffPeriod": null,
+                "componentType": "PROCESSOR",
+                "groupIdentifier": "df6b12fa-3efc-4d4c-929a-93f8d03c6fec"
+            },
+            {
+                "identifier": "716b3c47-689f-44db-848c-b82d4fdfc0d2",
+                "instanceIdentifier": "af5eecb7-f27d-4471-8276-eb23299f62fb",
+                "name": "EdgeTagger",
+                "comments": "",
+                "position": {
+                    "x": 2145.0,
+                    "y": 300.0
+                },
+                "type": "org.apache.nifi.minifi.processors.EdgeTagger",
+                "bundle": {
+                    "group": "org.apache.nifi.minifi",
+                    "artifact": "EdgeTagger.py",
+                    "version": "1.26.02"
+                },
+                "properties": {
+                    "Tag Value": "windowsdesktopcpp-live"
+                },
+                "propertyDescriptors": {
+                    "Tag Value": {
+                        "name": "Tag Value",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    }
+                },
+                "style": {},
+                "annotationData": null,
+                "schedulingPeriod": "1000 ms",
+                "schedulingStrategy": "TIMER_DRIVEN",
+                "executionNode": "ALL",
+                "penaltyDuration": "30000 ms",
+                "yieldDuration": "1000 ms",
+                "bulletinLevel": "WARN",
+                "runDurationMillis": 0,
+                "concurrentlySchedulableTaskCount": 1,
+                "autoTerminatedRelationships": [
+                    "original",
+                    "failure"
+                ],
+                "scheduledState": null,
+                "retryCount": null,
+                "retriedRelationships": null,
+                "backoffMechanism": null,
+                "maxBackoffPeriod": null,
+                "componentType": "PROCESSOR",
+                "groupIdentifier": "df6b12fa-3efc-4d4c-929a-93f8d03c6fec"
+            },
+            {
+                "identifier": "6f1988af-58d3-4ab3-b787-bc6499402dd8",
+                "instanceIdentifier": "ab514161-6e8d-458e-89ed-7472211b4717",
+                "name": "LogAttribute-Smoke",
+                "comments": "",
+                "position": {
+                    "x": 0.0,
+                    "y": 600.0
+                },
+                "type": "org.apache.nifi.minifi.processors.LogAttribute",
+                "bundle": {
+                    "group": "org.apache.nifi.minifi",
+                    "artifact": "minifi-standard-processors",
+                    "version": "1.26.02"
+                },
+                "properties": {
+                    "FlowFiles To Log": "0",
+                    "Log Level": "info",
+                    "Attributes to Ignore": null,
+                    "Attributes to Log": null,
+                    "Log Payload": "true",
+                    "Log Prefix": null,
+                    "Hexencode Payload": "false",
+                    "Maximum Payload Line Length": "0"
+                },
+                "propertyDescriptors": {
+                    "FlowFiles To Log": {
+                        "name": "FlowFiles To Log",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Log Level": {
+                        "name": "Log Level",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Attributes to Ignore": {
+                        "name": "Attributes to Ignore",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Attributes to Log": {
+                        "name": "Attributes to Log",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Log Payload": {
+                        "name": "Log Payload",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Log Prefix": {
+                        "name": "Log Prefix",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Hexencode Payload": {
+                        "name": "Hexencode Payload",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Maximum Payload Line Length": {
+                        "name": "Maximum Payload Line Length",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    }
+                },
+                "style": {},
+                "annotationData": null,
+                "schedulingPeriod": "1000 ms",
+                "schedulingStrategy": "TIMER_DRIVEN",
+                "executionNode": "ALL",
+                "penaltyDuration": "30000 ms",
+                "yieldDuration": "1000 ms",
+                "bulletinLevel": "WARN",
+                "runDurationMillis": 0,
+                "concurrentlySchedulableTaskCount": 1,
+                "autoTerminatedRelationships": [
+                    "success"
+                ],
+                "scheduledState": null,
+                "retryCount": null,
+                "retriedRelationships": null,
+                "backoffMechanism": null,
+                "maxBackoffPeriod": null,
+                "componentType": "PROCESSOR",
+                "groupIdentifier": "df6b12fa-3efc-4d4c-929a-93f8d03c6fec"
+            },
+            {
+                "identifier": "91a52988-9568-4f8e-afa1-c4300c1b96d4",
+                "instanceIdentifier": "58e841f9-d43e-4aea-b950-a8142ddcd979",
+                "name": "LogAttribute-LoadWindows",
+                "comments": "",
+                "position": {
+                    "x": 715.0,
+                    "y": 600.0
+                },
+                "type": "org.apache.nifi.minifi.processors.LogAttribute",
+                "bundle": {
+                    "group": "org.apache.nifi.minifi",
+                    "artifact": "minifi-standard-processors",
+                    "version": "1.26.02"
+                },
+                "properties": {
+                    "FlowFiles To Log": "0",
+                    "Log Level": "info",
+                    "Attributes to Ignore": null,
+                    "Attributes to Log": null,
+                    "Log Payload": "true",
+                    "Log Prefix": null,
+                    "Hexencode Payload": "false",
+                    "Maximum Payload Line Length": "0"
+                },
+                "propertyDescriptors": {
+                    "FlowFiles To Log": {
+                        "name": "FlowFiles To Log",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Log Level": {
+                        "name": "Log Level",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Attributes to Ignore": {
+                        "name": "Attributes to Ignore",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Attributes to Log": {
+                        "name": "Attributes to Log",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Log Payload": {
+                        "name": "Log Payload",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Log Prefix": {
+                        "name": "Log Prefix",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Hexencode Payload": {
+                        "name": "Hexencode Payload",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Maximum Payload Line Length": {
+                        "name": "Maximum Payload Line Length",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    }
+                },
+                "style": {},
+                "annotationData": null,
+                "schedulingPeriod": "1000 ms",
+                "schedulingStrategy": "TIMER_DRIVEN",
+                "executionNode": "ALL",
+                "penaltyDuration": "30000 ms",
+                "yieldDuration": "1000 ms",
+                "bulletinLevel": "WARN",
+                "runDurationMillis": 0,
+                "concurrentlySchedulableTaskCount": 1,
+                "autoTerminatedRelationships": [
+                    "success"
+                ],
+                "scheduledState": null,
+                "retryCount": null,
+                "retriedRelationships": null,
+                "backoffMechanism": null,
+                "maxBackoffPeriod": null,
+                "componentType": "PROCESSOR",
+                "groupIdentifier": "df6b12fa-3efc-4d4c-929a-93f8d03c6fec"
+            },
+            {
+                "identifier": "59d7918b-0894-46a9-9c84-dcfe82049357",
+                "instanceIdentifier": "25a58868-641d-430f-b6e3-494aec83af2d",
+                "name": "LogAttribute-MatrixWindows",
+                "comments": "",
+                "position": {
+                    "x": 1430.0,
+                    "y": 600.0
+                },
+                "type": "org.apache.nifi.minifi.processors.LogAttribute",
+                "bundle": {
+                    "group": "org.apache.nifi.minifi",
+                    "artifact": "minifi-standard-processors",
+                    "version": "1.26.02"
+                },
+                "properties": {
+                    "FlowFiles To Log": "0",
+                    "Log Level": "info",
+                    "Attributes to Ignore": null,
+                    "Attributes to Log": null,
+                    "Log Payload": "true",
+                    "Log Prefix": null,
+                    "Hexencode Payload": "false",
+                    "Maximum Payload Line Length": "0"
+                },
+                "propertyDescriptors": {
+                    "FlowFiles To Log": {
+                        "name": "FlowFiles To Log",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Log Level": {
+                        "name": "Log Level",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Attributes to Ignore": {
+                        "name": "Attributes to Ignore",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Attributes to Log": {
+                        "name": "Attributes to Log",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Log Payload": {
+                        "name": "Log Payload",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Log Prefix": {
+                        "name": "Log Prefix",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Hexencode Payload": {
+                        "name": "Hexencode Payload",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Maximum Payload Line Length": {
+                        "name": "Maximum Payload Line Length",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    }
+                },
+                "style": {},
+                "annotationData": null,
+                "schedulingPeriod": "1000 ms",
+                "schedulingStrategy": "TIMER_DRIVEN",
+                "executionNode": "ALL",
+                "penaltyDuration": "30000 ms",
+                "yieldDuration": "1000 ms",
+                "bulletinLevel": "WARN",
+                "runDurationMillis": 0,
+                "concurrentlySchedulableTaskCount": 1,
+                "autoTerminatedRelationships": [
+                    "success"
+                ],
+                "scheduledState": null,
+                "retryCount": null,
+                "retriedRelationships": null,
+                "backoffMechanism": null,
+                "maxBackoffPeriod": null,
+                "componentType": "PROCESSOR",
+                "groupIdentifier": "df6b12fa-3efc-4d4c-929a-93f8d03c6fec"
+            }
+        ],
+        "inputPorts": [],
+        "outputPorts": [],
+        "connections": [
+            {
+                "identifier": "ca175506-1dd0-48da-8b80-684f48ccb050",
+                "instanceIdentifier": "761d6307-0c58-48aa-88b1-a3b0a634974b",
+                "name": "ListenHTTP-Smoke/success/ExecuteScript-PythonSmoke",
+                "comments": null,
+                "position": {
+                    "x": 0.0,
+                    "y": 0.0
+                },
+                "source": {
+                    "id": "8b9851fd-4a7e-402f-95d4-2e8d3a38f223",
+                    "type": "PROCESSOR",
+                    "groupId": "df6b12fa-3efc-4d4c-929a-93f8d03c6fec",
+                    "name": "ListenHTTP-Smoke",
+                    "comments": null,
+                    "instanceIdentifier": "c76a33df-99dc-4e43-866e-76344fe33968"
+                },
+                "destination": {
+                    "id": "937286a4-87f4-479f-aee7-e0f544216de5",
+                    "type": "PROCESSOR",
+                    "groupId": "df6b12fa-3efc-4d4c-929a-93f8d03c6fec",
+                    "name": "ExecuteScript-PythonSmoke",
+                    "comments": null,
+                    "instanceIdentifier": "0c90c123-1113-4f03-9bf0-05df34312036"
+                },
+                "labelIndex": 1,
+                "zIndex": 0,
+                "selectedRelationships": [
+                    "success"
+                ],
+                "backPressureObjectThreshold": 2000,
+                "backPressureDataSizeThreshold": "100 MB",
+                "flowFileExpiration": "0 seconds",
+                "prioritizers": [],
+                "bends": [],
+                "loadBalanceStrategy": null,
+                "partitioningAttribute": null,
+                "loadBalanceCompression": null,
+                "componentType": "CONNECTION",
+                "groupIdentifier": "df6b12fa-3efc-4d4c-929a-93f8d03c6fec"
+            },
+            {
+                "identifier": "23ef8a05-2911-4fd9-a126-8b4d79690ddf",
+                "instanceIdentifier": "073a371d-7d41-40d1-a136-b8a0056d506a",
+                "name": "ListenHTTP-LoadWindows/success/ExecuteScript-LoadWindows",
+                "comments": null,
+                "position": {
+                    "x": 0.0,
+                    "y": 0.0
+                },
+                "source": {
+                    "id": "97136837-c2f7-4e69-99b8-e4bf78ff7367",
+                    "type": "PROCESSOR",
+                    "groupId": "df6b12fa-3efc-4d4c-929a-93f8d03c6fec",
+                    "name": "ListenHTTP-LoadWindows",
+                    "comments": null,
+                    "instanceIdentifier": "b931a048-110d-4f03-904e-04339a7015a9"
+                },
+                "destination": {
+                    "id": "21b99949-5ee5-42c5-a6b0-4258fbf26496",
+                    "type": "PROCESSOR",
+                    "groupId": "df6b12fa-3efc-4d4c-929a-93f8d03c6fec",
+                    "name": "ExecuteScript-LoadWindows",
+                    "comments": null,
+                    "instanceIdentifier": "bd8d3813-dfaa-4ec3-a99b-6941805fc02b"
+                },
+                "labelIndex": 1,
+                "zIndex": 0,
+                "selectedRelationships": [
+                    "success"
+                ],
+                "backPressureObjectThreshold": 2000,
+                "backPressureDataSizeThreshold": "100 MB",
+                "flowFileExpiration": "0 seconds",
+                "prioritizers": [],
+                "bends": [],
+                "loadBalanceStrategy": null,
+                "partitioningAttribute": null,
+                "loadBalanceCompression": null,
+                "componentType": "CONNECTION",
+                "groupIdentifier": "df6b12fa-3efc-4d4c-929a-93f8d03c6fec"
+            },
+            {
+                "identifier": "d0f04a17-7ba8-4c0a-b0bf-120f48d7a4fd",
+                "instanceIdentifier": "61b1a97a-4e54-4d77-b59b-4d0927474883",
+                "name": "ExecuteScript-LoadWindows/success/LogAttribute-LoadWindows",
+                "comments": null,
+                "position": {
+                    "x": 0.0,
+                    "y": 0.0
+                },
+                "source": {
+                    "id": "21b99949-5ee5-42c5-a6b0-4258fbf26496",
+                    "type": "PROCESSOR",
+                    "groupId": "df6b12fa-3efc-4d4c-929a-93f8d03c6fec",
+                    "name": "ExecuteScript-LoadWindows",
+                    "comments": null,
+                    "instanceIdentifier": "bd8d3813-dfaa-4ec3-a99b-6941805fc02b"
+                },
+                "destination": {
+                    "id": "91a52988-9568-4f8e-afa1-c4300c1b96d4",
+                    "type": "PROCESSOR",
+                    "groupId": "df6b12fa-3efc-4d4c-929a-93f8d03c6fec",
+                    "name": "LogAttribute-LoadWindows",
+                    "comments": null,
+                    "instanceIdentifier": "58e841f9-d43e-4aea-b950-a8142ddcd979"
+                },
+                "labelIndex": 1,
+                "zIndex": 0,
+                "selectedRelationships": [
+                    "success"
+                ],
+                "backPressureObjectThreshold": 2000,
+                "backPressureDataSizeThreshold": "100 MB",
+                "flowFileExpiration": "0 seconds",
+                "prioritizers": [],
+                "bends": [],
+                "loadBalanceStrategy": null,
+                "partitioningAttribute": null,
+                "loadBalanceCompression": null,
+                "componentType": "CONNECTION",
+                "groupIdentifier": "df6b12fa-3efc-4d4c-929a-93f8d03c6fec"
+            },
+            {
+                "identifier": "f38764f3-4073-496a-b533-71029ca0e4c3",
+                "instanceIdentifier": "52196633-2bbf-47b3-b359-f8efaf57bdf3",
+                "name": "EdgeTagger/success/LogAttribute-EdgeTagger",
+                "comments": null,
+                "position": {
+                    "x": 0.0,
+                    "y": 0.0
+                },
+                "source": {
+                    "id": "716b3c47-689f-44db-848c-b82d4fdfc0d2",
+                    "type": "PROCESSOR",
+                    "groupId": "df6b12fa-3efc-4d4c-929a-93f8d03c6fec",
+                    "name": "EdgeTagger",
+                    "comments": null,
+                    "instanceIdentifier": "af5eecb7-f27d-4471-8276-eb23299f62fb"
+                },
+                "destination": {
+                    "id": "34cc3f9a-0603-48e0-9b2d-f3942dd52b12",
+                    "type": "PROCESSOR",
+                    "groupId": "df6b12fa-3efc-4d4c-929a-93f8d03c6fec",
+                    "name": "LogAttribute-EdgeTagger",
+                    "comments": null,
+                    "instanceIdentifier": "5a953bbc-e6dd-4bb8-b77e-f377cfc8772c"
+                },
+                "labelIndex": 1,
+                "zIndex": 0,
+                "selectedRelationships": [
+                    "success"
+                ],
+                "backPressureObjectThreshold": 2000,
+                "backPressureDataSizeThreshold": "100 MB",
+                "flowFileExpiration": "0 seconds",
+                "prioritizers": [],
+                "bends": [],
+                "loadBalanceStrategy": null,
+                "partitioningAttribute": null,
+                "loadBalanceCompression": null,
+                "componentType": "CONNECTION",
+                "groupIdentifier": "df6b12fa-3efc-4d4c-929a-93f8d03c6fec"
+            },
+            {
+                "identifier": "4e3cf3c3-301f-4a35-9b74-f65435f7eb08",
+                "instanceIdentifier": "693a00c0-90d9-4011-a684-36a398ea7455",
+                "name": "ExecuteScript-PythonSmoke/success/LogAttribute-Smoke",
+                "comments": null,
+                "position": {
+                    "x": 0.0,
+                    "y": 0.0
+                },
+                "source": {
+                    "id": "937286a4-87f4-479f-aee7-e0f544216de5",
+                    "type": "PROCESSOR",
+                    "groupId": "df6b12fa-3efc-4d4c-929a-93f8d03c6fec",
+                    "name": "ExecuteScript-PythonSmoke",
+                    "comments": null,
+                    "instanceIdentifier": "0c90c123-1113-4f03-9bf0-05df34312036"
+                },
+                "destination": {
+                    "id": "6f1988af-58d3-4ab3-b787-bc6499402dd8",
+                    "type": "PROCESSOR",
+                    "groupId": "df6b12fa-3efc-4d4c-929a-93f8d03c6fec",
+                    "name": "LogAttribute-Smoke",
+                    "comments": null,
+                    "instanceIdentifier": "ab514161-6e8d-458e-89ed-7472211b4717"
+                },
+                "labelIndex": 1,
+                "zIndex": 0,
+                "selectedRelationships": [
+                    "success"
+                ],
+                "backPressureObjectThreshold": 2000,
+                "backPressureDataSizeThreshold": "100 MB",
+                "flowFileExpiration": "0 seconds",
+                "prioritizers": [],
+                "bends": [],
+                "loadBalanceStrategy": null,
+                "partitioningAttribute": null,
+                "loadBalanceCompression": null,
+                "componentType": "CONNECTION",
+                "groupIdentifier": "df6b12fa-3efc-4d4c-929a-93f8d03c6fec"
+            },
+            {
+                "identifier": "251f1cff-a192-42f3-9541-ceafc6ef8d6e",
+                "instanceIdentifier": "d02d088d-57f6-4562-806d-f2582a777c78",
+                "name": "ListenHTTP-MatrixWindows/success/ExecuteScript-MatrixWindows",
+                "comments": null,
+                "position": {
+                    "x": 0.0,
+                    "y": 0.0
+                },
+                "source": {
+                    "id": "6a90a798-d790-4f60-898f-b2a7d6cdd0f5",
+                    "type": "PROCESSOR",
+                    "groupId": "df6b12fa-3efc-4d4c-929a-93f8d03c6fec",
+                    "name": "ListenHTTP-MatrixWindows",
+                    "comments": null,
+                    "instanceIdentifier": "52e6a3cd-a0ef-443f-8b29-e3cac44da0cd"
+                },
+                "destination": {
+                    "id": "91d14764-0e1e-43d8-8531-51d54eac0b91",
+                    "type": "PROCESSOR",
+                    "groupId": "df6b12fa-3efc-4d4c-929a-93f8d03c6fec",
+                    "name": "ExecuteScript-MatrixWindows",
+                    "comments": null,
+                    "instanceIdentifier": "ffcec41c-519b-464b-b55f-b101db462694"
+                },
+                "labelIndex": 1,
+                "zIndex": 0,
+                "selectedRelationships": [
+                    "success"
+                ],
+                "backPressureObjectThreshold": 2000,
+                "backPressureDataSizeThreshold": "100 MB",
+                "flowFileExpiration": "0 seconds",
+                "prioritizers": [],
+                "bends": [],
+                "loadBalanceStrategy": null,
+                "partitioningAttribute": null,
+                "loadBalanceCompression": null,
+                "componentType": "CONNECTION",
+                "groupIdentifier": "df6b12fa-3efc-4d4c-929a-93f8d03c6fec"
+            },
+            {
+                "identifier": "90a5eb8e-9825-45d7-a364-a77b59ae4b8a",
+                "instanceIdentifier": "1b075652-01df-4771-ac83-00c0bd8a900a",
+                "name": "ExecuteScript-MatrixWindows/success/LogAttribute-MatrixWindows",
+                "comments": null,
+                "position": {
+                    "x": 0.0,
+                    "y": 0.0
+                },
+                "source": {
+                    "id": "91d14764-0e1e-43d8-8531-51d54eac0b91",
+                    "type": "PROCESSOR",
+                    "groupId": "df6b12fa-3efc-4d4c-929a-93f8d03c6fec",
+                    "name": "ExecuteScript-MatrixWindows",
+                    "comments": null,
+                    "instanceIdentifier": "ffcec41c-519b-464b-b55f-b101db462694"
+                },
+                "destination": {
+                    "id": "59d7918b-0894-46a9-9c84-dcfe82049357",
+                    "type": "PROCESSOR",
+                    "groupId": "df6b12fa-3efc-4d4c-929a-93f8d03c6fec",
+                    "name": "LogAttribute-MatrixWindows",
+                    "comments": null,
+                    "instanceIdentifier": "25a58868-641d-430f-b6e3-494aec83af2d"
+                },
+                "labelIndex": 1,
+                "zIndex": 0,
+                "selectedRelationships": [
+                    "success"
+                ],
+                "backPressureObjectThreshold": 2000,
+                "backPressureDataSizeThreshold": "100 MB",
+                "flowFileExpiration": "0 seconds",
+                "prioritizers": [],
+                "bends": [],
+                "loadBalanceStrategy": null,
+                "partitioningAttribute": null,
+                "loadBalanceCompression": null,
+                "componentType": "CONNECTION",
+                "groupIdentifier": "df6b12fa-3efc-4d4c-929a-93f8d03c6fec"
+            },
+            {
+                "identifier": "e69316ca-84a4-46dc-9db3-608ff530d57c",
+                "instanceIdentifier": "e65ba84e-d21a-4e38-90d7-47cb0fa114fd",
+                "name": "ListenHTTP-EdgeTagger/success/EdgeTagger",
+                "comments": null,
+                "position": {
+                    "x": 0.0,
+                    "y": 0.0
+                },
+                "source": {
+                    "id": "c017f3ab-361c-4f87-b188-857b6963bb6a",
+                    "type": "PROCESSOR",
+                    "groupId": "df6b12fa-3efc-4d4c-929a-93f8d03c6fec",
+                    "name": "ListenHTTP-EdgeTagger",
+                    "comments": null,
+                    "instanceIdentifier": "bcd5b95a-8feb-4afa-9b7e-f7ec377ba6fa"
+                },
+                "destination": {
+                    "id": "716b3c47-689f-44db-848c-b82d4fdfc0d2",
+                    "type": "PROCESSOR",
+                    "groupId": "df6b12fa-3efc-4d4c-929a-93f8d03c6fec",
+                    "name": "EdgeTagger",
+                    "comments": null,
+                    "instanceIdentifier": "af5eecb7-f27d-4471-8276-eb23299f62fb"
+                },
+                "labelIndex": 1,
+                "zIndex": 0,
+                "selectedRelationships": [
+                    "success"
+                ],
+                "backPressureObjectThreshold": 2000,
+                "backPressureDataSizeThreshold": "100 MB",
+                "flowFileExpiration": "0 seconds",
+                "prioritizers": [],
+                "bends": [],
+                "loadBalanceStrategy": null,
+                "partitioningAttribute": null,
+                "loadBalanceCompression": null,
+                "componentType": "CONNECTION",
+                "groupIdentifier": "df6b12fa-3efc-4d4c-929a-93f8d03c6fec"
+            }
+        ],
+        "labels": [],
+        "funnels": [],
+        "controllerServices": [],
+        "versionedFlowCoordinates": null,
+        "variables": {},
+        "parameterContextName": "92be3597-132f-4178-b0de-74002f300aa8",
+        "defaultFlowFileExpiration": null,
+        "defaultBackPressureObjectThreshold": null,
+        "defaultBackPressureDataSizeThreshold": null,
+        "logFileSuffix": null,
+        "flowFileConcurrency": null,
+        "flowFileOutboundPolicy": null,
+        "componentType": "PROCESS_GROUP",
+        "groupIdentifier": null
+    },
+    "parameterContexts": [
+        {
+            "id": "92be3597-132f-4178-b0de-74002f300aa8",
+            "name": "92be3597-132f-4178-b0de-74002f300aa8",
+            "parameters": [],
+            "usage": null
+        }
+    ],
+    "versionInfo": {
+        "flowVersion": 8,
+        "lastPublished": 1785538225330,
+        "lastPublishedBy": "anonymous",
+        "dirty": false,
+        "localChanges": false
+    },
+    "localFlowRevision": 52
+}

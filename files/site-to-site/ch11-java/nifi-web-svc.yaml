@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: nifi-web
+  namespace: cfm-streaming
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/instance: nifi
+    app.kubernetes.io/component: nifi
+  ports:
+  - name: https
+    port: 8443
+    targetPort: 8443

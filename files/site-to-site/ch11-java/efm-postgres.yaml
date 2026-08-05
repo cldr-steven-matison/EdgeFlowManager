@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata: {name: efm-postgres, namespace: cld-streaming}
+spec:
+  replicas: 1
+  selector: {matchLabels: {app: efm-postgres}}
+  template:
+    metadata: {labels: {app: efm-postgres}}
+    spec:
+      containers:
+      - name: postgres
+        image: postgres:14
+        ports: [{containerPort: 5432}]
+        env:
+        - {name: POSTGRES_USER, value: efm}
+        - {name: POSTGRES_DB, value: efm}
+        - name: POSTGRES_PASSWORD
+          valueFrom: {secretKeyRef: {name: efm-db-pass, key: password}}
+        - {name: PGDATA, value: /var/lib/postgresql/data/pgdata}
+        volumeMounts: [{name: pgdata, mountPath: /var/lib/postgresql/data}]
+      volumes: [{name: pgdata, emptyDir: {}}]
+---
+apiVersion: v1
+kind: Service
+metadata: {name: efm-postgres, namespace: cld-streaming}
+spec:
+  selector: {app: efm-postgres}
+  ports: [{port: 5432, targetPort: 5432}]

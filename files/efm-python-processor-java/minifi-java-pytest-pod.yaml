@@ -1,0 +1,63 @@
+# Throwaway MiNiFi-Java agent for the Ch6 custom-Python-processor Java leg (full flow-through test).
+# Clones files/site-to-site/ch11-java/minifi-java-agent-pod.yaml but:
+#   - own name/class (MinikubeMacJavaPyTest), fresh agent id  -> does not touch the live #98 S2S agent
+#   - NO S2S cert mounts (not needed for this test)
+#   - installs python3, sets nifi.python.command in bootstrap.conf (survives the minifi.properties
+#     regeneration that wipes a direct minifi.properties edit), authors a py4j custom processor.
+# Disposable: kubectl delete pod minifi-java-pytest -n cld-streaming
+apiVersion: v1
+kind: Pod
+metadata:
+  name: minifi-java-pytest
+  namespace: cld-streaming
+  labels: {app: minifi-java-pytest, purpose: ch6-python-processor-java-leg}
+spec:
+  containers:
+  - name: minifi
+    image: ubuntu:22.04
+    imagePullPolicy: IfNotPresent
+    command: ["/bin/bash","-c"]
+    args:
+    - |
+      export DEBIAN_FRONTEND=noninteractive
+      apt-get update && apt-get install -y curl tar sudo passwd openjdk-21-jre-headless python3 python3-venv python3-pip
+      AID=$(cat /proc/sys/kernel/random/uuid)
+      echo "agentIdentifier=$AID"
+      curl -sL \
+       -d agentClass=MinikubeMacJavaPyTest -d agentIdentifier=$AID -d agentType=java \
+       -d agentVersion=2.24.08.0-19 -d autoConfigureSecurity=false \
+       -d baseUrl=http%3A%2F%2Fefm.cld-streaming.svc%3A10090%2Fefm%2Fapi \
+       -d hbPeriod=5000 -d osArch=linux -d serviceName=minifi -d serviceUser=minifi \
+       -d trustSelfSignedCertificates=false \
+       http://efm.cld-streaming.svc:10090/efm/api/agent-deployer/script | bash -
+      MHOME=$(ls -d /minifi-2.24.08.0-19)
+      echo "=== stopping minifi to enable Python extensions ==="
+      sudo -u minifi $MHOME/bin/minifi.sh stop || true
+      sleep 5
+      # THE durable unblock: set nifi.python.command in bootstrap.conf (minifi.properties is
+      # regenerated from bootstrap.conf on every start, so a direct properties edit is wiped).
+      grep -q '^nifi.python.command=' $MHOME/conf/bootstrap.conf || \
+        printf '\nnifi.python.command=/usr/bin/python3\n' >> $MHOME/conf/bootstrap.conf
+      # minimal py4j custom Python processor (Java-bridge style: class Java: implements=[...])
+      mkdir -p $MHOME/python/extensions
+      cat > $MHOME/python/extensions/EdgeJavaTagger.py <<'PYEOF'
+      from nifiapi.flowfiletransform import FlowFileTransform, FlowFileTransformResult
+
+      class EdgeJavaTagger(FlowFileTransform):
+          class Java:
+              implements = ['org.apache.nifi.python.processor.FlowFileTransform']
+          class ProcessorDetails:
+              version = '0.0.1'
+              description = 'Ch6 Java-leg proof: minimal py4j custom Python processor'
+          def __init__(self, **kwargs):
+              super().__init__()
+          def transform(self, context, flowfile):
+              return FlowFileTransformResult(relationship='success', attributes={'edge.java.tag': 'minikube-java-py4j-ok'})
+      PYEOF
+      chown -R minifi:minifi $MHOME/python
+      echo "=== nifi.python.command in bootstrap.conf: ===" ; grep -E '^nifi.python.command=' $MHOME/conf/bootstrap.conf || true
+      echo "=== starting minifi with Python extensions enabled ==="
+      sudo -u minifi $MHOME/bin/minifi.sh start || true
+      sleep 8
+      echo "=== python.command landed in regenerated minifi.properties? ===" ; grep -E '^nifi.python.command=' $MHOME/conf/minifi.properties || echo MISSING
+      tail -f /dev/null

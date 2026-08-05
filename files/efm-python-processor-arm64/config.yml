@@ -1,0 +1,147 @@
+MiNiFi Config Version: 3
+Flow Controller:
+  name: root
+  comment: ""
+Core Properties:
+  flow controller graceful shutdown period: 10 sec
+  flow service write delay interval: 500 ms
+  administrative yield duration: 30 sec
+  bored yield duration: 10 millis
+  max concurrent threads: 1
+  variable registry properties: ""
+FlowFile Repository:
+  implementation: org.apache.nifi.controller.repository.WriteAheadFlowFileRepository
+  partitions: 256
+  checkpoint interval: 2 mins
+  always sync: false
+  Swap:
+    threshold: 20000
+    in period: 5 sec
+    in threads: 1
+    out period: 5 sec
+    out threads: 4
+Content Repository:
+  implementation: org.apache.nifi.controller.repository.FileSystemRepository
+  content claim max appendable size: 10 MB
+  content claim max flow files: 100
+  content repository archive enabled: false
+  content repository archive max retention period: 12 hours
+  content repository archive max usage percentage: 50%
+  always sync: false
+Provenance Repository:
+  provenance rollover time: 1 min
+  implementation: org.apache.nifi.provenance.WriteAheadProvenanceRepository
+  provenance index shard size: 500 MB
+  provenance max storage size: 1 GB
+  provenance max storage time: 24 hours
+  provenance buffer size: 10000
+Component Status Repository:
+  buffer size: 1440
+  snapshot frequency: 1 min
+Security Properties:
+  keystore: ""
+  keystore type: ""
+  keystore password: ""
+  key password: ""
+  truststore: ""
+  truststore type: ""
+  truststore password: ""
+  ssl protocol: ""
+  Sensitive Props:
+    key: ~
+    algorithm: NIFI_PBKDF2_AES_GCM_256
+Processors:
+  - id: 399A3C37-D9C9-47DB-A258-EE13AF789A04
+    name: ListenHTTP
+    class: org.apache.nifi.minifi.processors.ListenHTTP
+    max concurrent tasks: 1
+    scheduling strategy: TIMER_DRIVEN
+    scheduling period: 100 ms
+    penalization period: 30000 ms
+    yield period: 1000 ms
+    run duration nanos: 0
+    auto-terminated relationships list: []
+    Properties:
+      Base Path: contentListener
+      Batch Size: 1
+      Buffer Size: 1
+      Listening Port: 8080
+  - id: 73ED86B8-B3C9-49F1-8F49-273D0FA1C454
+    name: EdgeTagger
+    class: org.apache.nifi.minifi.processors.EdgeTagger
+    max concurrent tasks: 1
+    scheduling strategy: TIMER_DRIVEN
+    scheduling period: 10 ms
+    penalization period: 30000 ms
+    yield period: 1000 ms
+    run duration nanos: 0
+    auto-terminated relationships list:
+      - failure
+      - original
+    Properties:
+      Tag Value: field-test-arm64
+  - id: E2E7D9E1-B435-4986-A2EF-2633E9EBB0EA
+    name: LogAttribute
+    class: org.apache.nifi.minifi.processors.LogAttribute
+    max concurrent tasks: 1
+    scheduling strategy: TIMER_DRIVEN
+    scheduling period: 10 ms
+    penalization period: 30000 ms
+    yield period: 1000 ms
+    run duration nanos: 0
+    auto-terminated relationships list: []
+    Properties:
+      Log Level: info
+  - id: 2993240F-591E-4575-934A-E1E46E019C37
+    name: PutFile
+    class: org.apache.nifi.minifi.processors.PutFile
+    max concurrent tasks: 1
+    scheduling strategy: TIMER_DRIVEN
+    scheduling period: 10 ms
+    penalization period: 30000 ms
+    yield period: 1000 ms
+    run duration nanos: 0
+    auto-terminated relationships list:
+      - success
+      - failure
+    Properties:
+      Directory: /tmp/edgetagger-out
+      Conflict Resolution Strategy: replace
+      Create Missing Directories: true
+Controller Services: []
+Process Groups: []
+Input Ports: []
+Output Ports: []
+Funnels: []
+Connections:
+  - id: BB40F3A9-497E-4047-B6F3-A2AD706BC6DF
+    name: ListenHTTP/success/EdgeTagger
+    source id: 399A3C37-D9C9-47DB-A258-EE13AF789A04
+    source relationship names:
+      - success
+    destination id: 73ED86B8-B3C9-49F1-8F49-273D0FA1C454
+    max work queue size: 2000
+    max work queue data size: 100 MB
+    flowfile expiration: 0 seconds
+    queue prioritizer class: ""
+  - id: C8DA664F-6760-42E2-B28C-48E2626D386C
+    name: EdgeTagger/success/LogAttribute
+    source id: 73ED86B8-B3C9-49F1-8F49-273D0FA1C454
+    source relationship names:
+      - success
+    destination id: E2E7D9E1-B435-4986-A2EF-2633E9EBB0EA
+    max work queue size: 2000
+    max work queue data size: 100 MB
+    flowfile expiration: 0 seconds
+    queue prioritizer class: ""
+  - id: 028612FA-6BE8-46ED-B08A-672C49FCF560
+    name: LogAttribute/success/PutFile
+    source id: E2E7D9E1-B435-4986-A2EF-2633E9EBB0EA
+    source relationship names:
+      - success
+    destination id: 2993240F-591E-4575-934A-E1E46E019C37
+    max work queue size: 2000
+    max work queue data size: 100 MB
+    flowfile expiration: 0 seconds
+    queue prioritizer class: ""
+Remote Process Groups: []
