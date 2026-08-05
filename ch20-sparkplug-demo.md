@@ -148,6 +148,33 @@ That silence cuts both ways — as of this chapter, it also means the real XIAO 
 
 The original plan for this chapter included a further phase: a MiNiFi flow running directly on the edge device, consuming its own Sparkplug B locally, running a small TensorRT/ONNX anomaly-detection model, and triggering a GPIO buzzer on an extreme reading — real edge AI, not just relay. That phase depends on the BME280-real-sensor leg above, which stayed blocked, so it was never field-run. Left here as future work rather than removed, since the architecture (`ConsumeMQTTIIoT → ExecuteScript (TensorRT/ONNX) → GPIO buzzer`, still forwarding upstream to central Kafka) is sound and matches the pattern already field-proven for the Jetson in [Chapter 19](ch19-efm-and-nvidia-jetson.md).
 
+## Live assembly toward the full architecture (#109) — in progress, not complete
+
+#106 asked for the real end-to-end chain: **XIAO publishes to Mosquitto → NvidiaNano runs inference on the reading → NvidiaNano Site-to-Site to NiFi K8s.** As of this pass, two of the three legs are built and one is confirmed live; the third is blocked on a live production change that needs a human decision, not a doc fix.
+
+**Context that changed the plan.** The same day this work started, the live `NvidiaNano` EFM class was cut over (#28) from the Ch19 TensorRT/`PublishKafka` pipeline to an unrelated Java relay (`classify`/`streamChat`/`matrix` — screen and matrix-screensaver control, ports 8080/8081/8082). That flow is live production and was left untouched. The XIAO-sensor-inference leg needed a **new, separate EFM agent class** instead of reusing `NvidiaNano`.
+
+**MicroFi (XIAO) — republished, flow proven, real data movement not yet reconfirmed.** The `MicroFi` class's live flow had drifted to a `GetGPIO`/`ListenHTTP` test rig (leftover from the Ch12 engine-bug work) — no publisher at all. Replaced with the same `GenerateFlowFile → PublishMQTT` shape Ch12 already proved (`Broker URI: mqtt://192.168.1.121:1883`, `Topic: test/sensor/data`, flowVersion 17). The agent applied it cleanly (`GenerateFlowFile`/`PublishMQTT` both report `running: true`). Watching Mosquitto's own broker log for ~20s afterward, though, showed no client with this publisher's client ID ever connecting — only test subscribers. This is the same transport-layer failure shape Ch12 hit once before (a missing firewall rule). Needs a human at the XIAO's serial console to see the actual connect error, and confirmation the device is still on the same WiFi/subnet as `192.168.1.121`.
+
+**NvidiaNanoSparkPlug — new class, built, confirmed live.** A second C++ MiNiFi agent was enrolled under a brand-new class, `NvidiaNanoSparkPlug`, on the same physical Jetson (`tunastreet@192.168.1.197`) — the original `NvidiaNano`-class systemd service (`minifi.service`) is left exactly as the #28 cutover left it (inactive, superseded by the Java process), untouched. The new agent runs from `~/nifi-minifi-cpp-sparkplug` as a plain background process (`bin/minifi.sh run`, not systemd — EFM's agent-deployer hard-codes the systemd unit name `minifi`, so a second systemd-managed agent isn't possible on one host via that path). Flow: `ConsumeMQTT` (`tcp://192.168.1.121:1883`, `Topic: test/sensor/data`) → `ExecuteScript` (reuses [`gpu_nifi_tensorRT-3.py`](../files/gpu_nifi_tensorRT-3.py), already staged in the asset directory from the pre-cutover `NvidiaNano` install, `chmod +x`'d). Published as flowVersion 1, and the agent's own log confirms it for real: `Successfully connected to MQTT broker tcp://192.168.1.121:1883` / `Successfully subscribed to MQTT topic test/sensor/data`. Exported: [`files/efm/NvidiaNanoSparkPlug.json`](../files/efm/NvidiaNanoSparkPlug.json).
+
+`ExecuteScript`'s `success` relationship is **temporarily auto-terminated** rather than wired to a `RemoteProcessGroup` — there is nowhere real to send it yet (see next).
+
+**NiFi K8s Site-to-Site — blocked, needs a human decision.** The production NiFi (`mynifi-0`, `cfm-streaming`) has **no Site-to-Site configuration at all** — not disabled, never set up. Ch10/11's proven S2S recipe ran on a separate `s2s-lab` profile, not this instance. Turning this leg on for real means, on `mynifi-0` specifically:
+
+1. Add to the `Nifi` CR's `spec.configOverride.nifiProperties.upsert` (triggers an operator-managed pod restart of `mynifi-0` — confirmed idle first, 0 active threads cluster-wide, before this was even attempted):
+   ```yaml
+   nifi.remote.input.host: mynifi-web.mynifi.cfm-streaming.svc.cluster.local
+   nifi.remote.input.secure: "true"
+   nifi.remote.input.http.enabled: "true"
+   ```
+2. Create an Input Port (e.g. `from-nvidianano`) inside the `SparkPlug` PG with a downstream connection (an input port with no outgoing connection won't start) — a `PublishKafka-NvidiaNanoInference` processor is the natural target, matching the existing two-leg pattern.
+3. Declare a `User` CR for the peer identity (SAN-matched, not DN — see Ch10's "What NOT to do"), granting `write` on `/data-transfer/input-ports/<from-nvidianano-uuid>` and `read` on `/site-to-site`.
+4. Issue a client cert for the Jetson's new agent (SAN matching the `User.spec.identity`), mount it, and set `nifi.remote.input.secure=true` + `nifi.security.client.*` in the new agent's `minifi.properties` (Ch10's exact recipe — MiNiFi C++ has no SSL-context-service field on the RPG, client identity is global).
+5. Build the `RemoteProcessGroup` in the Designer, wire `ExecuteScript`'s `success` to it, validate, publish.
+
+Step 1 is what's actually blocking this — a production NiFi config change with an implicit pod restart. It needs a person to run it (or approve it), not an agent proceeding unattended on a shared production service. Steps 2-5 follow directly from Ch10's already-proven recipe once step 1 lands.
+
 ## What NOT to do
 
 **Assume a checked-in flow export matches what's live.** The `SparkPlug` PG existed only in a 2026-06-16 export by the time this chapter's NiFi work started — the live copy had been silently lost in an unrelated pod-recreate incident weeks earlier. Dump the live `flow.json.gz` before trusting any doc or export.
@@ -159,6 +186,8 @@ The original plan for this chapter included a further phase: a MiNiFi flow runni
 **Trust a firmware's own serial log as proof of delivery.** "WiFi connected" and "publish successful" on the device side don't confirm the broker received anything. Subscribe independently, from a different process, before calling a publish path verified.
 
 **Chase the BME280 hardware path further without a decision.** Two unresolved questions (which physical module, which Python library) were bundled into one blocked task. Both got flagged and parked rather than guessed at.
+
+**Assume EFM's agent-deployer's `serviceName` parameter controls the systemd unit name.** It doesn't — the deployer script hard-codes `SERVICE_NAME="minifi"` regardless of what's POSTed. A second systemd-managed C++ agent on the same host isn't possible via the deployer; run it with `bin/minifi.sh run` (foreground/backgroundable, no systemd) instead, and don't reuse an existing `nifi-minifi-cpp-*` install directory for a new class without clearing its persisted `conf/config.yml` first — a copied install boots straight into its old flow, including binding the same ports a live agent may already hold.
 
 ## Appendix — reusable command forms
 

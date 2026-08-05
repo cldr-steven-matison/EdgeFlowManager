@@ -1,0 +1,266 @@
+{
+    "flowMetadata": {
+        "identifier": "f7743d76-4c42-46ac-9b5d-1cc81dca1a3e",
+        "agentClass": "MicroFi",
+        "rootProcessGroupIdentifier": "383a5855-dd84-48b7-a2da-cb698dd9ba39",
+        "created": 1785344892733,
+        "updated": 1785962257746,
+        "undoEnabled": false,
+        "redoEnabled": false
+    },
+    "flowContent": {
+        "identifier": "383a5855-dd84-48b7-a2da-cb698dd9ba39",
+        "instanceIdentifier": "322c7266-4671-4327-9c20-a1f98f94eb7e",
+        "name": "root",
+        "comments": null,
+        "position": {
+            "x": 0.0,
+            "y": 0.0
+        },
+        "processGroups": [],
+        "remoteProcessGroups": [],
+        "processors": [
+            {
+                "identifier": "4b9279de-4e0c-4e45-a7af-8e0aaa80e658",
+                "instanceIdentifier": "9ab027c9-8484-4f40-b6a8-d9762b3181a1",
+                "name": "GenerateFlowFile-XiaoTelemetry",
+                "comments": "",
+                "position": {
+                    "x": 0.0,
+                    "y": 0.0
+                },
+                "type": "GenerateFlowFile",
+                "bundle": {
+                    "group": "org.apache.nifi",
+                    "artifact": "microfi-system",
+                    "version": "0.1.0"
+                },
+                "properties": {
+                    "File Size": "64 B",
+                    "Batch Size": "1",
+                    "Unique FlowFiles": "true",
+                    "Custom Text": null,
+                    "Data Format": "Text"
+                },
+                "propertyDescriptors": {
+                    "File Size": {
+                        "name": "File Size",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Batch Size": {
+                        "name": "Batch Size",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Unique FlowFiles": {
+                        "name": "Unique FlowFiles",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Custom Text": {
+                        "name": "Custom Text",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Data Format": {
+                        "name": "Data Format",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    }
+                },
+                "style": {},
+                "annotationData": null,
+                "schedulingPeriod": "1000 ms",
+                "schedulingStrategy": "TIMER_DRIVEN",
+                "executionNode": "ALL",
+                "penaltyDuration": "30000 ms",
+                "yieldDuration": "1000 ms",
+                "bulletinLevel": "WARN",
+                "runDurationMillis": 0,
+                "concurrentlySchedulableTaskCount": 1,
+                "autoTerminatedRelationships": [],
+                "scheduledState": null,
+                "retryCount": null,
+                "retriedRelationships": null,
+                "backoffMechanism": null,
+                "maxBackoffPeriod": null,
+                "componentType": "PROCESSOR",
+                "groupIdentifier": "383a5855-dd84-48b7-a2da-cb698dd9ba39"
+            },
+            {
+                "identifier": "45205f44-e1cc-4b84-8bb7-30af2685abdf",
+                "instanceIdentifier": "99be8b04-29e2-42a9-94c9-55393dfdfe08",
+                "name": "PublishMQTT-XiaoTelemetry",
+                "comments": "",
+                "position": {
+                    "x": 0.0,
+                    "y": 300.0
+                },
+                "type": "PublishMQTT",
+                "bundle": {
+                    "group": "org.apache.nifi",
+                    "artifact": "microfi-system",
+                    "version": "0.1.0"
+                },
+                "properties": {
+                    "Broker URI": "mqtt://192.168.1.121:1883",
+                    "Client ID": "xiao-microfi-sparkplug",
+                    "Username": null,
+                    "Topic": "test/sensor/data",
+                    "Quality of Service": "0",
+                    "Password": null
+                },
+                "propertyDescriptors": {
+                    "Broker URI": {
+                        "name": "Broker URI",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Client ID": {
+                        "name": "Client ID",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Username": {
+                        "name": "Username",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Topic": {
+                        "name": "Topic",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Quality of Service": {
+                        "name": "Quality of Service",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Password": {
+                        "name": "Password",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    }
+                },
+                "style": {},
+                "annotationData": null,
+                "schedulingPeriod": "1000 ms",
+                "schedulingStrategy": "TIMER_DRIVEN",
+                "executionNode": "ALL",
+                "penaltyDuration": "30000 ms",
+                "yieldDuration": "1000 ms",
+                "bulletinLevel": "WARN",
+                "runDurationMillis": 0,
+                "concurrentlySchedulableTaskCount": 1,
+                "autoTerminatedRelationships": [
+                    "success"
+                ],
+                "scheduledState": null,
+                "retryCount": null,
+                "retriedRelationships": null,
+                "backoffMechanism": null,
+                "maxBackoffPeriod": null,
+                "componentType": "PROCESSOR",
+                "groupIdentifier": "383a5855-dd84-48b7-a2da-cb698dd9ba39"
+            }
+        ],
+        "inputPorts": [],
+        "outputPorts": [],
+        "connections": [
+            {
+                "identifier": "9aa47e8e-22a4-4b39-8b49-9c45c694dfde",
+                "instanceIdentifier": "ba0e48e3-ef41-4429-96fc-5436159b8eb1",
+                "name": "GenerateFlowFile-XiaoTelemetry/success/PublishMQTT-XiaoTelemetry",
+                "comments": null,
+                "position": {
+                    "x": 0.0,
+                    "y": 0.0
+                },
+                "source": {
+                    "id": "4b9279de-4e0c-4e45-a7af-8e0aaa80e658",
+                    "type": "PROCESSOR",
+                    "groupId": "383a5855-dd84-48b7-a2da-cb698dd9ba39",
+                    "name": "GenerateFlowFile-XiaoTelemetry",
+                    "comments": null,
+                    "instanceIdentifier": "9ab027c9-8484-4f40-b6a8-d9762b3181a1"
+                },
+                "destination": {
+                    "id": "45205f44-e1cc-4b84-8bb7-30af2685abdf",
+                    "type": "PROCESSOR",
+                    "groupId": "383a5855-dd84-48b7-a2da-cb698dd9ba39",
+                    "name": "PublishMQTT-XiaoTelemetry",
+                    "comments": null,
+                    "instanceIdentifier": "99be8b04-29e2-42a9-94c9-55393dfdfe08"
+                },
+                "labelIndex": 1,
+                "zIndex": 0,
+                "selectedRelationships": [
+                    "success"
+                ],
+                "backPressureObjectThreshold": 2000,
+                "backPressureDataSizeThreshold": "100 MB",
+                "flowFileExpiration": "0 seconds",
+                "prioritizers": [],
+                "bends": [],
+                "loadBalanceStrategy": null,
+                "partitioningAttribute": null,
+                "loadBalanceCompression": null,
+                "componentType": "CONNECTION",
+                "groupIdentifier": "383a5855-dd84-48b7-a2da-cb698dd9ba39"
+            }
+        ],
+        "labels": [],
+        "funnels": [],
+        "controllerServices": [],
+        "versionedFlowCoordinates": null,
+        "variables": {},
+        "parameterContextName": "60abdd50-387f-4519-81fe-6b66b6094274",
+        "defaultFlowFileExpiration": null,
+        "defaultBackPressureObjectThreshold": null,
+        "defaultBackPressureDataSizeThreshold": null,
+        "logFileSuffix": null,
+        "flowFileConcurrency": null,
+        "flowFileOutboundPolicy": null,
+        "componentType": "PROCESS_GROUP",
+        "groupIdentifier": null
+    },
+    "parameterContexts": [
+        {
+            "id": "60abdd50-387f-4519-81fe-6b66b6094274",
+            "name": "60abdd50-387f-4519-81fe-6b66b6094274",
+            "parameters": [],
+            "usage": null
+        }
+    ],
+    "versionInfo": {
+        "flowVersion": 17,
+        "lastPublished": 1785962257328,
+        "lastPublishedBy": "anonymous",
+        "dirty": false,
+        "localChanges": false
+    },
+    "localFlowRevision": 93
+}

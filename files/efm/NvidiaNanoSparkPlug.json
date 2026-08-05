@@ -1,0 +1,444 @@
+{
+    "flowMetadata": {
+        "identifier": "cc756c6a-0276-4913-94fa-1cc5e2b20537",
+        "agentClass": "NvidiaNanoSparkPlug",
+        "rootProcessGroupIdentifier": "c73b7461-e639-4a2f-9548-a4d6f33fc1bd",
+        "created": 1785963099920,
+        "updated": 1785964919352,
+        "undoEnabled": false,
+        "redoEnabled": false
+    },
+    "flowContent": {
+        "identifier": "c73b7461-e639-4a2f-9548-a4d6f33fc1bd",
+        "instanceIdentifier": "048edf2a-1b75-4ba1-a0ce-2146691d14b8",
+        "name": "root",
+        "comments": null,
+        "position": {
+            "x": 0.0,
+            "y": 0.0
+        },
+        "processGroups": [],
+        "remoteProcessGroups": [],
+        "processors": [
+            {
+                "identifier": "97f65e03-2011-46e5-936f-f5fa81f522b2",
+                "instanceIdentifier": "e3dd8275-9bfc-4574-a308-59a2b8b1f1a6",
+                "name": "ExecuteScript-TensorRT",
+                "comments": "",
+                "position": {
+                    "x": 0.0,
+                    "y": 300.0
+                },
+                "type": "org.apache.nifi.minifi.processors.ExecuteScript",
+                "bundle": {
+                    "group": "org.apache.nifi.minifi",
+                    "artifact": "minifi-script-extension",
+                    "version": "1.26.02"
+                },
+                "properties": {
+                    "Script File": "/home/tunastreet/nifi-minifi-cpp-sparkplug/asset/gpu_nifi_tensorRT-3.py",
+                    "Script Engine": "python",
+                    "Script Body": null,
+                    "Module Directory": null
+                },
+                "propertyDescriptors": {
+                    "Script File": {
+                        "name": "Script File",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Script Engine": {
+                        "name": "Script Engine",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Script Body": {
+                        "name": "Script Body",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Module Directory": {
+                        "name": "Module Directory",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    }
+                },
+                "style": {},
+                "annotationData": null,
+                "schedulingPeriod": "1000 ms",
+                "schedulingStrategy": "TIMER_DRIVEN",
+                "executionNode": "ALL",
+                "penaltyDuration": "30000 ms",
+                "yieldDuration": "1000 ms",
+                "bulletinLevel": "WARN",
+                "runDurationMillis": 0,
+                "concurrentlySchedulableTaskCount": 1,
+                "autoTerminatedRelationships": [
+                    "original",
+                    "failure",
+                    "success"
+                ],
+                "scheduledState": null,
+                "retryCount": null,
+                "retriedRelationships": null,
+                "backoffMechanism": null,
+                "maxBackoffPeriod": null,
+                "componentType": "PROCESSOR",
+                "groupIdentifier": "c73b7461-e639-4a2f-9548-a4d6f33fc1bd"
+            },
+            {
+                "identifier": "4a031f6d-a105-451c-88cd-7ffb3c569d16",
+                "instanceIdentifier": "6a388a5e-f509-4d56-bd53-56de5c1b7934",
+                "name": "ConsumeMQTT-XiaoSensor",
+                "comments": "",
+                "position": {
+                    "x": 0.0,
+                    "y": 0.0
+                },
+                "type": "org.apache.nifi.minifi.processors.ConsumeMQTT",
+                "bundle": {
+                    "group": "org.apache.nifi.minifi",
+                    "artifact": "minifi-mqtt-extensions",
+                    "version": "1.26.02"
+                },
+                "properties": {
+                    "Client ID": "nvidiananosparkplug-consume",
+                    "Add Attributes As Fields": "true",
+                    "Receive Maximum": "65535",
+                    "Record Reader": null,
+                    "Broker URI": "tcp://192.168.1.121:1883",
+                    "MQTT Version": "3.x AUTO",
+                    "Connection Timeout": "10 sec",
+                    "Topic Alias Maximum": "0",
+                    "Security CA": null,
+                    "Security Pass Phrase": null,
+                    "Last Will Message": null,
+                    "Last Will QoS": "0",
+                    "Record Writer": null,
+                    "Topic": "test/sensor/data",
+                    "Security Cert": null,
+                    "Clean Session": "true",
+                    "Password": null,
+                    "Attribute From Content Type": null,
+                    "Queue Max Message": "1000",
+                    "Keep Alive Interval": "60 sec",
+                    "Security Private Key": null,
+                    "Quality of Service": "0",
+                    "Security Protocol": null,
+                    "Last Will Content Type": null,
+                    "Clean Start": "true",
+                    "Session Expiry Interval": "0 s",
+                    "Username": null,
+                    "Last Will Topic": null,
+                    "Last Will Retain": "false"
+                },
+                "propertyDescriptors": {
+                    "Client ID": {
+                        "name": "Client ID",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Add Attributes As Fields": {
+                        "name": "Add Attributes As Fields",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Receive Maximum": {
+                        "name": "Receive Maximum",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Record Reader": {
+                        "name": "Record Reader",
+                        "displayName": null,
+                        "identifiesControllerService": true,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Broker URI": {
+                        "name": "Broker URI",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "MQTT Version": {
+                        "name": "MQTT Version",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Connection Timeout": {
+                        "name": "Connection Timeout",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Topic Alias Maximum": {
+                        "name": "Topic Alias Maximum",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Security CA": {
+                        "name": "Security CA",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Security Pass Phrase": {
+                        "name": "Security Pass Phrase",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": true,
+                        "resourceDefinition": null
+                    },
+                    "Last Will Message": {
+                        "name": "Last Will Message",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Last Will QoS": {
+                        "name": "Last Will QoS",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Record Writer": {
+                        "name": "Record Writer",
+                        "displayName": null,
+                        "identifiesControllerService": true,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Topic": {
+                        "name": "Topic",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Security Cert": {
+                        "name": "Security Cert",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Clean Session": {
+                        "name": "Clean Session",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Password": {
+                        "name": "Password",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": true,
+                        "resourceDefinition": null
+                    },
+                    "Attribute From Content Type": {
+                        "name": "Attribute From Content Type",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Queue Max Message": {
+                        "name": "Queue Max Message",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Keep Alive Interval": {
+                        "name": "Keep Alive Interval",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Security Private Key": {
+                        "name": "Security Private Key",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Quality of Service": {
+                        "name": "Quality of Service",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Security Protocol": {
+                        "name": "Security Protocol",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Last Will Content Type": {
+                        "name": "Last Will Content Type",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Clean Start": {
+                        "name": "Clean Start",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Session Expiry Interval": {
+                        "name": "Session Expiry Interval",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Username": {
+                        "name": "Username",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Last Will Topic": {
+                        "name": "Last Will Topic",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Last Will Retain": {
+                        "name": "Last Will Retain",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    }
+                },
+                "style": {},
+                "annotationData": null,
+                "schedulingPeriod": "1000 ms",
+                "schedulingStrategy": "TIMER_DRIVEN",
+                "executionNode": "ALL",
+                "penaltyDuration": "30000 ms",
+                "yieldDuration": "1000 ms",
+                "bulletinLevel": "WARN",
+                "runDurationMillis": 0,
+                "concurrentlySchedulableTaskCount": 1,
+                "autoTerminatedRelationships": [],
+                "scheduledState": null,
+                "retryCount": null,
+                "retriedRelationships": null,
+                "backoffMechanism": null,
+                "maxBackoffPeriod": null,
+                "componentType": "PROCESSOR",
+                "groupIdentifier": "c73b7461-e639-4a2f-9548-a4d6f33fc1bd"
+            }
+        ],
+        "inputPorts": [],
+        "outputPorts": [],
+        "connections": [
+            {
+                "identifier": "b85019ae-9c20-46e0-abfe-008fd8ad0a9c",
+                "instanceIdentifier": "983ea40a-a35c-4a4f-a4d6-15c4bd343147",
+                "name": "ConsumeMQTT-XiaoSensor/success/ExecuteScript-TensorRT",
+                "comments": null,
+                "position": {
+                    "x": 0.0,
+                    "y": 0.0
+                },
+                "source": {
+                    "id": "4a031f6d-a105-451c-88cd-7ffb3c569d16",
+                    "type": "PROCESSOR",
+                    "groupId": "c73b7461-e639-4a2f-9548-a4d6f33fc1bd",
+                    "name": "ConsumeMQTT-XiaoSensor",
+                    "comments": null,
+                    "instanceIdentifier": "6a388a5e-f509-4d56-bd53-56de5c1b7934"
+                },
+                "destination": {
+                    "id": "97f65e03-2011-46e5-936f-f5fa81f522b2",
+                    "type": "PROCESSOR",
+                    "groupId": "c73b7461-e639-4a2f-9548-a4d6f33fc1bd",
+                    "name": "ExecuteScript-TensorRT",
+                    "comments": null,
+                    "instanceIdentifier": "e3dd8275-9bfc-4574-a308-59a2b8b1f1a6"
+                },
+                "labelIndex": 1,
+                "zIndex": 0,
+                "selectedRelationships": [
+                    "success"
+                ],
+                "backPressureObjectThreshold": 2000,
+                "backPressureDataSizeThreshold": "100 MB",
+                "flowFileExpiration": "0 seconds",
+                "prioritizers": [],
+                "bends": [],
+                "loadBalanceStrategy": null,
+                "partitioningAttribute": null,
+                "loadBalanceCompression": null,
+                "componentType": "CONNECTION",
+                "groupIdentifier": "c73b7461-e639-4a2f-9548-a4d6f33fc1bd"
+            }
+        ],
+        "labels": [],
+        "funnels": [],
+        "controllerServices": [],
+        "versionedFlowCoordinates": null,
+        "variables": {},
+        "parameterContextName": "80512b3f-105b-494c-8ca4-ed2ae3a3a190",
+        "defaultFlowFileExpiration": null,
+        "defaultBackPressureObjectThreshold": null,
+        "defaultBackPressureDataSizeThreshold": null,
+        "logFileSuffix": null,
+        "flowFileConcurrency": null,
+        "flowFileOutboundPolicy": null,
+        "componentType": "PROCESS_GROUP",
+        "groupIdentifier": null
+    },
+    "parameterContexts": [
+        {
+            "id": "80512b3f-105b-494c-8ca4-ed2ae3a3a190",
+            "name": "80512b3f-105b-494c-8ca4-ed2ae3a3a190",
+            "parameters": [],
+            "usage": null
+        }
+    ],
+    "versionInfo": {
+        "flowVersion": 1,
+        "lastPublished": 1785964919001,
+        "lastPublishedBy": "anonymous",
+        "dirty": false,
+        "localChanges": false
+    },
+    "localFlowRevision": 5
+}
