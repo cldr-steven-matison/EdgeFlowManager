@@ -10,7 +10,7 @@ at the edge — a MiNiFi agent on a Jetson, a Windows box over Tailscale, a Kube
 persistent identity — is where the real problems live: binary delivery, agent enrollment, which
 processors actually exist in which build, managing custom processors and resources, and how to get a
 flow from a designer canvas onto a device that keeps changing its IP. This guide is the map I wish
-I'd had when I first installed [EFM on Kubernetes](https://cldr-steven-matison.github.io/blog/cloudera-edge-flow-manager-on-kubernetes/).
+I'd had when I first installed [EFM on Kubernetes](https://cldr-steven-matison.github.io/blog/Cloudera-Edge-Flow-Manager-on-Kubernetes/).
 
 Every chapter here is built and run on real hardware — the processor catalogs are the ones counted
 on live agents, not the ones the docs promise, and every flow is one that actually ran.
