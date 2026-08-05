@@ -11,7 +11,7 @@ rest of the guide lives in.
 > **Why a chapter about a tool, in a guide about EFM?** Because the tool *is* how the EFM work got
 > done, and everything it knows about EFM was learned the expensive way — one silent-drop,
 > corrupted-credential, empty-install-dir bug at a time. Reading the skill is reading the
-> post-mortems without paying for them. The rest of Part V then puts it to work.
+> post-mortems without paying for them. The rest of Part VI then puts it to work.
 
 Everything here is field-verified against a live EFM `2.3.1.0-2`, MiNiFi C++ `1.26.02`, and MiNiFi
 Java `2.24.08.0-19`.
@@ -68,7 +68,7 @@ trivia — they're the ones that, ignored, cost an afternoon each:
    scheduling.
 
 Rules 1, 2, 5, and 6 are the ones that bite hardest at the edge, and they carry through the whole
-of Part V.
+of Part VI.
 
 ### The three deployment shapes
 
