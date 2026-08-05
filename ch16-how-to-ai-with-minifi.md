@@ -62,7 +62,7 @@ services instead of one `ListenHTTP`/`InvokeHTTP` pair per service. The agent do
 model is; it accepts a POST, forwards it, and hands the real response straight back. The value is
 the flow, the enrollment, and the transport, not the inference.
 
-![HandleHttpRequest-Lemonade → InvokeHTTP-Lemonade → HandleHttpResponse-Lemonade, live per-processor throughput in the EFM Flow Designer](assets/images/efm-starlink-ai-unified-lemonade-flow.png)
+![HandleHttpRequest-Lemonade → InvokeHTTP-Lemonade → HandleHttpResponse-Lemonade, live per-processor throughput in the EFM Flow Designer](images/efm-starlink-ai-unified-lemonade-flow.png)
 
 ### Why MiNiFi Java, not C++
 
@@ -299,7 +299,7 @@ In EFM Designer flows the C++ FQCN is `org.apache.nifi.minifi.processors.Execute
 `minifi` in the path. It is not the Java NiFi
 `org.apache.nifi.processors.standard.ExecuteScript`.
 
-![WindowsDesktopCpp Flow Designer canvas — parallel ListenHTTP → ExecuteScript → LogAttribute lanes for the Python smoke, load, and matrix tests](assets/images/efm-nifi-and-ai-skill-spacing.jpg)
+![WindowsDesktopCpp Flow Designer canvas — parallel ListenHTTP → ExecuteScript → LogAttribute lanes for the Python smoke, load, and matrix tests](images/efm-nifi-and-ai-skill-spacing.jpg)
 
 ### `ExecuteScript` availability
 
@@ -388,7 +388,7 @@ From there it wires into an EFM Designer flow (`ListenHTTP → EdgeTagger → Lo
 like a stock processor — no special-casing to reference a custom type — and publishes with zero
 validation errors.
 
-![The custom EdgeTagger Python processor live in a flow — ListenHTTP-EdgeTagger → EdgeTagger → LogAttribute-EdgeTagger, the middle node showing under its own name, not ExecuteScript](assets/images/efm-custome-python-edge-tagger.jpg)
+![The custom EdgeTagger Python processor live in a flow — ListenHTTP-EdgeTagger → EdgeTagger → LogAttribute-EdgeTagger, the middle node showing under its own name, not ExecuteScript](images/efm-custome-python-edge-tagger.jpg)
 
 > **⚠️ A custom processor is not a hot patch.** `PythonCreator` scans at boot; a `.py` dropped in
 > or edited after the agent is running is not picked up until the agent restarts. This is the sharp

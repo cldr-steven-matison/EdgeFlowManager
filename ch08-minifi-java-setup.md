@@ -408,11 +408,11 @@ or 502 on a downstream failure) rather than a fire-and-forget ack:
 - **`/streamChatListener`** — the Twitch `!load` screen-control front door.
 - **`/matrixListener`** — the Twitch `!matrix` screensaver front door.
 
-![NvidiaNanoJava Inference flow — HandleHttpRequest → InvokeHTTP → HandleHttpResponse](assets/images/efm-NvidiaNano-Inference-Flow.png)
+![NvidiaNanoJava Inference flow — HandleHttpRequest → InvokeHTTP → HandleHttpResponse](images/efm-NvidiaNano-Inference-Flow.png)
 
-![NvidiaNanoJava StreamChat flow — HandleHttpRequest → InvokeHTTP → HandleHttpResponse](assets/images/efm-NvidiaNano-StreamChat-Flow.png)
+![NvidiaNanoJava StreamChat flow — HandleHttpRequest → InvokeHTTP → HandleHttpResponse](images/efm-NvidiaNano-StreamChat-Flow.png)
 
-![NvidiaNanoJava Matrix flow — HandleHttpRequest → InvokeHTTP → HandleHttpResponse](assets/images/efm-NvidiaNano-Matrix-Flow.png)
+![NvidiaNanoJava Matrix flow — HandleHttpRequest → InvokeHTTP → HandleHttpResponse](images/efm-NvidiaNano-Matrix-Flow.png)
 
 ## What NOT to do
 

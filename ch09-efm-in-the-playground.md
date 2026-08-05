@@ -190,17 +190,17 @@ Expected output for both flavors:
 
 Check EFM Monitor → Agents after `kubectl apply`. Both should reach `ONLINE` status within ~2 minutes.
 
-![PlaygroundCpp agent class in EFM → Monitor → Agents — Good Health, one agent enrolled](assets/images/efm-PlaygroundCpp-Class.jpg)
+![PlaygroundCpp agent class in EFM → Monitor → Agents — Good Health, one agent enrolled](images/efm-PlaygroundCpp-Class.jpg)
 
-![PlaygroundJava agent class in EFM → Monitor → Agents — Good Health, one agent enrolled](assets/images/efm-PlaygroundJava-Class.jpg)
+![PlaygroundJava agent class in EFM → Monitor → Agents — Good Health, one agent enrolled](images/efm-PlaygroundJava-Class.jpg)
 
-![PlaygroundCpp Flow Designer — vertical GenerateFlowFile → LogAttribute at row pitch 300, Published, Monitoring Active](assets/images/efm-PlaygroundCpp-Class-efm-ui.jpg)
+![PlaygroundCpp Flow Designer — vertical GenerateFlowFile → LogAttribute at row pitch 300, Published, Monitoring Active](images/efm-PlaygroundCpp-Class-efm-ui.jpg)
 
-![PlaygroundCpp flow canvas close-up — correct (0,0)/(0,300) placement](assets/images/efm-PlaygroundCpp-Class-efm-ui-flow.jpg)
+![PlaygroundCpp flow canvas close-up — correct (0,0)/(0,300) placement](images/efm-PlaygroundCpp-Class-efm-ui-flow.jpg)
 
-![PlaygroundJava Flow Designer — same vertical shape, Published, Monitoring Active](assets/images/efm-PlaygroundJava-Class-efm-ui.jpg)
+![PlaygroundJava Flow Designer — same vertical shape, Published, Monitoring Active](images/efm-PlaygroundJava-Class-efm-ui.jpg)
 
-![PlaygroundJava flow canvas close-up — correct (0,0)/(0,300) placement](assets/images/efm-PlaygroundJava-Class-efm-ui-flow.jpg)
+![PlaygroundJava flow canvas close-up — correct (0,0)/(0,300) placement](images/efm-PlaygroundJava-Class-efm-ui-flow.jpg)
 
 Verify from the pod itself:
 

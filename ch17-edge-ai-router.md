@@ -71,7 +71,7 @@ Three processors, one port, no Kafka, no `request_id` correlation — the caller
 response directly and synchronously. Everything in the serving path runs **natively on Windows** —
 no containers, no WSL2 (WSL2 on this box is only used for repo/doc access).
 
-![HandleHttpRequest-Lemonade → InvokeHTTP-Lemonade → HandleHttpResponse-Lemonade, live per-processor throughput in the EFM Flow Designer](assets/images/efm-starlink-ai-unified-lemonade-flow.png)
+![HandleHttpRequest-Lemonade → InvokeHTTP-Lemonade → HandleHttpResponse-Lemonade, live per-processor throughput in the EFM Flow Designer](images/efm-starlink-ai-unified-lemonade-flow.png)
 
 The deployed router in the EFM Flow Designer with monitoring active — real per-processor throughput
 (In / Read-Write / Out / Tasks) on the three-processor primary path, plus an error-observability

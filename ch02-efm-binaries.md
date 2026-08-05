@@ -179,9 +179,9 @@ Output must be exactly these five leaves:
 Refresh the EFM UI and the deploy dropdown now cleanly offers `v1.26.02 - linux`,
 `v1.26.02 - windows`, and `v2.24.08.0-19 - linux`.
 
-![Deploy Agent CLI Command — Java binary version dropdown showing linux and windows leaves present](assets/images/efm-Deploy-Agent-CLI-1.jpg)
+![Deploy Agent CLI Command — Java binary version dropdown showing linux and windows leaves present](images/efm-Deploy-Agent-CLI-1.jpg)
 
-![Deploy Agent CLI Command — C++ binary version dropdown showing linux, linuxaarch64, and windows leaves](assets/images/efm-Deploy-Agent-CLI-2.jpg)
+![Deploy Agent CLI Command — C++ binary version dropdown showing linux, linuxaarch64, and windows leaves](images/efm-Deploy-Agent-CLI-2.jpg)
 
 ## Deploy an agent
 
@@ -315,7 +315,7 @@ curl -X POST http://127.0.0.1:10090/efm/api/agent-class-manifest-config \
   -d '{"agentClassName":"WindowsDesktopCpp","agentManifestId":"<id-from-GET-/agents/{id}>"}'
 ```
 
-![Windows extensions directory after full-feature install — both minifi-python-script-extension.dll and minifi_native.pyd present](assets/images/efm-binaries-windows.jpg)
+![Windows extensions directory after full-feature install — both minifi-python-script-extension.dll and minifi_native.pyd present](images/efm-binaries-windows.jpg)
 
 ## Windows Java: it installs clean, then you find out what's missing
 

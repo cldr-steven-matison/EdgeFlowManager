@@ -45,9 +45,9 @@ The Jetson is a separate box on the LAN and cannot reach the host's `127.0.0.1`.
 
 After EFM is up, create a class to reach the **Deploy Agent CLI** screen. The binary version dropdowns read from `agent-deployer/binaries/{agentType}/{osArch}/{agentVersion}` — the `linuxaarch64` C++ build is what the Jetson enrolls against.
 
-![Deploy Agent CLI Command — Java binary version dropdown](assets/images/efm-Deploy-Agent-CLI-1.jpg)
+![Deploy Agent CLI Command — Java binary version dropdown](images/efm-Deploy-Agent-CLI-1.jpg)
 
-![Deploy Agent CLI Command — C++ binary version dropdown, including the linuxaarch64 build for the Jetson](assets/images/efm-Deploy-Agent-CLI-2.jpg)
+![Deploy Agent CLI Command — C++ binary version dropdown, including the linuxaarch64 build for the Jetson](images/efm-Deploy-Agent-CLI-2.jpg)
 
 ## Windows networking: mirrored mode vs NAT mode
 
@@ -194,7 +194,7 @@ kubectl exec -it minifi-agent-k8s -n cld-streaming -- tail -f /nifi-minifi-cpp-1
 
 Field-captured on WindowsDesktop from the live pod — the C++ build only logs *failed* C2 heartbeats, not successful ones, so there's no "registered!" line. What the log shows is the agent retrying every 5s while EFM was mid-startup, then going quiet once EFM came up — consistent with the heartbeat succeeding silently. The live-connection proof is the EFM dashboard:
 
-![KubernetesPod class in EFM → Monitor → Agents — Good Health, one agent enrolled](assets/images/efm-KubernetesPod-Class.jpg)
+![KubernetesPod class in EFM → Monitor → Agents — Good Health, one agent enrolled](images/efm-KubernetesPod-Class.jpg)
 
 The `KubernetesPod` class shows **Good Health** with `minifi-agent-k8s-gaming` enrolled and reporting.
 
@@ -228,7 +228,7 @@ tail -f minifi-1.26.02/logs/minifi-app.log
 
 The agent appears in EFM → **Monitor** → **Agents** under class `NvidiaNano` within a few minutes:
 
-![NvidiaNano class in EFM → Monitor → Agents — Good Health, Jetson agent enrolled](assets/images/efm-NvidiaNano-Class.jpg)
+![NvidiaNano class in EFM → Monitor → Agents — Good Health, Jetson agent enrolled](images/efm-NvidiaNano-Class.jpg)
 
 The `NvidiaNano` class shows **Good Health** with the Jetson Orin Nano's C++ agent enrolled and reporting. The `NvidiaNano` class is field-confirmed operational.
 
