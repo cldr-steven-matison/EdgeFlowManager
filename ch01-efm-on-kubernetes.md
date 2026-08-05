@@ -1,4 +1,4 @@
-# Chapter 1: EFM on Kubernetes (incl. persistence)
+# Chapter 1: EFM on Kubernetes
 
 EFM — Cloudera Edge Flow Manager — is the central manager that turns a bare MiNiFi binary into a
 managed agent. It owns agent Classes, Resources, and Edge Flows, and it pushes configuration down

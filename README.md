@@ -22,7 +22,7 @@ on live agents, not the ones the docs promise, and every flow is one that actual
 ### Part I — EFM Foundations on Kubernetes
 Get EFM running and persisted, and fed with agent binaries. The infrastructure everything else rides on.
 
-- **Ch1** — [EFM on Kubernetes (incl. persistence)](ch01-efm-on-kubernetes.md)
+- **Ch1** — [EFM on Kubernetes](ch01-efm-on-kubernetes.md)
 - **Ch2** — [EFM Binaries & staging tree](ch02-efm-binaries.md)
 
 ### Part II — Processors (C++ & Java)
@@ -33,10 +33,10 @@ Which processors actually exist in each build, how `ExecuteScript` availability 
 - **Ch5** — [ExecuteScript Availability](ch05-executescript-availability.md)
 - **Ch6** — [MiNiFi custom Python processors](ch06-minifi-custom-python-processors.md)
 
-### Part III — MiNiFi Playground repo
+### Part III — MiNiFi Playground Repo
 Install and use plain MiNiFi (C++ and Java), then bring EFM in to manage the agents and resources.
 
-- **Ch7** — [Standalone MiNiFi C++ on Kubernetes (no EFM)](ch07-standalone-minifi-cpp-on-k8s.md)
+- **Ch7** — [Standalone MiNiFi C++ on Kubernetes](ch07-standalone-minifi-cpp-on-k8s.md)
 - **Ch8** — [MiNiFi Java setup](ch08-minifi-java-setup.md)
 - **Ch9** — [Introduce EFM into the Playground](ch09-efm-in-the-playground.md)
 
@@ -85,5 +85,4 @@ Sparkplug B over MQTT, the AI-at-the-edge patterns, a gallery of runnable flows,
 demos, and the observability layer that watches all of it.
 
 **This is the published guide** — the chapter files in this directory, read through this index on
-GitHub. There is no separate document to assemble and no other site to go to. Chapters marked
-*in progress* aren't linked yet; they land as they are finished.
+GitHub. There is no separate document to assemble and no other site to go to.
