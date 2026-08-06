@@ -161,28 +161,49 @@ the top of the pod log and nothing after.
 the deployer. Diagnose with `kubectl exec <agent-pod> -- ls /nifi-minifi-cpp-<ver>/` — empty means
 the deployer never ran.
 
-## The Deployer Curl
+## The Deployer Command — Get It From EFM, Never Hand-Build It
 
-Same shape for every arch — swap `agentType` / `agentVersion` / `osArch`:
+**The only sanctioned way to obtain a deployer command is EFM's own Deploy Agent CLI screen, or its
+backing API, `POST /efm/api/agent-deployer/generateCommand`.** Both return a full, ready-to-run
+command carrying a **server-minted `agentIdentifier`**. Do not hand-construct the `curl` /
+`Invoke-WebRequest`, and do not copy a previous deployment's command and tweak the fields for a new
+enrollment — that is exactly how a stale identifier gets reused and two pods collide on one EFM
+identity.
 
 ```bash
-curl -L \
- -d agentClass=MyClass \
- -d agentIdentifier=$(cat /proc/sys/kernel/random/uuid) \
- -d agentType=cpp \
- -d agentVersion=<ver> \
- -d autoConfigureSecurity=false \
- -d baseUrl=http%3A%2F%2F127.0.0.1%3A<port>%2Fefm%2Fapi \
- -d hbPeriod=5000 \
- -d osArch=linuxaarch64 \
- -d serviceName=minifi -d serviceUser=minifi \
- -d trustSelfSignedCertificates=false \
- http://<efm-host>:10090/efm/api/agent-deployer/script | bash -
+curl -s -X POST http://<efm-host>:10090/efm/api/agent-deployer/generateCommand \
+ -H 'Content-Type: application/json' \
+ -d '{
+   "agentClass": "MyClass",
+   "agentType": "cpp",
+   "agentVersion": "<ver>",
+   "osArch": "linuxaarch64",
+   "baseUrl": "http://127.0.0.1:<port>/efm/api",
+   "hbPeriod": 5000,
+   "serviceUser": "minifi",
+   "serviceName": "minifi",
+   "autoConfigureSecurity": false,
+   "trustSelfSignedCertificates": false
+ }'
 ```
 
-On **Windows** run the equivalent `Invoke-WebRequest ... | Invoke-Expression` from PowerShell **as
-Administrator**, and `cd` to a clean dir first — the deployer installs to `$PWD`, and running it from
-`C:\WINDOWS\system32` is a permission nightmare.
+Omit `agentIdentifier` from that body — the server generates a fresh, collision-free one. The
+returned command has the same shape as any deployer curl (`agentClass`, `agentType`, `osArch`, and so
+on, piped into `bash -` on Linux or `Invoke-Expression` on Windows), but its `agentIdentifier` field
+is server-supplied, not something to pick or copy.
+
+> **A real incident made this rule load-bearing.** Consolidating two classes of the same physical
+> agent into one, a session re-enrolled the Java agent with a **hand-built** deployer command that
+> **reused the retired class's `agentIdentifier`**. The EFM C2 `UPDATE` pushing the flow to the
+> re-enrolled agent failed repeatedly, and the class's dashboard status turned red — two identities
+> claiming one agent record. Re-enrolling through `generateCommand` with its own fresh identifier
+> fixed it outright. **The one place reusing an identifier is correct is restoring the exact same
+> bare pod that was never de-registered** (see the dark-agent recovery below) — a *new* enrollment or
+> a class migration is never that case; always mint a fresh identifier.
+
+On **Windows** run the *generated* command via `Invoke-WebRequest ... | Invoke-Expression` from
+PowerShell **as Administrator**, and `cd` to a clean dir first — the deployer installs to `$PWD`, and
+running it from `C:\WINDOWS\system32` is a permission nightmare.
 
 ---
 
@@ -308,6 +329,58 @@ across the flow, or budget for a real `Service` if the pod will restart more tha
 
 ---
 
+## Orphaned Resources, and Why the "Updated Agents" Badge Lies
+
+A second, distinct incident produced the exact same visible symptom as the deployer-command mistake
+above — a class showing red on the dashboard — from a completely unrelated cause. Worth separating
+the two clearly, because the fix for one does nothing for the other.
+
+An agent class had migrated from a C++ agent to a Java one, but a handful of Python `ExecuteScript`
+assets from the old C++ agent stayed **assigned** to the class in the Resource Manager. Java
+`ExecuteScript` cannot run Python at all, so those assets were dead weight the moment the migration
+happened — and every heartbeat cycle, the live agent's `SYNC RESOURCE` operation failed with an HTTP
+500 fetching resource content that, functionally, nothing needed anymore.
+
+**Unassigning the stale resources through the documented Resource Manager API was necessary but not
+sufficient.** Every read endpoint confirmed the unassignment landed correctly — the resource no
+longer showed as assigned to the class, and its own reverse lookup showed no class association at
+all. But the very next `SYNC RESOURCE` operation dispatched to the agent still carried the
+byte-identical resource list and hash digest as every failure before the fix. EFM was caching the
+per-class resource digest it uses to build that operation somewhere the assign/unassign API call
+doesn't reach — the read path was honest, the operation-generation path wasn't.
+
+**The actual fix was restarting the EFM pod itself** (`kubectl rollout restart deployment/efm`) —
+not the agent, not the class, just EFM's own process, to force it to drop its in-memory cache and
+reload from Postgres. Nothing is lost doing this: EFM's persistent state lives in Postgres and its
+PVCs, not in the pod's memory (see "EFM Persistence" above). The very next sync after the restart
+succeeded cleanly.
+
+**Here's the part that actually explains the confusion in the field:** even with the underlying sync
+now succeeding on every individual operation, **the dashboard's "Updated Agents" badge stayed red.**
+That badge is not a live health indicator — it reflects the class's *most recent bulk operation*, a
+different, coarser record that's only created by a class-wide action like publishing a flow. Routine
+per-agent sync retries never touch it. So a class can have every individual operation succeeding and
+still show red indefinitely, simply because nothing has run a fresh bulk action since the last one
+failed. Conversely, don't read a green badge as proof of health either — check the underlying
+per-agent operations directly.
+
+**Clearing the badge for real turned out to be cheap: republish the flow, even with zero content
+changes.** EFM's publish endpoint accepts a republish of an already-current, non-dirty flow, bumps
+its version number anyway, and pushes a fresh configuration update to every agent in the class. That
+alone was enough to create a new, successful bulk operation and flip the badge to green — no
+delete-and-recreate needed, and the live agent's own identity and running processors were completely
+unaffected.
+
+**If a plain republish doesn't clear it**, the class is more deeply broken than a stale badge and the
+fallback is delete-agent → delete-class → recreate. The trap in that fallback: **don't point the
+freshly recreated class at the old, retired class's flow definition.** That flow belongs to a
+identity that's gone; reusing it either fails outright or drags forward whatever made the original
+class unhealthy. Build the new class's flow fresh, and — combined with the deployer-command rule
+above — always mint a fresh `agentIdentifier` too. A class recreation that reuses either the old flow
+or the old identifier is liable to reproduce the exact failure it was meant to fix.
+
+---
+
 ## What NOT to Do
 
 - **Don't iterate direct-on-agent and assume it sticks.** A hand-edited `config.yml` or a
@@ -322,6 +395,14 @@ across the flow, or budget for a real `Service` if the pod will restart more tha
   and a crash-looper hangs it. Query the `agent` table.
 - **Don't GET-then-PUT a processor with sensitive properties.** The `********` mask writes back as a
   literal and destroys the credential (rule 2).
+- **Don't hand-build an agent-deployer command, or reuse an `agentIdentifier` for a new enrollment.**
+  Get it from `generateCommand` every time; a stale identifier collides two pods on one EFM identity.
+- **Don't assume unassigning a stale Resource actually stops EFM syncing it.** The read endpoints can
+  be honest while the operation-generation cache stays stale — verify the next sync actually succeeds,
+  and restart the EFM pod if it doesn't.
+- **Don't trust the "Updated Agents" dashboard badge either way.** It tracks the class's last bulk
+  operation, not live per-agent health — query the underlying operations directly before concluding a
+  class is broken or fixed.
 - **Don't `kubectl delete` a bare agent pod without first saving its
   `last-applied-configuration`.** It won't reschedule, and you'll have lost the manifest that
   re-registers it as the same agent.
