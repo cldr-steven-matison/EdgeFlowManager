@@ -23,7 +23,7 @@ on live agents, not the ones the docs promise, and every flow is one that actual
 Get EFM running and persisted, and fed with agent binaries. The infrastructure everything else rides on.
 
 - **Ch1** — [EFM on Kubernetes](ch01-efm-on-kubernetes.md)
-- **Ch2** — [EFM Binaries & staging tree](ch02-efm-binaries.md)
+- **Ch2** — [EFM Binaries & Staging Tree](ch02-efm-binaries.md)
 
 ### Part II — Processors (C++ & Java)
 Which processors actually exist in each build, how `ExecuteScript` availability differs across builds, and how to author custom Python processors as their own types at the edge.
@@ -31,7 +31,7 @@ Which processors actually exist in each build, how `ExecuteScript` availability 
 - **Ch3** — [MiNiFi C++ Processor Catalog](ch03-cpp-processor-catalog.md)
 - **Ch4** — [MiNiFi Java Processor Catalog](ch04-java-processor-catalog.md)
 - **Ch5** — [ExecuteScript Availability](ch05-executescript-availability.md)
-- **Ch6** — [MiNiFi custom Python processors](ch06-minifi-custom-python-processors.md)
+- **Ch6** — [MiNiFi Custom Python Processors](ch06-minifi-custom-python-processors.md)
 
 ### Part III — MiNiFi Playground Repo
 Install and use plain MiNiFi (C++ and Java), then bring EFM in to manage the agents and resources.
