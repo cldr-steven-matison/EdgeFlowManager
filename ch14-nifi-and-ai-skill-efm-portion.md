@@ -364,6 +364,13 @@ still show red indefinitely, simply because nothing has run a fresh bulk action 
 failed. Conversely, don't read a green badge as proof of health either — check the underlying
 per-agent operations directly.
 
+![Monitor → Agents "Updated Agents" column still showing a red warning icon at 100% — the badge tracks the last bulk operation, not live per-agent sync health](images/efm-orphaned-resources-updated-agents-badge.png)
+
+Clicking through the warning surfaces the coarser bulk-operation record itself, not the live
+per-agent state:
+
+![Updated Agents drill-down — "1 failed to update. 0 of 1 agents (100%) have received the last update." with a View Recent Alerts link](images/efm-orphaned-resources-sync-alert-detail.png)
+
 **Clearing the badge for real turned out to be cheap: republish the flow, even with zero content
 changes.** EFM's publish endpoint accepts a republish of an already-current, non-dirty flow, bumps
 its version number anyway, and pushes a fresh configuration update to every agent in the class. That
