@@ -58,7 +58,7 @@ The `nifi-and-ai` skill and its EFM machinery as the grounding lead-in, then NiF
 - **Ch14** — [The NiFi and AI Skill — EFM Portion](ch14-nifi-and-ai-skill-efm-portion.md)
 - **Ch15** — [How to AI with NiFi and Python](ch15-how-to-ai-with-nifi-and-python.md)
 - **Ch16** — [How to AI with MiNiFi](ch16-how-to-ai-with-minifi.md)
-- **Ch17** — [Edge-AI router case study](ch17-edge-ai-router.md)
+- **Ch17** — [Edge-AI Router Case Study](ch17-edge-ai-router.md)
 
 ### Part VII — Sample Gallery
 Curated, runnable flows accumulated as the guide is built.
@@ -68,8 +68,8 @@ Curated, runnable flows accumulated as the guide is built.
 ### Part VIII — Real-World Demos
 EFM + NVIDIA Jetson, and the SparkPlug/IIoT demos — the final output and story (NvidiaNano, StarlinkAI, SparkPlug).
 
-- **Ch19** — [EFM + NVIDIA Jetson use case](ch19-efm-and-nvidia-jetson.md)
-- **Ch20** — [SparkPlug B — MQTT/IIoT edge demo](ch20-sparkplug-demo.md)
+- **Ch19** — [EFM + NVIDIA Jetson Use Case](ch19-efm-and-nvidia-jetson.md)
+- **Ch20** — [SparkPlug B — MQTT/IIoT Edge Demo](ch20-sparkplug-demo.md)
 
 ### Part IX — Observability
 The layer that watches all of the above — EFM's own metrics, the C++ agent's Prometheus publisher, and the smallest agents' heartbeat metrics, all into one CSO Prometheus/Grafana stack.
