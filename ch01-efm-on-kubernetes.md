@@ -221,6 +221,7 @@ the `efm.db.url` property in `efm-configMap.yaml`.
 | Agent: `Script File ... does not exist` | Resource `file_name` in EFM doesn't match `Script File` in flow | Rename resource in EFM to match, or fix the flow property |
 | Port-forward returns HTTP 000 / RST | Stale forward bound to dead pod after rollout | `lsof -iTCP:10090 -sTCP:LISTEN`, kill, re-forward |
 | Postgres: `remaining connection slots are reserved` | Too many idle EFM connections | `SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE state='idle' AND datname='efm';` |
+| EFM UI dashboard keeps showing "N agents failed to update" after you deleted the failing agent | `bulk_operation` row for that class stuck at `current_state='FAILED'` — not cleaned up by deleting the agent or its `operation` rows | `DELETE FROM bulk_operation WHERE agent_class_id = '<class>' AND current_state != 'DONE';` (only after confirming the class's real agent(s) are healthy) |
 
 ---
 
@@ -239,6 +240,8 @@ as a missing file on the next heartbeat. The fix is `efm-pvc.yaml` + remounting,
 (though a re-upload after fixing the mount is the quickest way to repopulate).
 
 **Don't start a port-forward without checking for an existing one.** See Phase 6 above.
+
+**`DELETE /efm/api/agents/{id}` doesn't clean up that agent's history — check two more tables, not one.** Removing a stale/`MISSING` agent leaves its rows behind in both `operation` (per-operation log — clean with `DELETE FROM operation WHERE target_agent_id = '<id>' AND state = 'FAILED'`, terminal states only) and, separately, `bulk_operation` (a **class-scoped rollup row**, not per-agent, that the dashboard's "N agents received the last update" widget reads directly — `DELETE FROM bulk_operation WHERE agent_class_id = '<class>' AND current_state != 'DONE'`). Deleting only the `operation` row is not enough: the `bulk_operation` row is a separate table and isn't recomputed when the agent or its operation history is cleaned up, so the UI alert keeps showing a failure that no longer exists.
 
 ---
 
