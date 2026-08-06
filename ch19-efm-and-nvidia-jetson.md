@@ -354,6 +354,92 @@ kafka-console-consumer.sh --bootstrap-server gaming-pc-lan-ip:31623 \
 
 The `tensorrt` block was appended live on the Jetson's GPU by `gpu_nifi_tensorRT-3.py`. Full `ListenHTTP → ExecuteScript → PublishKafka` chain confirmed end to end on real aarch64 hardware.
 
+## Synchronous Request/Response — the `NvidiaNanoJava` HandleHttp Flow
+
+The fire-and-forget `ListenHTTP → ExecuteScript → PublishKafka` pattern documented above is one valid inference shape. The caller sends a POST, gets an immediate `200 OK`, and the real result lands in Kafka later for downstream consumers. That pattern is appropriate for high-throughput async pipelines — the inference itself is decoupled from the HTTP round trip.
+
+A second, current-choice pattern for synchronous request/response is the `NvidiaNanoJava` MiNiFi Java agent — a separate agent running on the same Jetson hardware, dedicated to serving inference requests with a real answer in the HTTP response body. This is necessary for scenarios where the caller (e.g. a microcontroller or edge device) expects to POST and get an immediate answer without needing to poll Kafka or handle correlation IDs.
+
+### Deploying the Java Agent
+
+MiNiFi Java requires a JRE; the Jetson's default image includes none:
+
+```bash
+sudo apt install -y openjdk-21-jre-headless
+cd ~/minifi-java-nano/minifi-2.24.08.0-19 && ./bin/minifi.sh start
+```
+
+With OpenJDK 21.0.11 installed, the agent starts in under 5 seconds and auto-registers with EFM as a `NvidiaNanoJava` class agent within the standard heartbeat cycle.
+
+### The Inference Flow Shape
+
+The flow is four processors and one HTTP Context Map controller service:
+
+```
+HandleHttpRequest-Inference  (0,   0)    :8090, path /classify, HTTP Context Map
+InvokeHTTP-Classify          (0,   300)  POST → http://127.0.0.1:5910/classify
+HandleHttpResponse-OK        (0,   600)  200          ← success path
+HandleHttpResponse-Error     (600, 600)  502          ← error branch
+```
+
+The `InvokeHTTP` processor routes successful responses (HTTP 200) to `HandleHttpResponse-OK` and anything else to `HandleHttpResponse-Error`. The `Retry` path self-loops with a 10-minute FlowFile expiration rather than auto-terminate, preventing in-flight requests from blocking if the inference daemon becomes unavailable mid-request.
+
+### Timeout Configuration — Critical for Local Inference
+
+The three `InvokeHTTP` timeouts are set deliberately, not left at framework defaults:
+
+- **Connection**: 5 seconds
+- **Socket Read**: 10 seconds
+- **Socket Write**: 10 seconds
+
+The framework default for all three is 15 seconds. When the inference daemon is local (127.0.0.1:5910) and answers in ~4 ms, a socket read timeout of 15 s means the caller hangs for 15 s on any network error — unacceptable for real-time scenarios. The tighter timeouts above ensure a failure is reported to the caller in under 10 seconds.
+
+### Real Round-Trip Performance
+
+Field-captured on the Jetson Orin Nano running the same MobileNetV2 FP16 inference daemon as the C++ agent flow:
+
+```console
+$ curl --data-binary @dog-640.jpg -H "Content-Type: application/octet-stream" \
+       http://127.0.0.1:8090/classify
+{"ok": true, "model": "mobilenetv2-12 (ImageNet-1k, FP16)", "source": "body",
+ "predictions": [{"label": "Samoyed", "class_id": 258, "confidence": 0.723496}, ...],
+ "preprocess_ms": 6.53, "inference_ms": 4.12}
+HTTP 200
+```
+
+**Field-captured** latency over 20 identical requests:
+
+| | p50 | p95 | min |
+|---|---|---|---|
+| through Java agent | 132 ms | 258 ms | 42 ms |
+| daemon direct (loopback) | 14.9 ms | — | — |
+
+MiNiFi Java adds roughly 117 ms of overhead per request — FlowFile repository persistence, queue scheduling, and Jetty HTTP context handling. This is expected and acceptable for EFM-managed flows; worth confirming before promising sub-100 ms latency to a client.
+
+### Error Handling and Timeouts
+
+When the inference daemon is unavailable or the input is malformed, the error path responds quickly without hanging:
+
+```console
+$ curl --data-binary "definitely not an image" http://127.0.0.1:8090/classify
+--- HTTP 502 in 0.028073s ---
+```
+
+The HTTP 502 (Bad Gateway) is returned within 28 milliseconds, preventing the caller from blocking while waiting for a timeout. This is critical for embedded devices with fixed request timeouts.
+
+### LAN Reachability
+
+The `HandleHttpRequest` processor binds to `*:8090` (all interfaces), not `127.0.0.1`, making it reachable from any device on the LAN. This allows microcontrollers and other edge devices to POST directly to `http://<jetson-ip>:8090/classify` without requiring them to reach a centralized message broker.
+
+![NvidiaNanoJava agent class in EFM → Monitor → Agents — Good Health with agent enrolled](images/efm-NvidiaNanoJava-Class.jpg)
+<!-- TODO: screenshot pending — see issue #125 -->
+
+![NvidiaNanoJava HandleHttp flow in EFM Designer — HandleHttpRequest → InvokeHTTP → HandleHttpResponse success/error paths](images/efm-NvidiaNanoJava-HandleHttp-Flow.jpg)
+<!-- TODO: screenshot pending — see issue #125 -->
+
+![NvidiaNanoJava HandleHttp round-trip verification in EFM provenance view](images/efm-NvidiaNanoJava-HandleHttp-Verify.jpg)
+<!-- TODO: screenshot pending — see issue #125 -->
+
 ## Prometheus Observability for EFM and the Jetson Agent
 
 Two metrics layers extend the CSO Prometheus/Grafana stack that already watches NiFi/Kafka/Flink. The full three-layer story is [Chapter 21 (Metrics & Observability)](ch21-metrics-and-observability.md); this section is the Jetson-specific slice.
