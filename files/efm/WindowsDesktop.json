@@ -1,17 +1,17 @@
 {
   "flowMetadata": {
-    "identifier": "4615bdc2-823a-4c13-b51d-edc85dd6c929",
+    "identifier": "ae54dfe3-bfd9-4c52-babd-834a6df9964c",
     "agentClass": "WindowsDesktop",
-    "rootProcessGroupIdentifier": "a9aaf51b-1fe8-4061-b75f-53fac625b784",
-    "created": 1781216480485,
-    "updated": 1785257142577,
+    "rootProcessGroupIdentifier": "37ca539f-40c0-4f7b-823f-9a21248e368f",
+    "created": 1786046692122,
+    "updated": 1786046947551,
     "undoEnabled": false,
     "redoEnabled": false
   },
   "flowContent": {
-    "identifier": "a9aaf51b-1fe8-4061-b75f-53fac625b784",
-    "instanceIdentifier": "c71ca799-938f-4044-8e0a-1ab790878943",
-    "name": "root",
+    "identifier": "37ca539f-40c0-4f7b-823f-9a21248e368f",
+    "instanceIdentifier": "37ca539f-40c0-4f7b-823f-9a21248e368f",
+    "name": "WindowsDesktop",
     "comments": null,
     "position": {
       "x": 0.0,
@@ -21,99 +21,187 @@
     "remoteProcessGroups": [],
     "processors": [
       {
-        "identifier": "7ba646e8-31aa-4d65-ade1-13ea899c64cd",
-        "instanceIdentifier": "2ff0a1ff-63f9-4605-ab67-6006166a2732",
-        "name": "LogAttribute",
+        "identifier": "6ed4b10d-5a69-4cc9-bc06-9dcb51e2689d",
+        "instanceIdentifier": "b0118f1d-9066-44cb-bfd5-7eea927cf7e3",
+        "name": "HandleHttpRequest-Screen2Load",
         "comments": "",
         "position": {
-          "x": 480.63140869140625,
-          "y": 14.420398712158203
+          "x": 0.0,
+          "y": 0.0
         },
-        "type": "org.apache.nifi.processors.standard.LogAttribute",
+        "type": "org.apache.nifi.processors.standard.HandleHttpRequest",
         "bundle": {
           "group": "org.apache.nifi.minifi",
           "artifact": "minifi-standard-nar",
           "version": "2.24.08.0-19"
         },
         "properties": {
-          "Log prefix": null,
-          "character-set": "UTF-8",
-          "Log FlowFile Properties": "true",
-          "Log Level": "info",
-          "attributes-to-ignore-regex": null,
-          "Attributes to Ignore": null,
-          "Attributes to Log": null,
-          "attributes-to-log-regex": ".*",
-          "Output Format": "Line per Attribute",
-          "Log Payload": "true"
+          "multipart-request-max-size": "1 MB",
+          "parameters-to-attributes": null,
+          "Allow POST": "true",
+          "Hostname": null,
+          "Default URL Character Set": "UTF-8",
+          "Allow DELETE": "true",
+          "Request Header Maximum Size": "8 KB",
+          "Maximum Threads": "200",
+          "HTTP Protocols": "HTTP_1_1",
+          "Additional HTTP Methods": null,
+          "container-queue-size": "50",
+          "HTTP Context Map": "cf1bf440-77a8-4c31-a006-8e4ee8773cf2",
+          "multipart-read-buffer-size": "512 KB",
+          "SSL Context Service": null,
+          "Allow OPTIONS": "false",
+          "Allowed Paths": null,
+          "Allow GET": "true",
+          "Allow HEAD": "false",
+          "Listening Port": "8082",
+          "Client Authentication": "No Authentication",
+          "Allow PUT": "true"
         },
         "propertyDescriptors": {
-          "Log prefix": {
-            "name": "Log prefix",
-            "displayName": "Log prefix",
+          "multipart-request-max-size": {
+            "name": "multipart-request-max-size",
+            "displayName": "Multipart Request Max Size",
             "identifiesControllerService": false,
             "sensitive": false,
             "resourceDefinition": null
           },
-          "character-set": {
-            "name": "character-set",
-            "displayName": "Character Set",
+          "parameters-to-attributes": {
+            "name": "parameters-to-attributes",
+            "displayName": "Parameters to Attributes List",
             "identifiesControllerService": false,
             "sensitive": false,
             "resourceDefinition": null
           },
-          "Log FlowFile Properties": {
-            "name": "Log FlowFile Properties",
-            "displayName": "Log FlowFile Properties",
+          "Allow POST": {
+            "name": "Allow POST",
+            "displayName": "Allow POST",
             "identifiesControllerService": false,
             "sensitive": false,
             "resourceDefinition": null
           },
-          "Log Level": {
-            "name": "Log Level",
-            "displayName": "Log Level",
+          "Hostname": {
+            "name": "Hostname",
+            "displayName": "Hostname",
             "identifiesControllerService": false,
             "sensitive": false,
             "resourceDefinition": null
           },
-          "attributes-to-ignore-regex": {
-            "name": "attributes-to-ignore-regex",
-            "displayName": "Attributes to Ignore by Regular Expression",
+          "Default URL Character Set": {
+            "name": "Default URL Character Set",
+            "displayName": "Default URL Character Set",
             "identifiesControllerService": false,
             "sensitive": false,
             "resourceDefinition": null
           },
-          "Attributes to Ignore": {
-            "name": "Attributes to Ignore",
-            "displayName": "Attributes to Ignore",
+          "Allow DELETE": {
+            "name": "Allow DELETE",
+            "displayName": "Allow DELETE",
             "identifiesControllerService": false,
             "sensitive": false,
             "resourceDefinition": null
           },
-          "Attributes to Log": {
-            "name": "Attributes to Log",
-            "displayName": "Attributes to Log",
+          "Request Header Maximum Size": {
+            "name": "Request Header Maximum Size",
+            "displayName": "Request Header Maximum Size",
             "identifiesControllerService": false,
             "sensitive": false,
             "resourceDefinition": null
           },
-          "attributes-to-log-regex": {
-            "name": "attributes-to-log-regex",
-            "displayName": "Attributes to Log by Regular Expression",
+          "Maximum Threads": {
+            "name": "Maximum Threads",
+            "displayName": "Maximum Threads",
             "identifiesControllerService": false,
             "sensitive": false,
             "resourceDefinition": null
           },
-          "Output Format": {
-            "name": "Output Format",
-            "displayName": "Output Format",
+          "HTTP Protocols": {
+            "name": "HTTP Protocols",
+            "displayName": "HTTP Protocols",
             "identifiesControllerService": false,
             "sensitive": false,
             "resourceDefinition": null
           },
-          "Log Payload": {
-            "name": "Log Payload",
-            "displayName": "Log Payload",
+          "Additional HTTP Methods": {
+            "name": "Additional HTTP Methods",
+            "displayName": "Additional HTTP Methods",
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "container-queue-size": {
+            "name": "container-queue-size",
+            "displayName": "Container Queue Size",
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "HTTP Context Map": {
+            "name": "HTTP Context Map",
+            "displayName": "HTTP Context Map",
+            "identifiesControllerService": true,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "multipart-read-buffer-size": {
+            "name": "multipart-read-buffer-size",
+            "displayName": "Multipart Read Buffer Size",
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "SSL Context Service": {
+            "name": "SSL Context Service",
+            "displayName": "SSL Context Service",
+            "identifiesControllerService": true,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Allow OPTIONS": {
+            "name": "Allow OPTIONS",
+            "displayName": "Allow OPTIONS",
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Allowed Paths": {
+            "name": "Allowed Paths",
+            "displayName": "Allowed Paths",
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Allow GET": {
+            "name": "Allow GET",
+            "displayName": "Allow GET",
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Allow HEAD": {
+            "name": "Allow HEAD",
+            "displayName": "Allow HEAD",
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Listening Port": {
+            "name": "Listening Port",
+            "displayName": "Listening Port",
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Client Authentication": {
+            "name": "Client Authentication",
+            "displayName": "Client Authentication",
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Allow PUT": {
+            "name": "Allow PUT",
+            "displayName": "Allow PUT",
             "identifiesControllerService": false,
             "sensitive": false,
             "resourceDefinition": null
@@ -121,7 +209,7 @@
         },
         "style": {},
         "annotationData": null,
-        "schedulingPeriod": "0 sec",
+        "schedulingPeriod": "0 ms",
         "schedulingStrategy": "TIMER_DRIVEN",
         "executionNode": "ALL",
         "penaltyDuration": "30000 ms",
@@ -129,111 +217,53 @@
         "bulletinLevel": "WARN",
         "runDurationMillis": 0,
         "concurrentlySchedulableTaskCount": 1,
-        "autoTerminatedRelationships": [
-          "success"
-        ],
+        "autoTerminatedRelationships": [],
         "scheduledState": null,
         "retryCount": null,
         "retriedRelationships": null,
         "backoffMechanism": null,
         "maxBackoffPeriod": null,
         "componentType": "PROCESSOR",
-        "groupIdentifier": "a9aaf51b-1fe8-4061-b75f-53fac625b784"
+        "groupIdentifier": "37ca539f-40c0-4f7b-823f-9a21248e368f"
       },
       {
-        "identifier": "f24ed6d1-232e-4127-88fc-d9c872054851",
-        "instanceIdentifier": "f29b76f8-7321-4f93-bb9d-467f6c029246",
-        "name": "LogAttribute-MatrixWindowsJava",
+        "identifier": "d8d3faaf-2125-45a5-95cc-e1b1c1b69371",
+        "instanceIdentifier": "3f6c3536-45d5-444e-9735-82d58e498899",
+        "name": "HandleHttpResponse-Screen2Load",
         "comments": "",
         "position": {
-          "x": 1300.0,
-          "y": -30.0
+          "x": 0.0,
+          "y": 900.0
         },
-        "type": "org.apache.nifi.processors.standard.LogAttribute",
+        "type": "org.apache.nifi.processors.standard.HandleHttpResponse",
         "bundle": {
           "group": "org.apache.nifi.minifi",
           "artifact": "minifi-standard-nar",
           "version": "2.24.08.0-19"
         },
         "properties": {
-          "Log prefix": null,
-          "character-set": "UTF-8",
-          "Log FlowFile Properties": "true",
-          "Log Level": "info",
-          "attributes-to-ignore-regex": null,
-          "Attributes to Ignore": null,
-          "Attributes to Log": null,
-          "attributes-to-log-regex": ".*",
-          "Output Format": "Line per Attribute",
-          "Log Payload": "true"
+          "HTTP Context Map": "cf1bf440-77a8-4c31-a006-8e4ee8773cf2",
+          "Attributes to add to the HTTP Response (Regex)": null,
+          "HTTP Status Code": "200"
         },
         "propertyDescriptors": {
-          "Log prefix": {
-            "name": "Log prefix",
-            "displayName": "Log prefix",
+          "HTTP Context Map": {
+            "name": "HTTP Context Map",
+            "displayName": "HTTP Context Map",
+            "identifiesControllerService": true,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Attributes to add to the HTTP Response (Regex)": {
+            "name": "Attributes to add to the HTTP Response (Regex)",
+            "displayName": "Attributes to add to the HTTP Response (Regex)",
             "identifiesControllerService": false,
             "sensitive": false,
             "resourceDefinition": null
           },
-          "character-set": {
-            "name": "character-set",
-            "displayName": "Character Set",
-            "identifiesControllerService": false,
-            "sensitive": false,
-            "resourceDefinition": null
-          },
-          "Log FlowFile Properties": {
-            "name": "Log FlowFile Properties",
-            "displayName": "Log FlowFile Properties",
-            "identifiesControllerService": false,
-            "sensitive": false,
-            "resourceDefinition": null
-          },
-          "Log Level": {
-            "name": "Log Level",
-            "displayName": "Log Level",
-            "identifiesControllerService": false,
-            "sensitive": false,
-            "resourceDefinition": null
-          },
-          "attributes-to-ignore-regex": {
-            "name": "attributes-to-ignore-regex",
-            "displayName": "Attributes to Ignore by Regular Expression",
-            "identifiesControllerService": false,
-            "sensitive": false,
-            "resourceDefinition": null
-          },
-          "Attributes to Ignore": {
-            "name": "Attributes to Ignore",
-            "displayName": "Attributes to Ignore",
-            "identifiesControllerService": false,
-            "sensitive": false,
-            "resourceDefinition": null
-          },
-          "Attributes to Log": {
-            "name": "Attributes to Log",
-            "displayName": "Attributes to Log",
-            "identifiesControllerService": false,
-            "sensitive": false,
-            "resourceDefinition": null
-          },
-          "attributes-to-log-regex": {
-            "name": "attributes-to-log-regex",
-            "displayName": "Attributes to Log by Regular Expression",
-            "identifiesControllerService": false,
-            "sensitive": false,
-            "resourceDefinition": null
-          },
-          "Output Format": {
-            "name": "Output Format",
-            "displayName": "Output Format",
-            "identifiesControllerService": false,
-            "sensitive": false,
-            "resourceDefinition": null
-          },
-          "Log Payload": {
-            "name": "Log Payload",
-            "displayName": "Log Payload",
+          "HTTP Status Code": {
+            "name": "HTTP Status Code",
+            "displayName": "HTTP Status Code",
             "identifiesControllerService": false,
             "sensitive": false,
             "resourceDefinition": null
@@ -250,7 +280,8 @@
         "runDurationMillis": 0,
         "concurrentlySchedulableTaskCount": 1,
         "autoTerminatedRelationships": [
-          "success"
+          "success",
+          "failure"
         ],
         "scheduledState": null,
         "retryCount": null,
@@ -258,54 +289,446 @@
         "backoffMechanism": null,
         "maxBackoffPeriod": null,
         "componentType": "PROCESSOR",
-        "groupIdentifier": "a9aaf51b-1fe8-4061-b75f-53fac625b784"
+        "groupIdentifier": "37ca539f-40c0-4f7b-823f-9a21248e368f"
       },
       {
-        "identifier": "50d9a99c-e2e6-4c33-8381-f4d2cae90c8a",
-        "instanceIdentifier": "83123007-67bb-40e6-85ea-29af9fffdc75",
-        "name": "ExecuteScript-WindowsJavaNarTest",
+        "identifier": "c36e42fb-ee7d-4cd8-8713-7d2e0719e8d8",
+        "instanceIdentifier": "f88c1647-52aa-41e9-b939-c6d5a13dc5a0",
+        "name": "ExecuteStreamCommand-MatrixLoad",
         "comments": "",
         "position": {
-          "x": 483.264404296875,
-          "y": -267.12852478027344
+          "x": 800.0,
+          "y": 300.0
         },
-        "type": "org.apache.nifi.processors.script.ExecuteScript",
+        "type": "org.apache.nifi.processors.standard.ExecuteStreamCommand",
         "bundle": {
-          "group": "org.apache.nifi",
-          "artifact": "nifi-scripting-nar",
+          "group": "org.apache.nifi.minifi",
+          "artifact": "minifi-standard-nar",
           "version": "2.24.08.0-19"
         },
         "properties": {
-          "Script File": null,
-          "Script Engine": "Groovy",
-          "Script Body": "def flowFile = session.get()\nif (!flowFile) return\nflowFile = session.putAttribute(flowFile, 'nar.groovy.smoke', 'windows-java-nar-drop-in-ok')\nsession.transfer(flowFile, REL_SUCCESS)",
-          "Module Directory": null
+          "argumentsStrategy": "Command Arguments Property",
+          "Max Attribute Length": "256",
+          "Output MIME Type": null,
+          "Working Directory": "C:\\minifi-manual",
+          "Command Path": "python.exe",
+          "Output Destination Attribute": null,
+          "Argument Delimiter": ";",
+          "Ignore STDIN": "false",
+          "Command Arguments": "C:\\minifi-manual\\windows_screen_control.py;matrix-load;screen2"
         },
         "propertyDescriptors": {
-          "Script File": {
-            "name": "Script File",
-            "displayName": "Script File",
+          "argumentsStrategy": {
+            "name": "argumentsStrategy",
+            "displayName": "Command Arguments Strategy",
             "identifiesControllerService": false,
             "sensitive": false,
             "resourceDefinition": null
           },
-          "Script Engine": {
-            "name": "Script Engine",
-            "displayName": "Script Engine",
+          "Max Attribute Length": {
+            "name": "Max Attribute Length",
+            "displayName": "Max Attribute Length",
             "identifiesControllerService": false,
             "sensitive": false,
             "resourceDefinition": null
           },
-          "Script Body": {
-            "name": "Script Body",
-            "displayName": "Script Body",
+          "Output MIME Type": {
+            "name": "Output MIME Type",
+            "displayName": "Output MIME Type",
             "identifiesControllerService": false,
             "sensitive": false,
             "resourceDefinition": null
           },
-          "Module Directory": {
-            "name": "Module Directory",
-            "displayName": "Module Directory",
+          "Working Directory": {
+            "name": "Working Directory",
+            "displayName": "Working Directory",
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Command Path": {
+            "name": "Command Path",
+            "displayName": "Command Path",
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Output Destination Attribute": {
+            "name": "Output Destination Attribute",
+            "displayName": "Output Destination Attribute",
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Argument Delimiter": {
+            "name": "Argument Delimiter",
+            "displayName": "Argument Delimiter",
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Ignore STDIN": {
+            "name": "Ignore STDIN",
+            "displayName": "Ignore STDIN",
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Command Arguments": {
+            "name": "Command Arguments",
+            "displayName": "Command Arguments",
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          }
+        },
+        "style": {},
+        "annotationData": null,
+        "schedulingPeriod": "0 ms",
+        "schedulingStrategy": "TIMER_DRIVEN",
+        "executionNode": "ALL",
+        "penaltyDuration": "30000 ms",
+        "yieldDuration": "1000 ms",
+        "bulletinLevel": "WARN",
+        "runDurationMillis": 0,
+        "concurrentlySchedulableTaskCount": 1,
+        "autoTerminatedRelationships": [
+          "original"
+        ],
+        "scheduledState": null,
+        "retryCount": null,
+        "retriedRelationships": null,
+        "backoffMechanism": null,
+        "maxBackoffPeriod": null,
+        "componentType": "PROCESSOR",
+        "groupIdentifier": "37ca539f-40c0-4f7b-823f-9a21248e368f"
+      },
+      {
+        "identifier": "78b4193f-ee28-474f-9907-ca2fa6cf0c87",
+        "instanceIdentifier": "6ff1aa2d-866a-4f31-ac92-f3c304974324",
+        "name": "HandleHttpResponse-Screen2Matrix",
+        "comments": "",
+        "position": {
+          "x": 800.0,
+          "y": 600.0
+        },
+        "type": "org.apache.nifi.processors.standard.HandleHttpResponse",
+        "bundle": {
+          "group": "org.apache.nifi.minifi",
+          "artifact": "minifi-standard-nar",
+          "version": "2.24.08.0-19"
+        },
+        "properties": {
+          "HTTP Context Map": "cf1bf440-77a8-4c31-a006-8e4ee8773cf2",
+          "Attributes to add to the HTTP Response (Regex)": null,
+          "HTTP Status Code": "200"
+        },
+        "propertyDescriptors": {
+          "HTTP Context Map": {
+            "name": "HTTP Context Map",
+            "displayName": "HTTP Context Map",
+            "identifiesControllerService": true,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Attributes to add to the HTTP Response (Regex)": {
+            "name": "Attributes to add to the HTTP Response (Regex)",
+            "displayName": "Attributes to add to the HTTP Response (Regex)",
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "HTTP Status Code": {
+            "name": "HTTP Status Code",
+            "displayName": "HTTP Status Code",
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          }
+        },
+        "style": {},
+        "annotationData": null,
+        "schedulingPeriod": "0 ms",
+        "schedulingStrategy": "TIMER_DRIVEN",
+        "executionNode": "ALL",
+        "penaltyDuration": "30000 ms",
+        "yieldDuration": "1000 ms",
+        "bulletinLevel": "WARN",
+        "runDurationMillis": 0,
+        "concurrentlySchedulableTaskCount": 1,
+        "autoTerminatedRelationships": [
+          "success",
+          "failure"
+        ],
+        "scheduledState": null,
+        "retryCount": null,
+        "retriedRelationships": null,
+        "backoffMechanism": null,
+        "maxBackoffPeriod": null,
+        "componentType": "PROCESSOR",
+        "groupIdentifier": "37ca539f-40c0-4f7b-823f-9a21248e368f"
+      },
+      {
+        "identifier": "b4a4dbaa-0bd0-43db-87a7-a0801c9ae4e0",
+        "instanceIdentifier": "b7e5e381-d46f-4d62-93a8-41990c9326c2",
+        "name": "HandleHttpRequest-Screen2Matrix",
+        "comments": "",
+        "position": {
+          "x": 800.0,
+          "y": 0.0
+        },
+        "type": "org.apache.nifi.processors.standard.HandleHttpRequest",
+        "bundle": {
+          "group": "org.apache.nifi.minifi",
+          "artifact": "minifi-standard-nar",
+          "version": "2.24.08.0-19"
+        },
+        "properties": {
+          "multipart-request-max-size": "1 MB",
+          "parameters-to-attributes": null,
+          "Allow POST": "true",
+          "Hostname": null,
+          "Default URL Character Set": "UTF-8",
+          "Allow DELETE": "true",
+          "Request Header Maximum Size": "8 KB",
+          "Maximum Threads": "200",
+          "HTTP Protocols": "HTTP_1_1",
+          "Additional HTTP Methods": null,
+          "container-queue-size": "50",
+          "HTTP Context Map": "cf1bf440-77a8-4c31-a006-8e4ee8773cf2",
+          "multipart-read-buffer-size": "512 KB",
+          "SSL Context Service": null,
+          "Allow OPTIONS": "false",
+          "Allowed Paths": null,
+          "Allow GET": "true",
+          "Allow HEAD": "false",
+          "Listening Port": "8081",
+          "Client Authentication": "No Authentication",
+          "Allow PUT": "true"
+        },
+        "propertyDescriptors": {
+          "multipart-request-max-size": {
+            "name": "multipart-request-max-size",
+            "displayName": "Multipart Request Max Size",
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "parameters-to-attributes": {
+            "name": "parameters-to-attributes",
+            "displayName": "Parameters to Attributes List",
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Allow POST": {
+            "name": "Allow POST",
+            "displayName": "Allow POST",
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Hostname": {
+            "name": "Hostname",
+            "displayName": "Hostname",
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Default URL Character Set": {
+            "name": "Default URL Character Set",
+            "displayName": "Default URL Character Set",
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Allow DELETE": {
+            "name": "Allow DELETE",
+            "displayName": "Allow DELETE",
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Request Header Maximum Size": {
+            "name": "Request Header Maximum Size",
+            "displayName": "Request Header Maximum Size",
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Maximum Threads": {
+            "name": "Maximum Threads",
+            "displayName": "Maximum Threads",
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "HTTP Protocols": {
+            "name": "HTTP Protocols",
+            "displayName": "HTTP Protocols",
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Additional HTTP Methods": {
+            "name": "Additional HTTP Methods",
+            "displayName": "Additional HTTP Methods",
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "container-queue-size": {
+            "name": "container-queue-size",
+            "displayName": "Container Queue Size",
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "HTTP Context Map": {
+            "name": "HTTP Context Map",
+            "displayName": "HTTP Context Map",
+            "identifiesControllerService": true,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "multipart-read-buffer-size": {
+            "name": "multipart-read-buffer-size",
+            "displayName": "Multipart Read Buffer Size",
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "SSL Context Service": {
+            "name": "SSL Context Service",
+            "displayName": "SSL Context Service",
+            "identifiesControllerService": true,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Allow OPTIONS": {
+            "name": "Allow OPTIONS",
+            "displayName": "Allow OPTIONS",
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Allowed Paths": {
+            "name": "Allowed Paths",
+            "displayName": "Allowed Paths",
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Allow GET": {
+            "name": "Allow GET",
+            "displayName": "Allow GET",
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Allow HEAD": {
+            "name": "Allow HEAD",
+            "displayName": "Allow HEAD",
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Listening Port": {
+            "name": "Listening Port",
+            "displayName": "Listening Port",
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Client Authentication": {
+            "name": "Client Authentication",
+            "displayName": "Client Authentication",
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Allow PUT": {
+            "name": "Allow PUT",
+            "displayName": "Allow PUT",
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          }
+        },
+        "style": {},
+        "annotationData": null,
+        "schedulingPeriod": "0 ms",
+        "schedulingStrategy": "TIMER_DRIVEN",
+        "executionNode": "ALL",
+        "penaltyDuration": "30000 ms",
+        "yieldDuration": "1000 ms",
+        "bulletinLevel": "WARN",
+        "runDurationMillis": 0,
+        "concurrentlySchedulableTaskCount": 1,
+        "autoTerminatedRelationships": [],
+        "scheduledState": null,
+        "retryCount": null,
+        "retriedRelationships": null,
+        "backoffMechanism": null,
+        "maxBackoffPeriod": null,
+        "componentType": "PROCESSOR",
+        "groupIdentifier": "37ca539f-40c0-4f7b-823f-9a21248e368f"
+      },
+      {
+        "identifier": "dbb9d0e4-8f8d-4a8f-afbe-af5b360a9d71",
+        "instanceIdentifier": "d0b65a34-7da1-464e-8ce4-c0d77137b7fe",
+        "name": "EvaluateJsonPath-ExtractStreamer",
+        "comments": "",
+        "position": {
+          "x": 0.0,
+          "y": 300.0
+        },
+        "type": "org.apache.nifi.processors.standard.EvaluateJsonPath",
+        "bundle": {
+          "group": "org.apache.nifi.minifi",
+          "artifact": "minifi-standard-nar",
+          "version": "2.24.08.0-19"
+        },
+        "properties": {
+          "Destination": "flowfile-attribute",
+          "streamer": "$.streamer",
+          "Max String Length": "20 MB",
+          "Return Type": "auto-detect",
+          "Null Value Representation": "empty string",
+          "Path Not Found Behavior": "ignore"
+        },
+        "propertyDescriptors": {
+          "Destination": {
+            "name": "Destination",
+            "displayName": "Destination",
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Max String Length": {
+            "name": "Max String Length",
+            "displayName": "Max String Length",
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Return Type": {
+            "name": "Return Type",
+            "displayName": "Return Type",
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Null Value Representation": {
+            "name": "Null Value Representation",
+            "displayName": "Null Value Representation",
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Path Not Found Behavior": {
+            "name": "Path Not Found Behavior",
+            "displayName": "Path Not Found Behavior",
             "identifiesControllerService": false,
             "sensitive": false,
             "resourceDefinition": null
@@ -330,318 +753,16 @@
         "backoffMechanism": null,
         "maxBackoffPeriod": null,
         "componentType": "PROCESSOR",
-        "groupIdentifier": "a9aaf51b-1fe8-4061-b75f-53fac625b784"
+        "groupIdentifier": "37ca539f-40c0-4f7b-823f-9a21248e368f"
       },
       {
-        "identifier": "e7ed2479-eccc-4b36-84b5-e9d9adce1326",
-        "instanceIdentifier": "50b18d53-2469-4f9e-9d9b-480d6d4e5547",
-        "name": "ListenHTTP",
+        "identifier": "d6ec3f67-e92a-4144-90a4-c61dcfec5bb3",
+        "instanceIdentifier": "0c159e8e-bf02-4521-b6f0-0a2503ac3aef",
+        "name": "ExecuteStreamCommand-MpvLoad",
         "comments": "",
         "position": {
-          "x": 487.3431641951264,
-          "y": -564.350209160844
-        },
-        "type": "org.apache.nifi.processors.standard.ListenHTTP",
-        "bundle": {
-          "group": "org.apache.nifi.minifi",
-          "artifact": "minifi-standard-nar",
-          "version": "2.24.08.0-19"
-        },
-        "properties": {
-          "authorized-issuer-dn-pattern": ".*",
-          "multipart-request-max-size": "1 MB",
-          "record-writer": null,
-          "Request Header Maximum Size": "8 KB",
-          "HTTP Protocols": "HTTP_1_1",
-          "HTTP Headers to receive as Attributes (Regex)": null,
-          "health-check-port": null,
-          "Authorized DN Pattern": ".*",
-          "max-thread-pool-size": "200",
-          "Base Path": "contentListener",
-          "multipart-read-buffer-size": "512 KB",
-          "SSL Context Service": null,
-          "Max Unconfirmed Flowfile Time": "60 secs",
-          "Max Data to Receive per Second": null,
-          "client-authentication": "AUTO",
-          "Return Code": "200",
-          "record-reader": null,
-          "Listening Port": "8080"
-        },
-        "propertyDescriptors": {
-          "authorized-issuer-dn-pattern": {
-            "name": "authorized-issuer-dn-pattern",
-            "displayName": "Authorized Issuer DN Pattern",
-            "identifiesControllerService": false,
-            "sensitive": false,
-            "resourceDefinition": null
-          },
-          "multipart-request-max-size": {
-            "name": "multipart-request-max-size",
-            "displayName": "Multipart Request Max Size",
-            "identifiesControllerService": false,
-            "sensitive": false,
-            "resourceDefinition": null
-          },
-          "record-writer": {
-            "name": "record-writer",
-            "displayName": "Record Writer",
-            "identifiesControllerService": true,
-            "sensitive": false,
-            "resourceDefinition": null
-          },
-          "Request Header Maximum Size": {
-            "name": "Request Header Maximum Size",
-            "displayName": "Request Header Maximum Size",
-            "identifiesControllerService": false,
-            "sensitive": false,
-            "resourceDefinition": null
-          },
-          "HTTP Protocols": {
-            "name": "HTTP Protocols",
-            "displayName": "HTTP Protocols",
-            "identifiesControllerService": false,
-            "sensitive": false,
-            "resourceDefinition": null
-          },
-          "HTTP Headers to receive as Attributes (Regex)": {
-            "name": "HTTP Headers to receive as Attributes (Regex)",
-            "displayName": "HTTP Headers to receive as Attributes (Regex)",
-            "identifiesControllerService": false,
-            "sensitive": false,
-            "resourceDefinition": null
-          },
-          "health-check-port": {
-            "name": "health-check-port",
-            "displayName": "Listening Port for Health Check Requests",
-            "identifiesControllerService": false,
-            "sensitive": false,
-            "resourceDefinition": null
-          },
-          "Authorized DN Pattern": {
-            "name": "Authorized DN Pattern",
-            "displayName": "Authorized Subject DN Pattern",
-            "identifiesControllerService": false,
-            "sensitive": false,
-            "resourceDefinition": null
-          },
-          "max-thread-pool-size": {
-            "name": "max-thread-pool-size",
-            "displayName": "Maximum Thread Pool Size",
-            "identifiesControllerService": false,
-            "sensitive": false,
-            "resourceDefinition": null
-          },
-          "Base Path": {
-            "name": "Base Path",
-            "displayName": "Base Path",
-            "identifiesControllerService": false,
-            "sensitive": false,
-            "resourceDefinition": null
-          },
-          "multipart-read-buffer-size": {
-            "name": "multipart-read-buffer-size",
-            "displayName": "Multipart Read Buffer Size",
-            "identifiesControllerService": false,
-            "sensitive": false,
-            "resourceDefinition": null
-          },
-          "SSL Context Service": {
-            "name": "SSL Context Service",
-            "displayName": "SSL Context Service",
-            "identifiesControllerService": true,
-            "sensitive": false,
-            "resourceDefinition": null
-          },
-          "Max Unconfirmed Flowfile Time": {
-            "name": "Max Unconfirmed Flowfile Time",
-            "displayName": "Max Unconfirmed Flowfile Time",
-            "identifiesControllerService": false,
-            "sensitive": false,
-            "resourceDefinition": null
-          },
-          "Max Data to Receive per Second": {
-            "name": "Max Data to Receive per Second",
-            "displayName": "Max Data to Receive per Second",
-            "identifiesControllerService": false,
-            "sensitive": false,
-            "resourceDefinition": null
-          },
-          "client-authentication": {
-            "name": "client-authentication",
-            "displayName": "Client Authentication",
-            "identifiesControllerService": false,
-            "sensitive": false,
-            "resourceDefinition": null
-          },
-          "Return Code": {
-            "name": "Return Code",
-            "displayName": "Return Code",
-            "identifiesControllerService": false,
-            "sensitive": false,
-            "resourceDefinition": null
-          },
-          "record-reader": {
-            "name": "record-reader",
-            "displayName": "Record Reader",
-            "identifiesControllerService": true,
-            "sensitive": false,
-            "resourceDefinition": null
-          },
-          "Listening Port": {
-            "name": "Listening Port",
-            "displayName": "Listening Port",
-            "identifiesControllerService": false,
-            "sensitive": false,
-            "resourceDefinition": null
-          }
-        },
-        "style": {},
-        "annotationData": null,
-        "schedulingPeriod": "0 ms",
-        "schedulingStrategy": "TIMER_DRIVEN",
-        "executionNode": "ALL",
-        "penaltyDuration": "30000 ms",
-        "yieldDuration": "1000 ms",
-        "bulletinLevel": "WARN",
-        "runDurationMillis": 0,
-        "concurrentlySchedulableTaskCount": 1,
-        "autoTerminatedRelationships": [],
-        "scheduledState": null,
-        "retryCount": null,
-        "retriedRelationships": null,
-        "backoffMechanism": null,
-        "maxBackoffPeriod": null,
-        "componentType": "PROCESSOR",
-        "groupIdentifier": "a9aaf51b-1fe8-4061-b75f-53fac625b784"
-      },
-      {
-        "identifier": "d2413084-b06e-46ad-a110-5978d9a4a975",
-        "instanceIdentifier": "46b7e37c-ab0a-4e07-86f8-fb916be27d8a",
-        "name": "LogAttribute-LoadWindowsJava",
-        "comments": "",
-        "position": {
-          "x": 900.0,
-          "y": -30.0
-        },
-        "type": "org.apache.nifi.processors.standard.LogAttribute",
-        "bundle": {
-          "group": "org.apache.nifi.minifi",
-          "artifact": "minifi-standard-nar",
-          "version": "2.24.08.0-19"
-        },
-        "properties": {
-          "Log prefix": null,
-          "character-set": "UTF-8",
-          "Log FlowFile Properties": "true",
-          "Log Level": "info",
-          "attributes-to-ignore-regex": null,
-          "Attributes to Ignore": null,
-          "Attributes to Log": null,
-          "attributes-to-log-regex": ".*",
-          "Output Format": "Line per Attribute",
-          "Log Payload": "true"
-        },
-        "propertyDescriptors": {
-          "Log prefix": {
-            "name": "Log prefix",
-            "displayName": "Log prefix",
-            "identifiesControllerService": false,
-            "sensitive": false,
-            "resourceDefinition": null
-          },
-          "character-set": {
-            "name": "character-set",
-            "displayName": "Character Set",
-            "identifiesControllerService": false,
-            "sensitive": false,
-            "resourceDefinition": null
-          },
-          "Log FlowFile Properties": {
-            "name": "Log FlowFile Properties",
-            "displayName": "Log FlowFile Properties",
-            "identifiesControllerService": false,
-            "sensitive": false,
-            "resourceDefinition": null
-          },
-          "Log Level": {
-            "name": "Log Level",
-            "displayName": "Log Level",
-            "identifiesControllerService": false,
-            "sensitive": false,
-            "resourceDefinition": null
-          },
-          "attributes-to-ignore-regex": {
-            "name": "attributes-to-ignore-regex",
-            "displayName": "Attributes to Ignore by Regular Expression",
-            "identifiesControllerService": false,
-            "sensitive": false,
-            "resourceDefinition": null
-          },
-          "Attributes to Ignore": {
-            "name": "Attributes to Ignore",
-            "displayName": "Attributes to Ignore",
-            "identifiesControllerService": false,
-            "sensitive": false,
-            "resourceDefinition": null
-          },
-          "Attributes to Log": {
-            "name": "Attributes to Log",
-            "displayName": "Attributes to Log",
-            "identifiesControllerService": false,
-            "sensitive": false,
-            "resourceDefinition": null
-          },
-          "attributes-to-log-regex": {
-            "name": "attributes-to-log-regex",
-            "displayName": "Attributes to Log by Regular Expression",
-            "identifiesControllerService": false,
-            "sensitive": false,
-            "resourceDefinition": null
-          },
-          "Output Format": {
-            "name": "Output Format",
-            "displayName": "Output Format",
-            "identifiesControllerService": false,
-            "sensitive": false,
-            "resourceDefinition": null
-          },
-          "Log Payload": {
-            "name": "Log Payload",
-            "displayName": "Log Payload",
-            "identifiesControllerService": false,
-            "sensitive": false,
-            "resourceDefinition": null
-          }
-        },
-        "style": {},
-        "annotationData": null,
-        "schedulingPeriod": "0 ms",
-        "schedulingStrategy": "TIMER_DRIVEN",
-        "executionNode": "ALL",
-        "penaltyDuration": "30000 ms",
-        "yieldDuration": "1000 ms",
-        "bulletinLevel": "WARN",
-        "runDurationMillis": 0,
-        "concurrentlySchedulableTaskCount": 1,
-        "autoTerminatedRelationships": [
-          "success"
-        ],
-        "scheduledState": null,
-        "retryCount": null,
-        "retriedRelationships": null,
-        "backoffMechanism": null,
-        "maxBackoffPeriod": null,
-        "componentType": "PROCESSOR",
-        "groupIdentifier": "a9aaf51b-1fe8-4061-b75f-53fac625b784"
-      },
-      {
-        "identifier": "9e4ffa81-1d03-4114-81ee-056f8672a373",
-        "instanceIdentifier": "29a47344-5417-4b4f-97ce-ad2d8f2cb682",
-        "name": "ExecuteStreamCommand-LoadWindowsJava",
-        "comments": "",
-        "position": {
-          "x": 900.0,
-          "y": -300.0
+          "x": 0.0,
+          "y": 600.0
         },
         "type": "org.apache.nifi.processors.standard.ExecuteStreamCommand",
         "bundle": {
@@ -653,12 +774,12 @@
           "argumentsStrategy": "Command Arguments Property",
           "Max Attribute Length": "256",
           "Output MIME Type": null,
-          "Working Directory": "C:\\minifi-windesktop",
-          "Command Path": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+          "Working Directory": "C:\\minifi-manual",
+          "Command Path": "python.exe",
           "Output Destination Attribute": null,
           "Argument Delimiter": ";",
           "Ignore STDIN": "false",
-          "Command Arguments": "-NoProfile;-ExecutionPolicy;Bypass;-File;C:\\minifi-windesktop\\launch_stream_java.ps1"
+          "Command Arguments": "C:\\minifi-manual\\windows_screen_control.py;mpv-load;screen2;${streamer}"
         },
         "propertyDescriptors": {
           "argumentsStrategy": {
@@ -736,8 +857,7 @@
         "runDurationMillis": 0,
         "concurrentlySchedulableTaskCount": 1,
         "autoTerminatedRelationships": [
-          "original",
-          "nonzero status"
+          "original"
         ],
         "scheduledState": null,
         "retryCount": null,
@@ -745,513 +865,36 @@
         "backoffMechanism": null,
         "maxBackoffPeriod": null,
         "componentType": "PROCESSOR",
-        "groupIdentifier": "a9aaf51b-1fe8-4061-b75f-53fac625b784"
-      },
-      {
-        "identifier": "e275bb9a-5bb0-472e-9c48-791538ecaf0b",
-        "instanceIdentifier": "7c788bd6-a0a1-499f-9f7c-f1525428a288",
-        "name": "ListenHTTP-MatrixWindowsJava",
-        "comments": "",
-        "position": {
-          "x": 1300.0,
-          "y": -564.0
-        },
-        "type": "org.apache.nifi.processors.standard.ListenHTTP",
-        "bundle": {
-          "group": "org.apache.nifi.minifi",
-          "artifact": "minifi-standard-nar",
-          "version": "2.24.08.0-19"
-        },
-        "properties": {
-          "authorized-issuer-dn-pattern": ".*",
-          "multipart-request-max-size": "1 MB",
-          "record-writer": null,
-          "Request Header Maximum Size": "8 KB",
-          "HTTP Protocols": "HTTP_1_1",
-          "HTTP Headers to receive as Attributes (Regex)": null,
-          "health-check-port": null,
-          "Authorized DN Pattern": ".*",
-          "max-thread-pool-size": "200",
-          "Base Path": "matrixWindows",
-          "multipart-read-buffer-size": "512 KB",
-          "SSL Context Service": null,
-          "Max Unconfirmed Flowfile Time": "60 secs",
-          "Max Data to Receive per Second": null,
-          "client-authentication": "AUTO",
-          "Return Code": "200",
-          "record-reader": null,
-          "Listening Port": "8082"
-        },
-        "propertyDescriptors": {
-          "authorized-issuer-dn-pattern": {
-            "name": "authorized-issuer-dn-pattern",
-            "displayName": "Authorized Issuer DN Pattern",
-            "identifiesControllerService": false,
-            "sensitive": false,
-            "resourceDefinition": null
-          },
-          "multipart-request-max-size": {
-            "name": "multipart-request-max-size",
-            "displayName": "Multipart Request Max Size",
-            "identifiesControllerService": false,
-            "sensitive": false,
-            "resourceDefinition": null
-          },
-          "record-writer": {
-            "name": "record-writer",
-            "displayName": "Record Writer",
-            "identifiesControllerService": true,
-            "sensitive": false,
-            "resourceDefinition": null
-          },
-          "Request Header Maximum Size": {
-            "name": "Request Header Maximum Size",
-            "displayName": "Request Header Maximum Size",
-            "identifiesControllerService": false,
-            "sensitive": false,
-            "resourceDefinition": null
-          },
-          "HTTP Protocols": {
-            "name": "HTTP Protocols",
-            "displayName": "HTTP Protocols",
-            "identifiesControllerService": false,
-            "sensitive": false,
-            "resourceDefinition": null
-          },
-          "HTTP Headers to receive as Attributes (Regex)": {
-            "name": "HTTP Headers to receive as Attributes (Regex)",
-            "displayName": "HTTP Headers to receive as Attributes (Regex)",
-            "identifiesControllerService": false,
-            "sensitive": false,
-            "resourceDefinition": null
-          },
-          "health-check-port": {
-            "name": "health-check-port",
-            "displayName": "Listening Port for Health Check Requests",
-            "identifiesControllerService": false,
-            "sensitive": false,
-            "resourceDefinition": null
-          },
-          "Authorized DN Pattern": {
-            "name": "Authorized DN Pattern",
-            "displayName": "Authorized Subject DN Pattern",
-            "identifiesControllerService": false,
-            "sensitive": false,
-            "resourceDefinition": null
-          },
-          "max-thread-pool-size": {
-            "name": "max-thread-pool-size",
-            "displayName": "Maximum Thread Pool Size",
-            "identifiesControllerService": false,
-            "sensitive": false,
-            "resourceDefinition": null
-          },
-          "Base Path": {
-            "name": "Base Path",
-            "displayName": "Base Path",
-            "identifiesControllerService": false,
-            "sensitive": false,
-            "resourceDefinition": null
-          },
-          "multipart-read-buffer-size": {
-            "name": "multipart-read-buffer-size",
-            "displayName": "Multipart Read Buffer Size",
-            "identifiesControllerService": false,
-            "sensitive": false,
-            "resourceDefinition": null
-          },
-          "SSL Context Service": {
-            "name": "SSL Context Service",
-            "displayName": "SSL Context Service",
-            "identifiesControllerService": true,
-            "sensitive": false,
-            "resourceDefinition": null
-          },
-          "Max Unconfirmed Flowfile Time": {
-            "name": "Max Unconfirmed Flowfile Time",
-            "displayName": "Max Unconfirmed Flowfile Time",
-            "identifiesControllerService": false,
-            "sensitive": false,
-            "resourceDefinition": null
-          },
-          "Max Data to Receive per Second": {
-            "name": "Max Data to Receive per Second",
-            "displayName": "Max Data to Receive per Second",
-            "identifiesControllerService": false,
-            "sensitive": false,
-            "resourceDefinition": null
-          },
-          "client-authentication": {
-            "name": "client-authentication",
-            "displayName": "Client Authentication",
-            "identifiesControllerService": false,
-            "sensitive": false,
-            "resourceDefinition": null
-          },
-          "Return Code": {
-            "name": "Return Code",
-            "displayName": "Return Code",
-            "identifiesControllerService": false,
-            "sensitive": false,
-            "resourceDefinition": null
-          },
-          "record-reader": {
-            "name": "record-reader",
-            "displayName": "Record Reader",
-            "identifiesControllerService": true,
-            "sensitive": false,
-            "resourceDefinition": null
-          },
-          "Listening Port": {
-            "name": "Listening Port",
-            "displayName": "Listening Port",
-            "identifiesControllerService": false,
-            "sensitive": false,
-            "resourceDefinition": null
-          }
-        },
-        "style": {},
-        "annotationData": null,
-        "schedulingPeriod": "0 ms",
-        "schedulingStrategy": "TIMER_DRIVEN",
-        "executionNode": "ALL",
-        "penaltyDuration": "30000 ms",
-        "yieldDuration": "1000 ms",
-        "bulletinLevel": "WARN",
-        "runDurationMillis": 0,
-        "concurrentlySchedulableTaskCount": 1,
-        "autoTerminatedRelationships": [],
-        "scheduledState": null,
-        "retryCount": null,
-        "retriedRelationships": null,
-        "backoffMechanism": null,
-        "maxBackoffPeriod": null,
-        "componentType": "PROCESSOR",
-        "groupIdentifier": "a9aaf51b-1fe8-4061-b75f-53fac625b784"
-      },
-      {
-        "identifier": "d107f9ef-3a9d-4df5-a375-eeae98e988a9",
-        "instanceIdentifier": "413387c4-af9e-4c62-838b-329ee12f1cbb",
-        "name": "ListenHTTP-LoadWindowsJava",
-        "comments": "",
-        "position": {
-          "x": 900.0,
-          "y": -564.0
-        },
-        "type": "org.apache.nifi.processors.standard.ListenHTTP",
-        "bundle": {
-          "group": "org.apache.nifi.minifi",
-          "artifact": "minifi-standard-nar",
-          "version": "2.24.08.0-19"
-        },
-        "properties": {
-          "authorized-issuer-dn-pattern": ".*",
-          "multipart-request-max-size": "1 MB",
-          "record-writer": null,
-          "Request Header Maximum Size": "8 KB",
-          "HTTP Protocols": "HTTP_1_1",
-          "HTTP Headers to receive as Attributes (Regex)": null,
-          "health-check-port": null,
-          "Authorized DN Pattern": ".*",
-          "max-thread-pool-size": "200",
-          "Base Path": "loadWindows",
-          "multipart-read-buffer-size": "512 KB",
-          "SSL Context Service": null,
-          "Max Unconfirmed Flowfile Time": "60 secs",
-          "Max Data to Receive per Second": null,
-          "client-authentication": "AUTO",
-          "Return Code": "200",
-          "record-reader": null,
-          "Listening Port": "8081"
-        },
-        "propertyDescriptors": {
-          "authorized-issuer-dn-pattern": {
-            "name": "authorized-issuer-dn-pattern",
-            "displayName": "Authorized Issuer DN Pattern",
-            "identifiesControllerService": false,
-            "sensitive": false,
-            "resourceDefinition": null
-          },
-          "multipart-request-max-size": {
-            "name": "multipart-request-max-size",
-            "displayName": "Multipart Request Max Size",
-            "identifiesControllerService": false,
-            "sensitive": false,
-            "resourceDefinition": null
-          },
-          "record-writer": {
-            "name": "record-writer",
-            "displayName": "Record Writer",
-            "identifiesControllerService": true,
-            "sensitive": false,
-            "resourceDefinition": null
-          },
-          "Request Header Maximum Size": {
-            "name": "Request Header Maximum Size",
-            "displayName": "Request Header Maximum Size",
-            "identifiesControllerService": false,
-            "sensitive": false,
-            "resourceDefinition": null
-          },
-          "HTTP Protocols": {
-            "name": "HTTP Protocols",
-            "displayName": "HTTP Protocols",
-            "identifiesControllerService": false,
-            "sensitive": false,
-            "resourceDefinition": null
-          },
-          "HTTP Headers to receive as Attributes (Regex)": {
-            "name": "HTTP Headers to receive as Attributes (Regex)",
-            "displayName": "HTTP Headers to receive as Attributes (Regex)",
-            "identifiesControllerService": false,
-            "sensitive": false,
-            "resourceDefinition": null
-          },
-          "health-check-port": {
-            "name": "health-check-port",
-            "displayName": "Listening Port for Health Check Requests",
-            "identifiesControllerService": false,
-            "sensitive": false,
-            "resourceDefinition": null
-          },
-          "Authorized DN Pattern": {
-            "name": "Authorized DN Pattern",
-            "displayName": "Authorized Subject DN Pattern",
-            "identifiesControllerService": false,
-            "sensitive": false,
-            "resourceDefinition": null
-          },
-          "max-thread-pool-size": {
-            "name": "max-thread-pool-size",
-            "displayName": "Maximum Thread Pool Size",
-            "identifiesControllerService": false,
-            "sensitive": false,
-            "resourceDefinition": null
-          },
-          "Base Path": {
-            "name": "Base Path",
-            "displayName": "Base Path",
-            "identifiesControllerService": false,
-            "sensitive": false,
-            "resourceDefinition": null
-          },
-          "multipart-read-buffer-size": {
-            "name": "multipart-read-buffer-size",
-            "displayName": "Multipart Read Buffer Size",
-            "identifiesControllerService": false,
-            "sensitive": false,
-            "resourceDefinition": null
-          },
-          "SSL Context Service": {
-            "name": "SSL Context Service",
-            "displayName": "SSL Context Service",
-            "identifiesControllerService": true,
-            "sensitive": false,
-            "resourceDefinition": null
-          },
-          "Max Unconfirmed Flowfile Time": {
-            "name": "Max Unconfirmed Flowfile Time",
-            "displayName": "Max Unconfirmed Flowfile Time",
-            "identifiesControllerService": false,
-            "sensitive": false,
-            "resourceDefinition": null
-          },
-          "Max Data to Receive per Second": {
-            "name": "Max Data to Receive per Second",
-            "displayName": "Max Data to Receive per Second",
-            "identifiesControllerService": false,
-            "sensitive": false,
-            "resourceDefinition": null
-          },
-          "client-authentication": {
-            "name": "client-authentication",
-            "displayName": "Client Authentication",
-            "identifiesControllerService": false,
-            "sensitive": false,
-            "resourceDefinition": null
-          },
-          "Return Code": {
-            "name": "Return Code",
-            "displayName": "Return Code",
-            "identifiesControllerService": false,
-            "sensitive": false,
-            "resourceDefinition": null
-          },
-          "record-reader": {
-            "name": "record-reader",
-            "displayName": "Record Reader",
-            "identifiesControllerService": true,
-            "sensitive": false,
-            "resourceDefinition": null
-          },
-          "Listening Port": {
-            "name": "Listening Port",
-            "displayName": "Listening Port",
-            "identifiesControllerService": false,
-            "sensitive": false,
-            "resourceDefinition": null
-          }
-        },
-        "style": {},
-        "annotationData": null,
-        "schedulingPeriod": "0 ms",
-        "schedulingStrategy": "TIMER_DRIVEN",
-        "executionNode": "ALL",
-        "penaltyDuration": "30000 ms",
-        "yieldDuration": "1000 ms",
-        "bulletinLevel": "WARN",
-        "runDurationMillis": 0,
-        "concurrentlySchedulableTaskCount": 1,
-        "autoTerminatedRelationships": [],
-        "scheduledState": null,
-        "retryCount": null,
-        "retriedRelationships": null,
-        "backoffMechanism": null,
-        "maxBackoffPeriod": null,
-        "componentType": "PROCESSOR",
-        "groupIdentifier": "a9aaf51b-1fe8-4061-b75f-53fac625b784"
-      },
-      {
-        "identifier": "5789103a-87c0-47bf-942e-d396de059591",
-        "instanceIdentifier": "c5664018-6900-45bb-854d-c6c3abc0b713",
-        "name": "ExecuteStreamCommand-MatrixWindowsJava",
-        "comments": "",
-        "position": {
-          "x": 1300.0,
-          "y": -300.0
-        },
-        "type": "org.apache.nifi.processors.standard.ExecuteStreamCommand",
-        "bundle": {
-          "group": "org.apache.nifi.minifi",
-          "artifact": "minifi-standard-nar",
-          "version": "2.24.08.0-19"
-        },
-        "properties": {
-          "argumentsStrategy": "Command Arguments Property",
-          "Max Attribute Length": "256",
-          "Output MIME Type": null,
-          "Working Directory": "C:\\minifi-windesktop",
-          "Command Path": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
-          "Output Destination Attribute": null,
-          "Argument Delimiter": ";",
-          "Ignore STDIN": "false",
-          "Command Arguments": "-NoProfile;-ExecutionPolicy;Bypass;-File;C:\\minifi-windesktop\\launch_matrix_java.ps1"
-        },
-        "propertyDescriptors": {
-          "argumentsStrategy": {
-            "name": "argumentsStrategy",
-            "displayName": "Command Arguments Strategy",
-            "identifiesControllerService": false,
-            "sensitive": false,
-            "resourceDefinition": null
-          },
-          "Max Attribute Length": {
-            "name": "Max Attribute Length",
-            "displayName": "Max Attribute Length",
-            "identifiesControllerService": false,
-            "sensitive": false,
-            "resourceDefinition": null
-          },
-          "Output MIME Type": {
-            "name": "Output MIME Type",
-            "displayName": "Output MIME Type",
-            "identifiesControllerService": false,
-            "sensitive": false,
-            "resourceDefinition": null
-          },
-          "Working Directory": {
-            "name": "Working Directory",
-            "displayName": "Working Directory",
-            "identifiesControllerService": false,
-            "sensitive": false,
-            "resourceDefinition": null
-          },
-          "Command Path": {
-            "name": "Command Path",
-            "displayName": "Command Path",
-            "identifiesControllerService": false,
-            "sensitive": false,
-            "resourceDefinition": null
-          },
-          "Output Destination Attribute": {
-            "name": "Output Destination Attribute",
-            "displayName": "Output Destination Attribute",
-            "identifiesControllerService": false,
-            "sensitive": false,
-            "resourceDefinition": null
-          },
-          "Argument Delimiter": {
-            "name": "Argument Delimiter",
-            "displayName": "Argument Delimiter",
-            "identifiesControllerService": false,
-            "sensitive": false,
-            "resourceDefinition": null
-          },
-          "Ignore STDIN": {
-            "name": "Ignore STDIN",
-            "displayName": "Ignore STDIN",
-            "identifiesControllerService": false,
-            "sensitive": false,
-            "resourceDefinition": null
-          },
-          "Command Arguments": {
-            "name": "Command Arguments",
-            "displayName": "Command Arguments",
-            "identifiesControllerService": false,
-            "sensitive": false,
-            "resourceDefinition": null
-          }
-        },
-        "style": {},
-        "annotationData": null,
-        "schedulingPeriod": "0 ms",
-        "schedulingStrategy": "TIMER_DRIVEN",
-        "executionNode": "ALL",
-        "penaltyDuration": "30000 ms",
-        "yieldDuration": "1000 ms",
-        "bulletinLevel": "WARN",
-        "runDurationMillis": 0,
-        "concurrentlySchedulableTaskCount": 1,
-        "autoTerminatedRelationships": [
-          "original",
-          "nonzero status"
-        ],
-        "scheduledState": null,
-        "retryCount": null,
-        "retriedRelationships": null,
-        "backoffMechanism": null,
-        "maxBackoffPeriod": null,
-        "componentType": "PROCESSOR",
-        "groupIdentifier": "a9aaf51b-1fe8-4061-b75f-53fac625b784"
+        "groupIdentifier": "37ca539f-40c0-4f7b-823f-9a21248e368f"
       }
     ],
     "inputPorts": [],
     "outputPorts": [],
     "connections": [
       {
-        "identifier": "c59a7224-7700-4eb2-8af2-4f3c5897d505",
-        "instanceIdentifier": "b4962c92-9d30-4ca5-ae76-1ac748d01027",
-        "name": "ExecuteScript-WindowsJavaNarTest/success/LogAttribute",
+        "identifier": "b958aad4-5b9b-416a-8c19-9f1a9edcc0e3",
+        "instanceIdentifier": "cbbd6cf6-3dd1-44c7-b383-59c04c7d5661",
+        "name": "request->extract",
         "comments": null,
         "position": {
           "x": 0.0,
           "y": 0.0
         },
         "source": {
-          "id": "50d9a99c-e2e6-4c33-8381-f4d2cae90c8a",
+          "id": "6ed4b10d-5a69-4cc9-bc06-9dcb51e2689d",
           "type": "PROCESSOR",
-          "groupId": "a9aaf51b-1fe8-4061-b75f-53fac625b784",
-          "name": "ExecuteScript-WindowsJavaNarTest",
+          "groupId": "37ca539f-40c0-4f7b-823f-9a21248e368f",
+          "name": "HandleHttpRequest-Screen2Load",
           "comments": null,
-          "instanceIdentifier": "83123007-67bb-40e6-85ea-29af9fffdc75"
+          "instanceIdentifier": "b0118f1d-9066-44cb-bfd5-7eea927cf7e3"
         },
         "destination": {
-          "id": "7ba646e8-31aa-4d65-ade1-13ea899c64cd",
+          "id": "dbb9d0e4-8f8d-4a8f-afbe-af5b360a9d71",
           "type": "PROCESSOR",
-          "groupId": "a9aaf51b-1fe8-4061-b75f-53fac625b784",
-          "name": "LogAttribute",
+          "groupId": "37ca539f-40c0-4f7b-823f-9a21248e368f",
+          "name": "EvaluateJsonPath-ExtractStreamer",
           "comments": null,
-          "instanceIdentifier": "2ff0a1ff-63f9-4605-ab67-6006166a2732"
+          "instanceIdentifier": "d0b65a34-7da1-464e-8ce4-c0d77137b7fe"
         },
         "labelIndex": 1,
         "zIndex": 0,
@@ -1267,37 +910,37 @@
         "partitioningAttribute": null,
         "loadBalanceCompression": null,
         "componentType": "CONNECTION",
-        "groupIdentifier": "a9aaf51b-1fe8-4061-b75f-53fac625b784"
+        "groupIdentifier": "37ca539f-40c0-4f7b-823f-9a21248e368f"
       },
       {
-        "identifier": "76a5232f-d2b8-4654-a5df-d6206126408e",
-        "instanceIdentifier": "dcbee4b0-3c6e-435d-8837-5060b6189d1f",
-        "name": "ListenHTTP-MatrixWindowsJava/success/ExecuteStreamCommand-MatrixWindowsJava",
+        "identifier": "dccf1ac0-61c3-4d8a-bf4e-3ec186545492",
+        "instanceIdentifier": "3b403b56-93a2-467f-b593-dc9a2b018faf",
+        "name": "extract->exec (matched)",
         "comments": null,
         "position": {
           "x": 0.0,
           "y": 0.0
         },
         "source": {
-          "id": "e275bb9a-5bb0-472e-9c48-791538ecaf0b",
+          "id": "dbb9d0e4-8f8d-4a8f-afbe-af5b360a9d71",
           "type": "PROCESSOR",
-          "groupId": "a9aaf51b-1fe8-4061-b75f-53fac625b784",
-          "name": "ListenHTTP-MatrixWindowsJava",
+          "groupId": "37ca539f-40c0-4f7b-823f-9a21248e368f",
+          "name": "EvaluateJsonPath-ExtractStreamer",
           "comments": null,
-          "instanceIdentifier": "7c788bd6-a0a1-499f-9f7c-f1525428a288"
+          "instanceIdentifier": "d0b65a34-7da1-464e-8ce4-c0d77137b7fe"
         },
         "destination": {
-          "id": "5789103a-87c0-47bf-942e-d396de059591",
+          "id": "d6ec3f67-e92a-4144-90a4-c61dcfec5bb3",
           "type": "PROCESSOR",
-          "groupId": "a9aaf51b-1fe8-4061-b75f-53fac625b784",
-          "name": "ExecuteStreamCommand-MatrixWindowsJava",
+          "groupId": "37ca539f-40c0-4f7b-823f-9a21248e368f",
+          "name": "ExecuteStreamCommand-MpvLoad",
           "comments": null,
-          "instanceIdentifier": "c5664018-6900-45bb-854d-c6c3abc0b713"
+          "instanceIdentifier": "0c159e8e-bf02-4521-b6f0-0a2503ac3aef"
         },
         "labelIndex": 1,
         "zIndex": 0,
         "selectedRelationships": [
-          "success"
+          "matched"
         ],
         "backPressureObjectThreshold": 2000,
         "backPressureDataSizeThreshold": "100 MB",
@@ -1308,32 +951,73 @@
         "partitioningAttribute": null,
         "loadBalanceCompression": null,
         "componentType": "CONNECTION",
-        "groupIdentifier": "a9aaf51b-1fe8-4061-b75f-53fac625b784"
+        "groupIdentifier": "37ca539f-40c0-4f7b-823f-9a21248e368f"
       },
       {
-        "identifier": "ab18ff33-29f3-41a0-9b31-f568b1041c11",
-        "instanceIdentifier": "e8ad0824-2020-4f25-a1b1-f378428f2459",
-        "name": "ExecuteStreamCommand-MatrixWindowsJava/output stream/LogAttribute-MatrixWindowsJava",
+        "identifier": "657574c4-5ff8-4aac-bd6e-21bab5ceb078",
+        "instanceIdentifier": "c47f5103-5654-47f3-abdf-b6011d24b484",
+        "name": "exec->response (nonzero)",
         "comments": null,
         "position": {
           "x": 0.0,
           "y": 0.0
         },
         "source": {
-          "id": "5789103a-87c0-47bf-942e-d396de059591",
+          "id": "d6ec3f67-e92a-4144-90a4-c61dcfec5bb3",
           "type": "PROCESSOR",
-          "groupId": "a9aaf51b-1fe8-4061-b75f-53fac625b784",
-          "name": "ExecuteStreamCommand-MatrixWindowsJava",
+          "groupId": "37ca539f-40c0-4f7b-823f-9a21248e368f",
+          "name": "ExecuteStreamCommand-MpvLoad",
           "comments": null,
-          "instanceIdentifier": "c5664018-6900-45bb-854d-c6c3abc0b713"
+          "instanceIdentifier": "0c159e8e-bf02-4521-b6f0-0a2503ac3aef"
         },
         "destination": {
-          "id": "f24ed6d1-232e-4127-88fc-d9c872054851",
+          "id": "d8d3faaf-2125-45a5-95cc-e1b1c1b69371",
           "type": "PROCESSOR",
-          "groupId": "a9aaf51b-1fe8-4061-b75f-53fac625b784",
-          "name": "LogAttribute-MatrixWindowsJava",
+          "groupId": "37ca539f-40c0-4f7b-823f-9a21248e368f",
+          "name": "HandleHttpResponse-Screen2Load",
           "comments": null,
-          "instanceIdentifier": "f29b76f8-7321-4f93-bb9d-467f6c029246"
+          "instanceIdentifier": "3f6c3536-45d5-444e-9735-82d58e498899"
+        },
+        "labelIndex": 1,
+        "zIndex": 0,
+        "selectedRelationships": [
+          "nonzero status"
+        ],
+        "backPressureObjectThreshold": 2000,
+        "backPressureDataSizeThreshold": "100 MB",
+        "flowFileExpiration": "0 seconds",
+        "prioritizers": [],
+        "bends": [],
+        "loadBalanceStrategy": null,
+        "partitioningAttribute": null,
+        "loadBalanceCompression": null,
+        "componentType": "CONNECTION",
+        "groupIdentifier": "37ca539f-40c0-4f7b-823f-9a21248e368f"
+      },
+      {
+        "identifier": "1d4bd4f8-edcf-4346-b9eb-5a5396e78298",
+        "instanceIdentifier": "15b13e67-503c-4727-a0a1-d32690936f41",
+        "name": "exec->response (ok)",
+        "comments": null,
+        "position": {
+          "x": 0.0,
+          "y": 0.0
+        },
+        "source": {
+          "id": "c36e42fb-ee7d-4cd8-8713-7d2e0719e8d8",
+          "type": "PROCESSOR",
+          "groupId": "37ca539f-40c0-4f7b-823f-9a21248e368f",
+          "name": "ExecuteStreamCommand-MatrixLoad",
+          "comments": null,
+          "instanceIdentifier": "f88c1647-52aa-41e9-b939-c6d5a13dc5a0"
+        },
+        "destination": {
+          "id": "78b4193f-ee28-474f-9907-ca2fa6cf0c87",
+          "type": "PROCESSOR",
+          "groupId": "37ca539f-40c0-4f7b-823f-9a21248e368f",
+          "name": "HandleHttpResponse-Screen2Matrix",
+          "comments": null,
+          "instanceIdentifier": "6ff1aa2d-866a-4f31-ac92-f3c304974324"
         },
         "labelIndex": 1,
         "zIndex": 0,
@@ -1349,32 +1033,32 @@
         "partitioningAttribute": null,
         "loadBalanceCompression": null,
         "componentType": "CONNECTION",
-        "groupIdentifier": "a9aaf51b-1fe8-4061-b75f-53fac625b784"
+        "groupIdentifier": "37ca539f-40c0-4f7b-823f-9a21248e368f"
       },
       {
-        "identifier": "f063ca98-45ce-446a-8bb0-78a439a6861c",
-        "instanceIdentifier": "89ffe26b-dd9e-495e-8836-95e029903fde",
-        "name": "ListenHTTP/success/ExecuteScript-WindowsJavaNarTest",
+        "identifier": "14a36da6-79c8-4ee3-91d3-af9b310218f5",
+        "instanceIdentifier": "94d52db4-6d38-4e28-967c-d753c4635d26",
+        "name": "request->exec",
         "comments": null,
         "position": {
           "x": 0.0,
           "y": 0.0
         },
         "source": {
-          "id": "e7ed2479-eccc-4b36-84b5-e9d9adce1326",
+          "id": "b4a4dbaa-0bd0-43db-87a7-a0801c9ae4e0",
           "type": "PROCESSOR",
-          "groupId": "a9aaf51b-1fe8-4061-b75f-53fac625b784",
-          "name": "ListenHTTP",
+          "groupId": "37ca539f-40c0-4f7b-823f-9a21248e368f",
+          "name": "HandleHttpRequest-Screen2Matrix",
           "comments": null,
-          "instanceIdentifier": "50b18d53-2469-4f9e-9d9b-480d6d4e5547"
+          "instanceIdentifier": "b7e5e381-d46f-4d62-93a8-41990c9326c2"
         },
         "destination": {
-          "id": "50d9a99c-e2e6-4c33-8381-f4d2cae90c8a",
+          "id": "c36e42fb-ee7d-4cd8-8713-7d2e0719e8d8",
           "type": "PROCESSOR",
-          "groupId": "a9aaf51b-1fe8-4061-b75f-53fac625b784",
-          "name": "ExecuteScript-WindowsJavaNarTest",
+          "groupId": "37ca539f-40c0-4f7b-823f-9a21248e368f",
+          "name": "ExecuteStreamCommand-MatrixLoad",
           "comments": null,
-          "instanceIdentifier": "83123007-67bb-40e6-85ea-29af9fffdc75"
+          "instanceIdentifier": "f88c1647-52aa-41e9-b939-c6d5a13dc5a0"
         },
         "labelIndex": 1,
         "zIndex": 0,
@@ -1390,32 +1074,114 @@
         "partitioningAttribute": null,
         "loadBalanceCompression": null,
         "componentType": "CONNECTION",
-        "groupIdentifier": "a9aaf51b-1fe8-4061-b75f-53fac625b784"
+        "groupIdentifier": "37ca539f-40c0-4f7b-823f-9a21248e368f"
       },
       {
-        "identifier": "50080893-014c-46d9-8deb-f74b3fbc90ac",
-        "instanceIdentifier": "c484d7d4-2f4d-4965-a9e3-b5d9bad02651",
-        "name": "ExecuteStreamCommand-LoadWindowsJava/output stream/LogAttribute-LoadWindowsJava",
+        "identifier": "3d8e037b-c940-4453-91f0-ec6dbf79210a",
+        "instanceIdentifier": "82273740-f986-4e1b-8cb4-fbfc0163ba9a",
+        "name": "extract->exec (unmatched)",
         "comments": null,
         "position": {
           "x": 0.0,
           "y": 0.0
         },
         "source": {
-          "id": "9e4ffa81-1d03-4114-81ee-056f8672a373",
+          "id": "dbb9d0e4-8f8d-4a8f-afbe-af5b360a9d71",
           "type": "PROCESSOR",
-          "groupId": "a9aaf51b-1fe8-4061-b75f-53fac625b784",
-          "name": "ExecuteStreamCommand-LoadWindowsJava",
+          "groupId": "37ca539f-40c0-4f7b-823f-9a21248e368f",
+          "name": "EvaluateJsonPath-ExtractStreamer",
           "comments": null,
-          "instanceIdentifier": "29a47344-5417-4b4f-97ce-ad2d8f2cb682"
+          "instanceIdentifier": "d0b65a34-7da1-464e-8ce4-c0d77137b7fe"
         },
         "destination": {
-          "id": "d2413084-b06e-46ad-a110-5978d9a4a975",
+          "id": "d6ec3f67-e92a-4144-90a4-c61dcfec5bb3",
           "type": "PROCESSOR",
-          "groupId": "a9aaf51b-1fe8-4061-b75f-53fac625b784",
-          "name": "LogAttribute-LoadWindowsJava",
+          "groupId": "37ca539f-40c0-4f7b-823f-9a21248e368f",
+          "name": "ExecuteStreamCommand-MpvLoad",
           "comments": null,
-          "instanceIdentifier": "46b7e37c-ab0a-4e07-86f8-fb916be27d8a"
+          "instanceIdentifier": "0c159e8e-bf02-4521-b6f0-0a2503ac3aef"
+        },
+        "labelIndex": 1,
+        "zIndex": 0,
+        "selectedRelationships": [
+          "unmatched"
+        ],
+        "backPressureObjectThreshold": 2000,
+        "backPressureDataSizeThreshold": "100 MB",
+        "flowFileExpiration": "0 seconds",
+        "prioritizers": [],
+        "bends": [],
+        "loadBalanceStrategy": null,
+        "partitioningAttribute": null,
+        "loadBalanceCompression": null,
+        "componentType": "CONNECTION",
+        "groupIdentifier": "37ca539f-40c0-4f7b-823f-9a21248e368f"
+      },
+      {
+        "identifier": "5c819810-2724-4be1-ab02-15653e9d36d3",
+        "instanceIdentifier": "231e41f4-6028-4e1d-9981-fbf57007e78f",
+        "name": "exec->response (nonzero)",
+        "comments": null,
+        "position": {
+          "x": 0.0,
+          "y": 0.0
+        },
+        "source": {
+          "id": "c36e42fb-ee7d-4cd8-8713-7d2e0719e8d8",
+          "type": "PROCESSOR",
+          "groupId": "37ca539f-40c0-4f7b-823f-9a21248e368f",
+          "name": "ExecuteStreamCommand-MatrixLoad",
+          "comments": null,
+          "instanceIdentifier": "f88c1647-52aa-41e9-b939-c6d5a13dc5a0"
+        },
+        "destination": {
+          "id": "78b4193f-ee28-474f-9907-ca2fa6cf0c87",
+          "type": "PROCESSOR",
+          "groupId": "37ca539f-40c0-4f7b-823f-9a21248e368f",
+          "name": "HandleHttpResponse-Screen2Matrix",
+          "comments": null,
+          "instanceIdentifier": "6ff1aa2d-866a-4f31-ac92-f3c304974324"
+        },
+        "labelIndex": 1,
+        "zIndex": 0,
+        "selectedRelationships": [
+          "nonzero status"
+        ],
+        "backPressureObjectThreshold": 2000,
+        "backPressureDataSizeThreshold": "100 MB",
+        "flowFileExpiration": "0 seconds",
+        "prioritizers": [],
+        "bends": [],
+        "loadBalanceStrategy": null,
+        "partitioningAttribute": null,
+        "loadBalanceCompression": null,
+        "componentType": "CONNECTION",
+        "groupIdentifier": "37ca539f-40c0-4f7b-823f-9a21248e368f"
+      },
+      {
+        "identifier": "44f32ddc-bd0b-4b06-b6c8-8f620265a1d9",
+        "instanceIdentifier": "8926e2f5-58f6-45b0-8fa0-7b09f80487e3",
+        "name": "exec->response (ok)",
+        "comments": null,
+        "position": {
+          "x": 0.0,
+          "y": 0.0
+        },
+        "source": {
+          "id": "d6ec3f67-e92a-4144-90a4-c61dcfec5bb3",
+          "type": "PROCESSOR",
+          "groupId": "37ca539f-40c0-4f7b-823f-9a21248e368f",
+          "name": "ExecuteStreamCommand-MpvLoad",
+          "comments": null,
+          "instanceIdentifier": "0c159e8e-bf02-4521-b6f0-0a2503ac3aef"
+        },
+        "destination": {
+          "id": "d8d3faaf-2125-45a5-95cc-e1b1c1b69371",
+          "type": "PROCESSOR",
+          "groupId": "37ca539f-40c0-4f7b-823f-9a21248e368f",
+          "name": "HandleHttpResponse-Screen2Load",
+          "comments": null,
+          "instanceIdentifier": "3f6c3536-45d5-444e-9735-82d58e498899"
         },
         "labelIndex": 1,
         "zIndex": 0,
@@ -1431,155 +1197,42 @@
         "partitioningAttribute": null,
         "loadBalanceCompression": null,
         "componentType": "CONNECTION",
-        "groupIdentifier": "a9aaf51b-1fe8-4061-b75f-53fac625b784"
-      },
-      {
-        "identifier": "921eebb1-0bd8-46c4-a676-37aa23d54ce6",
-        "instanceIdentifier": "a36a79be-3b07-4166-b8fb-67bfb26a9149",
-        "name": "ListenHTTP-LoadWindowsJava/success/ExecuteStreamCommand-LoadWindowsJava",
-        "comments": null,
-        "position": {
-          "x": 0.0,
-          "y": 0.0
-        },
-        "source": {
-          "id": "d107f9ef-3a9d-4df5-a375-eeae98e988a9",
-          "type": "PROCESSOR",
-          "groupId": "a9aaf51b-1fe8-4061-b75f-53fac625b784",
-          "name": "ListenHTTP-LoadWindowsJava",
-          "comments": null,
-          "instanceIdentifier": "413387c4-af9e-4c62-838b-329ee12f1cbb"
-        },
-        "destination": {
-          "id": "9e4ffa81-1d03-4114-81ee-056f8672a373",
-          "type": "PROCESSOR",
-          "groupId": "a9aaf51b-1fe8-4061-b75f-53fac625b784",
-          "name": "ExecuteStreamCommand-LoadWindowsJava",
-          "comments": null,
-          "instanceIdentifier": "29a47344-5417-4b4f-97ce-ad2d8f2cb682"
-        },
-        "labelIndex": 1,
-        "zIndex": 0,
-        "selectedRelationships": [
-          "success"
-        ],
-        "backPressureObjectThreshold": 2000,
-        "backPressureDataSizeThreshold": "100 MB",
-        "flowFileExpiration": "0 seconds",
-        "prioritizers": [],
-        "bends": [],
-        "loadBalanceStrategy": null,
-        "partitioningAttribute": null,
-        "loadBalanceCompression": null,
-        "componentType": "CONNECTION",
-        "groupIdentifier": "a9aaf51b-1fe8-4061-b75f-53fac625b784"
+        "groupIdentifier": "37ca539f-40c0-4f7b-823f-9a21248e368f"
       }
     ],
     "labels": [],
     "funnels": [],
     "controllerServices": [
       {
-        "identifier": "0dbba5fc-5ff8-4d6f-8ce6-ef242d864157",
-        "instanceIdentifier": "3c2a748f-316c-4c5d-b72f-d51c839ce808",
-        "name": "Kafka3ConnectionService-WindowsJavaNarTest",
+        "identifier": "cf1bf440-77a8-4c31-a006-8e4ee8773cf2",
+        "instanceIdentifier": "e3626de3-08e7-41ff-84fd-251fd7278579",
+        "name": "StandardHttpContextMap",
         "comments": null,
         "position": {
           "x": 0.0,
           "y": 0.0
         },
-        "type": "org.apache.nifi.kafka.service.Kafka3ConnectionService",
+        "type": "org.apache.nifi.http.StandardHttpContextMap",
         "bundle": {
           "group": "org.apache.nifi",
-          "artifact": "nifi-kafka-3-service-nar",
+          "artifact": "nifi-http-context-map-nar",
           "version": "2.24.08.0-19"
         },
         "properties": {
-          "security.protocol": "PLAINTEXT",
-          "SSL Context Service": null,
-          "ack.wait.time": "5 sec",
-          "sasl.username": null,
-          "max.poll.records": "10000",
-          "sasl.mechanism": "GSSAPI",
-          "isolation.level": "read_committed",
-          "max.block.ms": "5 sec",
-          "bootstrap.servers": "192.168.1.121:31623",
-          "sasl.password": null,
-          "default.api.timeout.ms": "60 sec"
+          "Request Expiration": "1 min",
+          "Maximum Outstanding Requests": "5000"
         },
         "propertyDescriptors": {
-          "security.protocol": {
-            "name": "security.protocol",
-            "displayName": "Security Protocol",
+          "Request Expiration": {
+            "name": "Request Expiration",
+            "displayName": "Request Expiration",
             "identifiesControllerService": false,
             "sensitive": false,
             "resourceDefinition": null
           },
-          "SSL Context Service": {
-            "name": "SSL Context Service",
-            "displayName": "SSL Context Service",
-            "identifiesControllerService": true,
-            "sensitive": false,
-            "resourceDefinition": null
-          },
-          "ack.wait.time": {
-            "name": "ack.wait.time",
-            "displayName": "Acknowledgment Wait Time",
-            "identifiesControllerService": false,
-            "sensitive": false,
-            "resourceDefinition": null
-          },
-          "sasl.username": {
-            "name": "sasl.username",
-            "displayName": "SASL Username",
-            "identifiesControllerService": false,
-            "sensitive": false,
-            "resourceDefinition": null
-          },
-          "max.poll.records": {
-            "name": "max.poll.records",
-            "displayName": "Max Poll Records",
-            "identifiesControllerService": false,
-            "sensitive": false,
-            "resourceDefinition": null
-          },
-          "sasl.mechanism": {
-            "name": "sasl.mechanism",
-            "displayName": "SASL Mechanism",
-            "identifiesControllerService": false,
-            "sensitive": false,
-            "resourceDefinition": null
-          },
-          "isolation.level": {
-            "name": "isolation.level",
-            "displayName": "Transaction Isolation Level",
-            "identifiesControllerService": false,
-            "sensitive": false,
-            "resourceDefinition": null
-          },
-          "max.block.ms": {
-            "name": "max.block.ms",
-            "displayName": "Max Metadata Wait Time",
-            "identifiesControllerService": false,
-            "sensitive": false,
-            "resourceDefinition": null
-          },
-          "bootstrap.servers": {
-            "name": "bootstrap.servers",
-            "displayName": "Bootstrap Servers",
-            "identifiesControllerService": false,
-            "sensitive": false,
-            "resourceDefinition": null
-          },
-          "sasl.password": {
-            "name": "sasl.password",
-            "displayName": "SASL Password",
-            "identifiesControllerService": false,
-            "sensitive": true,
-            "resourceDefinition": null
-          },
-          "default.api.timeout.ms": {
-            "name": "default.api.timeout.ms",
-            "displayName": "Client Timeout",
+          "Maximum Outstanding Requests": {
+            "name": "Maximum Outstanding Requests",
+            "displayName": "Maximum Outstanding Requests",
             "identifiesControllerService": false,
             "sensitive": false,
             "resourceDefinition": null
@@ -1587,10 +1240,10 @@
         },
         "controllerServiceApis": [
           {
-            "type": "org.apache.nifi.kafka.service.api.KafkaConnectionService",
+            "type": "org.apache.nifi.http.HttpContextMap",
             "bundle": {
               "group": "org.apache.nifi",
-              "artifact": "nifi-kafka-service-api-nar",
+              "artifact": "nifi-standard-services-api-nar",
               "version": "2.24.08.0-19"
             }
           }
@@ -1599,12 +1252,12 @@
         "scheduledState": null,
         "bulletinLevel": null,
         "componentType": "CONTROLLER_SERVICE",
-        "groupIdentifier": "a9aaf51b-1fe8-4061-b75f-53fac625b784"
+        "groupIdentifier": "37ca539f-40c0-4f7b-823f-9a21248e368f"
       }
     ],
     "versionedFlowCoordinates": null,
     "variables": {},
-    "parameterContextName": "6279f261-318a-46a7-a73c-c8c5c891e920",
+    "parameterContextName": "9a4a3988-be82-4750-82ee-31750e5f3d61",
     "defaultFlowFileExpiration": null,
     "defaultBackPressureObjectThreshold": null,
     "defaultBackPressureDataSizeThreshold": null,
@@ -1616,18 +1269,18 @@
   },
   "parameterContexts": [
     {
-      "id": "6279f261-318a-46a7-a73c-c8c5c891e920",
-      "name": "6279f261-318a-46a7-a73c-c8c5c891e920",
+      "id": "9a4a3988-be82-4750-82ee-31750e5f3d61",
+      "name": "9a4a3988-be82-4750-82ee-31750e5f3d61",
       "parameters": [],
       "usage": null
     }
   ],
   "versionInfo": {
-    "flowVersion": 6,
-    "lastPublished": 1785257142392,
+    "flowVersion": 1,
+    "lastPublished": 1786046947365,
     "lastPublishedBy": "anonymous",
     "dirty": false,
     "localChanges": false
   },
-  "localFlowRevision": 77
+  "localFlowRevision": 25
 }
