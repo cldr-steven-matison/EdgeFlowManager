@@ -1,6 +1,6 @@
 # Chapter 4: MiNiFi Java Processor Catalog
 
-I run MiNiFi C++ and MiNiFi Java side-by-side in the same minikube playground, same Strimzi Kafka cluster, same EFM server. The swap is a Dockerfile change, a memory bump in the K8s YAML, and a different `agentType` in the EFM deployer curl. What you get from Java is a processor set that C++ can't match out of the box: `HandleHttpRequest`/`HandleHttpResponse` (synchronous request/reply HTTP — absent in C++), a scripting engine once the right NARs are present, and a Record Reader/Writer framework. The field-verified count from a live `minifi-java` agent manifest (`2.24.08.0-19` on WindowsDesktop): **114 processors, 45 controller services**.
+I run MiNiFi C++ and MiNiFi Java side-by-side in the same minikube playground, same Strimzi Kafka cluster, same EFM server. The swap is a Dockerfile change, a memory bump in the K8s YAML, and a different `agentType` in the EFM deployer curl. What you get from Java is a processor set that C++ can't match out of the box: `HandleHttpRequest`/`HandleHttpResponse` (synchronous request/reply HTTP — absent in C++), a scripting engine once the right NARs are present, and a Record Reader/Writer framework. The field-verified count from the **stock** `minifi-java` tarball (`2.24.08.0-19`, before the NAR drop-in below): **114 processors, 45 controller services**. Every production Java class in this cluster (`KubernetesPodJava`, `NvidiaNano`, `WindowsDesktop`) is already running the **NAR-drop-in build** — confirmed live 2026-08-06: **122 processors, 51 controller services**. There is no "stock 114" manifest live anywhere in this cluster today; 114/45 is the pre-drop-in baseline, not current production reality.
 
 ---
 
@@ -14,13 +14,13 @@ I run MiNiFi C++ and MiNiFi Java side-by-side in the same minikube playground, s
 | **PublishKafka / ConsumeKafka** | Present (C++ extensions) | Missing from the stock `2.24.08.0-19` tarball, but NAR drop-in fix field-verified — real transactional Kafka producer confirmed connecting |
 | **Record Reader/Writer framework** | `ConvertRecord` and `SplitRecord` present but require controller services | **[Cloudera stock]** — RecordReader/RecordWriter controller services present |
 | **Scripting engines** | None without extra-extensions | Shell via `ExecuteProcess`/`ExecuteStreamCommand` in stock; Groovy/Clojure via NAR drop-in |
-| **Total processors** | 74 (stock), more via extra-extensions | 114 (field-verified from live agent manifest) |
+| **Total processors** | 74 (stock), more via extra-extensions | 114 stock, **122 field-verified live in production** after the Kafka/scripting NAR drop-in |
 | **Image size** | ~15 MB | ~300–400 MB |
 | **Memory minimum** | ~128Mi | ~512Mi |
 | **JVM startup** | None | ~30–60s cold start |
 | **Kubernetes sidecar use** | Production-ready | Not recommended — footprint too large |
 
-> **⚠️ Heads up:** There is no `minifi-java` Docker image to check the "200+ processors" figure against. Field-verified: `container.repo.cloudera.com/cloudera/minifi-java:latest` does not exist in the registry (nor ~12 name variants), while `apacheminificpp:latest` resolves — Cloudera containerizes only the C++ agent; MiNiFi Java ships as the tarball. The authoritative count is the tarball's field-verified **114 processors / 45 controller services**; "200+" has no running Java manifest behind it.
+> **⚠️ Heads up:** There is no `minifi-java` Docker image to check the "200+ processors" figure against. Field-verified: `container.repo.cloudera.com/cloudera/minifi-java:latest` does not exist in the registry (nor ~12 name variants), while `apacheminificpp:latest` resolves — Cloudera containerizes only the C++ agent; MiNiFi Java ships as the tarball. The authoritative baseline is the stock tarball's field-verified **114 processors / 45 controller services**; production classes today run the NAR-drop-in build at **122 processors / 51 controller services**. "200+" has no running Java manifest behind it, stock or drop-in.
 
 ---
 

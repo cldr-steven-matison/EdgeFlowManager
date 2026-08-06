@@ -354,11 +354,13 @@ kafka-console-consumer.sh --bootstrap-server gaming-pc-lan-ip:31623 \
 
 The `tensorrt` block was appended live on the Jetson's GPU by `gpu_nifi_tensorRT-3.py`. Full `ListenHTTP → ExecuteScript → PublishKafka` chain confirmed end to end on real aarch64 hardware.
 
-## Synchronous Request/Response — the `NvidiaNanoJava` HandleHttp Flow
+## Synchronous Request/Response — the `NvidiaNano` HandleHttp Flow
 
 The fire-and-forget `ListenHTTP → ExecuteScript → PublishKafka` pattern documented above is one valid inference shape. The caller sends a POST, gets an immediate `200 OK`, and the real result lands in Kafka later for downstream consumers. That pattern is appropriate for high-throughput async pipelines — the inference itself is decoupled from the HTTP round trip.
 
-A second, current-choice pattern for synchronous request/response is the `NvidiaNanoJava` MiNiFi Java agent — a separate agent running on the same Jetson hardware, dedicated to serving inference requests with a real answer in the HTTP response body. This is necessary for scenarios where the caller (e.g. a microcontroller or edge device) expects to POST and get an immediate answer without needing to poll Kafka or handle correlation IDs.
+A second, current-choice pattern for synchronous request/response is a MiNiFi **Java** agent on the same Jetson hardware, dedicated to serving requests with a real answer in the HTTP response body. This is necessary for scenarios where the caller (e.g. a microcontroller or edge device) expects to POST and get an immediate answer without needing to poll Kafka or handle correlation IDs.
+
+> **⚠️ Class history — read this before cross-referencing "Enrolling the Jetson Orin Nano" above.** This Java agent originally enrolled under its own field-test class, `NvidiaNanoJava`. That class is now retired. The production Java agent and its real flow run under the **`NvidiaNano`** class — the same class name the C++ agent enrollment earlier in this chapter uses. The C++ agent has since gone stale/`MISSING` and the class was repurposed; `NvidiaNano` today means the Java runtime described in this section, not the C++ agent from "Enrolling the Jetson Orin Nano." This is exactly the device-class-roster shift the callout at the top of this chapter warned about — confirm the live class assignment (`GET /efm/api/agents/page?agentClass=NvidiaNano`) before building anything that assumes a fixed runtime per class name.
 
 ### Deploying the Java Agent
 
@@ -369,11 +371,17 @@ sudo apt install -y openjdk-21-jre-headless
 cd ~/minifi-java-nano/minifi-2.24.08.0-19 && ./bin/minifi.sh start
 ```
 
-With OpenJDK 21.0.11 installed, the agent starts in under 5 seconds and auto-registers with EFM as a `NvidiaNanoJava` class agent within the standard heartbeat cycle.
+With OpenJDK 21.0.11 installed, the agent starts in under 5 seconds and auto-registers with EFM as a `NvidiaNano` class agent within the standard heartbeat cycle.
 
-### The Inference Flow Shape
+![NvidiaNano agent class in EFM → Monitor → Agents — Good Health with the Java agent enrolled](images/efm-NvidiaNano-Class.jpg)
 
-The flow is four processors and one HTTP Context Map controller service:
+### Three Parallel HandleHttp Legs, Not One
+
+The live flow isn't a single inference endpoint — it's **three independent `HandleHttpRequest → InvokeHTTP → HandleHttpResponse` legs on the same agent**, each serving a different downstream target: `Inference` (image classification), `Matrix` (the matrix-screensaver launcher), and `StreamChat` (the stream-chat launcher) — the same launch-trigger pattern used elsewhere in this array, now exposed as synchronous HTTP instead of fire-and-forget.
+
+![NvidiaNano Designer canvas — three parallel HandleHttp legs: Inference, StreamChat, and Matrix, each with its own success/error branch](images/efm-NvidiaNano-Flow.png)
+
+Each leg has the identical four-processor shape, just pointed at a different `InvokeHTTP` target:
 
 ```
 HandleHttpRequest-Inference  (0,   0)    :8090, path /classify, HTTP Context Map
@@ -382,7 +390,13 @@ HandleHttpResponse-OK        (0,   600)  200          ← success path
 HandleHttpResponse-Error     (600, 600)  502          ← error branch
 ```
 
-The `InvokeHTTP` processor routes successful responses (HTTP 200) to `HandleHttpResponse-OK` and anything else to `HandleHttpResponse-Error`. The `Retry` path self-loops with a 10-minute FlowFile expiration rather than auto-terminate, preventing in-flight requests from blocking if the inference daemon becomes unavailable mid-request.
+The `InvokeHTTP` processor routes successful responses (HTTP 200) to `HandleHttpResponse-OK` and anything else to `HandleHttpResponse-Error`. The `Retry` path self-loops with a 10-minute FlowFile expiration rather than auto-terminate, preventing in-flight requests from blocking if the target daemon becomes unavailable mid-request. Real field numbers below are all against the **Inference** leg — the one this chapter's TensorRT work already exercises end to end; the Matrix and StreamChat legs share the identical structure but haven't had their own latency/error-path runs captured yet.
+
+![Inference leg zoomed in — HandleHttpRequest-Inference → InvokeHTTP-Classify → HandleHttpResponse-OK / HandleHttpResponse-Error](images/efm-NvidiaNano-Inference-Flow.png)
+
+![Matrix leg zoomed in — same shape, InvokeHTTP-Matrix targets the matrix-screensaver launcher](images/efm-NvidiaNano-Matrix-Flow.png)
+
+![StreamChat leg zoomed in — same shape, InvokeHTTP-StreamChat targets the stream-chat launcher](images/efm-NvidiaNano-StreamChat-Flow.png)
 
 ### Timeout Configuration — Critical for Local Inference
 
@@ -431,14 +445,9 @@ The HTTP 502 (Bad Gateway) is returned within 28 milliseconds, preventing the ca
 
 The `HandleHttpRequest` processor binds to `*:8090` (all interfaces), not `127.0.0.1`, making it reachable from any device on the LAN. This allows microcontrollers and other edge devices to POST directly to `http://<jetson-ip>:8090/classify` without requiring them to reach a centralized message broker.
 
-![NvidiaNanoJava agent class in EFM → Monitor → Agents — Good Health with agent enrolled](images/efm-NvidiaNanoJava-Class.jpg)
-<!-- TODO: screenshot pending — see issue #125 -->
+A live request/response provenance trace for the Inference leg is still outstanding — the Designer canvas and per-leg screenshots above confirm the flow topology and its live per-processor task counters (46,225+ tasks on `HandleHttpRequest-Inference` alone), but a dedicated provenance-view capture of one round trip hasn't been taken yet:
 
-![NvidiaNanoJava HandleHttp flow in EFM Designer — HandleHttpRequest → InvokeHTTP → HandleHttpResponse success/error paths](images/efm-NvidiaNanoJava-HandleHttp-Flow.jpg)
-<!-- TODO: screenshot pending — see issue #125 -->
-
-![NvidiaNanoJava HandleHttp round-trip verification in EFM provenance view](images/efm-NvidiaNanoJava-HandleHttp-Verify.jpg)
-<!-- TODO: screenshot pending — see issue #125 -->
+<!-- TODO: screenshot pending — NvidiaNano HandleHttp round-trip verification in EFM provenance view -->
 
 ## Prometheus Observability for EFM and the Jetson Agent
 
