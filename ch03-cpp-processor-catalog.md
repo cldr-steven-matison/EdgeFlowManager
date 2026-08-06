@@ -4,7 +4,7 @@ I pulled the complete processor catalog from a running `apacheminificpp:latest` 
 
 ---
 
-## Cloudera vs Apache: what ships vs what's possible
+## Cloudera vs Apache: What Ships vs What's Possible
 
 The stock image is Cloudera-curated, Apache-licensed. The upstream source lives at `https://github.com/apache/nifi-minifi-cpp`. All 74 processors in the catalog below are Apache upstream processors — Cloudera controls which subset gets compiled into `apacheminificpp:latest`. The full Apache ceiling is in upstream `PROCESSORS.md`; getting anything beyond 74 requires the extra-extensions tarball injection or a source build.
 
@@ -13,7 +13,7 @@ The EFM deployer registers these agents as `agentType=cpp`. `MINIFI_HOME` inside
 
 ---
 
-## Verified stock catalog — 74 processors (Linux x86_64, v1.26.02)
+## Verified Stock Catalog — 74 Processors (Linux x86_64, v1.26.02)
 
 Extracted from a running instance. Every name below is verbatim from that catalog — nothing added, nothing inferred from docs.
 
@@ -139,7 +139,7 @@ Extracted from a running instance. Every name below is verbatim from that catalo
 
 ---
 
-## Platform matrix (x86_64 / aarch64 / Windows)
+## Platform Matrix (x86_64 / aarch64 / Windows)
 
 | Platform | Agent binary | Stock count | Extra-extensions | ExecuteScript | Status |
 |---|---|---|---|---|---|
@@ -153,7 +153,7 @@ Extracted from a running instance. Every name below is verbatim from that catalo
 
 ---
 
-## Processors unlocked by extra-extensions injection
+## Processors Unlocked by Extra-Extensions Injection
 
 After injecting `extra-extensions-linux.tar.gz` into the agent's `extensions/` directory (recipe in [Chapter 2](ch02-efm-binaries.md)), these `.so` files appear:
 
@@ -174,11 +174,11 @@ On Windows, the equivalent is the MSI with `ADDLOCAL=ALL` — `.dll` files compi
 
 ---
 
-## config.yml class names vs EFM FQCNs
+## config.yml Class Names vs EFM FQCNs
 
 Standalone `config.yml` uses short class names. EFM-deployed flows use FQCNs. They are not interchangeable.
 
-### Short class names — standalone `config.yml`
+### Short Class Names — Standalone `config.yml`
 
 ```yaml
 Flow Controller:
@@ -205,7 +205,7 @@ Processors:
 
 Every component needs an explicit UUID `id` field. `PublishKafka` requires `Client Name`. Use C++ class names, not Java NiFi names (`ListenHTTP`, not `org.apache.nifi.processors.standard.ListenHTTP`).
 
-### FQCNs — EFM-deployed flow format
+### FQCNs — EFM-Deployed Flow Format
 
 | Processor | FQCN for EFM |
 |---|---|
@@ -223,7 +223,7 @@ Always read `GET /efm/api/designer/flows/{id}` to confirm the exact FQCN and bun
 
 ---
 
-## Flow gotchas
+## Flow Gotchas
 
 These are real bugs found on live instances.
 
@@ -241,7 +241,7 @@ buffer is NOT full 1/5
 
 `ListenHTTP` is also fire-and-forget — the caller gets an empty HTTP 200 immediately. There is no `HandleHttpRequest`/`HandleHttpResponse` pair in MiNiFi C++. Async reply must go via Kafka keyed on a caller-supplied `request_id`. If you need synchronous request/reply in a single HTTP connection, use MiNiFi Java.
 
-### InvokeHTTP — HTTP Method persistence
+### InvokeHTTP — HTTP Method Persistence
 
 **Symptom:** `InvokeHTTP` sends GET when you configured POST, causing 405 or data loss.
 
@@ -249,7 +249,7 @@ buffer is NOT full 1/5
 
 **Fix:** Always explicitly set `HTTP Method` in EFM or `config.yml`. Never assume the default matches intent.
 
-### PublishKafka — NodePort vs in-cluster
+### PublishKafka — NodePort vs in-Cluster
 
 **Symptom:** `PublishKafka` fails with `Connection refused` or `LEADER_NOT_AVAILABLE` from an edge agent running outside Kubernetes.
 
@@ -257,13 +257,13 @@ buffer is NOT full 1/5
 
 **Fix:** For edge agents outside the cluster, use the external NodePort (e.g., `<node-ip>:31623`). For in-cluster `KubernetesPod` agents, the internal DNS is correct.
 
-### EvaluateJsonPath — path syntax
+### EvaluateJsonPath — Path Syntax
 
 `$.request_id` extracts a top-level field. `$[0]` extracts the first array element. When `EvaluateJsonPath` produces empty attributes, check path syntax first. For multipart request bodies, `EvaluateJsonPath` cannot parse a multipart payload — set `ListenHTTP`'s `HTTP Headers to receive as Attributes (Regex)` and have the caller send the field as an HTTP header instead.
 
 ---
 
-## When to use C++
+## When to Use C++
 
 The stock image is ~15 MB. No JVM. Memory request of ~128Mi works. It deploys as a Kubernetes sidecar in seconds. Kafka, S3, Azure, GCS, HTTP ingestion, SQL, MQTT, Modbus, and Kubernetes metrics all ship in the 74-processor stock set — no scripting required.
 
@@ -271,7 +271,7 @@ Use C++ when you need a lightweight agent that moves data: ingestion, routing, p
 
 ---
 
-## What NOT to do
+## What NOT to Do
 
 - **Do not assume `ExecuteScript` is in the stock image.** It isn't. Cloudera docs list it for Linux because it can be built — not because `apacheminificpp:latest` ships it. The tell: `libminifi-python-script-extension.so` is absent from `extensions/`.
 
@@ -289,7 +289,7 @@ Use C++ when you need a lightweight agent that moves data: ingestion, routing, p
 
 ---
 
-## Related chapters
+## Related Chapters
 
 - Ch2 — [EFM Binaries](ch02-efm-binaries.md): the extra-extensions injection recipe and staging tree.
 - Ch5 — [ExecuteScript Availability](ch05-executescript-availability.md): the four `ExecuteScript` fix paths (A–D) in full.

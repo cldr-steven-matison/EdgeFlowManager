@@ -4,7 +4,7 @@
 
 ---
 
-## The short answer
+## The Short Answer
 
 Field-verified in this lab (a Windows box and a Kubernetes agent), not from vendor docs:
 
@@ -21,7 +21,7 @@ The old claim — "switch to Java and you get ExecuteScript for free" — is dea
 
 ---
 
-## Why the stock builds don't have it
+## Why the Stock Builds Don't Have It
 
 `ExecuteScript` is a build-time or feature-time capability, not a runtime one. Cloudera ships production-minimal binaries:
 
@@ -51,7 +51,7 @@ That's not a config error. The agent-class manifest genuinely doesn't contain it
 
 ---
 
-## Path A — C++ extra-extensions injection (the proven path)
+## Path A — C++ Extra-Extensions Injection (The Proven Path)
 
 No compile needed. Cloudera ships a separate `extra-extensions-linux.tar.gz` (and an ARM64 variant). Inject its `.so` files into the agent tarball's `extensions/` dir before the tarball lands on the EFM binaries PVC, so every agent EFM deploys from that coordinate already has scripting.
 
@@ -90,7 +90,7 @@ A property worth knowing: a running C++ agent's `ExecuteScript` re-reads its Scr
 
 ---
 
-## Path B — C++ multi-stage source build
+## Path B — C++ Multi-Stage Source Build
 
 Full control, ~20–40 min on an M4. Build from Apache source at the matching tag with the scripting flags on, then overlay the built `bin/` and `extensions/` onto the stock image:
 
@@ -116,11 +116,11 @@ Reach for this if the extra-extensions tarball is unavailable or a version misma
 
 ---
 
-## Path C — Java NAR drop-in (solved) and the Docker open item
+## Path C — Java NAR Drop-In
 
 The stock EFM-staged CEM Java binary `2.24.08.0-19` has neither `ExecuteScript` nor Kafka. Confirmed against the live agent manifest (`files/efm/java-minifi-2.24.08.0-19-processors.txt`): 114 processors, 45 controller services. Stock Java gives you `ExecuteProcess` / `ExecuteStreamCommand` — shell execution, not a script engine.
 
-**Solved.** Build `nifi-scripting-nar`, `nifi-kafka-nar`, and `nifi-kafka-3-service-nar` from the exact-matching `2.24.08.0-19` source tarball, then drop them into the agent's `nifi.nar.library.autoload.directory`. The manifest goes 114 → 122 and `ExecuteScript` runs real Groovy (no Python/Jython in this build) on both `KubernetesPodJava` and the `WindowsDesktop` agent. Field-verified twice. Full recipe: [Chapter 8 (MiNiFi Java Setup)](ch08-minifi-java-setup.md).
+Build `nifi-scripting-nar`, `nifi-kafka-nar`, and `nifi-kafka-3-service-nar` from the exact-matching `2.24.08.0-19` source tarball, then drop them into the agent's `nifi.nar.library.autoload.directory`. The manifest goes 114 → 122 and `ExecuteScript` runs real Groovy (no Python/Jython in this build) on both `KubernetesPodJava` and the `WindowsDesktop` agent. Field-verified twice. Full recipe: [Chapter 8 (MiNiFi Java Setup)](ch08-minifi-java-setup.md).
 
 > **⚠️ Version match is mandatory.** The NAR must be built from the source tarball at exactly `2.24.08.0-19`. A version mismatch causes silent class-loading failure.
 
@@ -138,7 +138,7 @@ Docker `minifi-java:latest` — **the image does not exist.** `docker manifest i
 | Windows service (`Apache NiFi MiNiFi` + `ADDLOCAL=ALL`) | ✅ ExecuteScript Python smoke after C2 enable |
 | An agent installed before the `ADDLOCAL=ALL` recipe | ❌ Not present — only the generic `minifi-script-extension.dll` exists, no `minifi-python-script-extension.dll`, and `minifi_native.pyd` is a 0-byte stub. Fixing it needs the `ADDLOCAL=ALL` reinstall plus a service restart, with a drain plan if the agent runs a live flow (e.g. the Lemonade routing flow) |
 
-### MSI facts (1.26.02-b30 x64)
+### MSI Facts (1.26.02-b30 x64)
 
 | Fact | Detail |
 |---|---|
@@ -148,7 +148,7 @@ Docker `minifi-java:latest` — **the image does not exist.** `docker manifest i
 | Host Python | 3.14.4 x64 at `C:\Python314` worked; agent creates `minifi-python-env` on first boot |
 | Non-elevated `msiexec /i` | Exit 1625 (system policy) — service install needs real Admin PowerShell |
 
-### Preferred how-to — Windows service + ADDLOCAL=ALL (production)
+### Preferred How-To — Windows Service + ADDLOCAL=ALL (Production)
 
 **Requires:** interactive **Administrator PowerShell** (UAC). Do not leave `$PWD` as `C:\WINDOWS\system32`.
 
@@ -209,7 +209,7 @@ Start-Service 'Apache NiFi MiNiFi'   # or Restart-Service after editing props
 # EFM: agent ONLINE within ~5-15s
 ```
 
-### Smoke test — pass criteria
+### Smoke Test — Pass Criteria
 
 Flow on the agent class (C++ FQCNs):
 
@@ -239,7 +239,7 @@ Invoke-WebRequest -Uri http://127.0.0.1:18080/contentListener -Method Post `
 
 ---
 
-## Getting the script onto the agent
+## Getting the Script onto the Agent
 
 Having the engine is half of it — the Script File still has to reach the agent and survive a pod restart. Two mechanisms:
 
@@ -251,7 +251,7 @@ Use the Resource Manager path for anything running in service; use `kubectl cp` 
 
 ---
 
-## What NOT to do
+## What NOT to Do
 
 **Do not assume `ExecuteScript` is in any stock Cloudera binary.** Neither the C++ image (74 processors, no scripting `.so`), nor the CEM Java 2.24.08.0-19 tarball (114 processors, no scripting NAR), nor the Windows MSI default install includes it. All four paths to add it are now field-verified in this lab.
 
@@ -271,7 +271,7 @@ Additional traps from field work:
 
 ---
 
-## Related chapters
+## Related Chapters
 
 - Ch2 — [EFM Binaries](ch02-efm-binaries.md): the binary-staging tree and extra-extensions injection recipe.
 - Ch8 — [MiNiFi Java Setup](ch08-minifi-java-setup.md): the Java NAR drop-in recipe (Path C).

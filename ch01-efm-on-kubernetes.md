@@ -9,7 +9,7 @@ what was originally a separate persistence chapter — the two topics are insepa
 
 ---
 
-## What EFM is
+## What EFM Is
 
 EFM exposes a UI at `http://127.0.0.1:10090/efm/ui/` where I author flows for each agent Class, stage
 agent installers, and upload Resources (Python scripts, JARs) that get pushed to agents on their next
@@ -28,7 +28,7 @@ uploaded script silently breaks.
 
 ---
 
-## Storage layout — what lives where
+## Storage Layout — What Lives Where
 
 | State | Backing store | Path in pod | Survives restart? |
 |---|---|---|---|
@@ -49,11 +49,11 @@ All three YAMLs live in `~/ClouderaStreamingOperators/`: `efm-configMap.yaml`, `
 
 ---
 
-## The 8-phase deploy
+## The 8-Phase Deploy
 
 This section keeps the key command per phase.
 
-### Phase 0 — cluster up check
+### Phase 0 — Cluster Up Check
 
 ```bash
 kubectl get pods -n cld-streaming | grep -E "postgres|kafka|efm"
@@ -61,7 +61,7 @@ kubectl get pods -n cld-streaming | grep -E "postgres|kafka|efm"
 
 `ssb-postgresql-*` must be Running before proceeding. Kafka pods only matter if flows publish there.
 
-### Phase 1 — PostgreSQL one-time setup
+### Phase 1 — PostgreSQL One-Time Setup
 
 Skip if the `efm` DB and user already exist.
 
@@ -75,7 +75,7 @@ kubectl exec $PG -n cld-streaming -- psql -U postgres -c "ALTER DATABASE efm OWN
 
 Verify with `psql -U postgres -c "\l" | grep efm`.
 
-### Phase 2 — secrets
+### Phase 2 — Secrets
 
 ```bash
 kubectl create secret generic efm-db-pass \
@@ -96,7 +96,7 @@ kubectl create secret docker-registry cloudera-registry \
 
 `already exists` errors from a prior session are fine.
 
-### Phase 3 — pull image into minikube
+### Phase 3 — Pull Image into Minikube
 
 ```bash
 eval $(minikube docker-env)
@@ -106,7 +106,7 @@ docker pull container.repo.cloudera.com/cloudera/efm:2.3.1.0-2
 
 Match the tag to your CSO / CEM entitlement.
 
-### Phase 4 — deploy with persistence
+### Phase 4 — Deploy with Persistence
 
 ```bash
 cd ~/ClouderaStreamingOperators
@@ -126,7 +126,7 @@ kubectl exec $EFM_POD -n cld-streaming -- mount | grep efm-2.3.1.0-2
 
 If `grep db.url` shows `h2`, the ConfigMap didn't mount — re-apply `efm-configMap.yaml` and restart.
 
-### Phase 5 — stage agent binaries (one-time per PVC)
+### Phase 5 — Stage Agent Binaries (One-Time per PVC)
 
 If the binaries directory is already populated, skip this. Otherwise see [Chapter 2 (EFM Binaries)](ch02-efm-binaries.md) for the
 full build. The streaming copy:
@@ -138,7 +138,7 @@ cd ~/efm-binaries/staging/ && tar -cf - binaries/ | \
 kubectl rollout restart deployment/efm -n cld-streaming
 ```
 
-### Phase 6 — reach the UI
+### Phase 6 — Reach the UI
 
 ```bash
 kubectl port-forward -n cld-streaming svc/efm 10090:10090
@@ -149,7 +149,7 @@ Open `http://127.0.0.1:10090/efm/ui/`. Check for a stale port-forward first (`ls
 
 > **⚠️ Check before port-forwarding.** The canonical port-forwards run as zellij panes (`kube-service-ports-efm.kdl`). A duplicate forward on the same target silently orphans or hangs.
 
-### Phase 7 — upload resources
+### Phase 7 — Upload Resources
 
 EFM UI → **Resources** → Upload. Set **File / Name** to match whatever the flow's `Script File`
 property expects (e.g. `cpu_nifi_tensorRT.py`). Set **Agent Class** to the target class
@@ -166,7 +166,7 @@ kubectl exec $EFM_POD -n cld-streaming -- ls -la /opt/efm/efm-2.3.1.0-2/resource
 
 Both should exist. The file syncs to `<minifi-install>/asset/<file_name>` on the agent's next heartbeat.
 
-### Phase 8 — persistence test
+### Phase 8 — Persistence Test
 
 ```bash
 kubectl rollout restart deployment/efm -n cld-streaming
@@ -188,7 +188,7 @@ After the YAMLs are applied once, a cold `minikube stop` / `minikube start` only
 
 ---
 
-## Postgres + 2-PVC persistence
+## Postgres + 2-PVC Persistence
 
 The two PVCs exist for different reasons:
 
@@ -210,7 +210,7 @@ the `efm.db.url` property in `efm-configMap.yaml`.
 
 ---
 
-## Failure modes
+## Failure Modes
 
 | Symptom | Cause | Fix |
 |---|---|---|
@@ -224,7 +224,7 @@ the `efm.db.url` property in `efm-configMap.yaml`.
 
 ---
 
-## What NOT to do
+## What NOT to Do
 
 **Don't deploy from `efm-deployment.yaml` (the non-persisted variant).** It's in
 `~/ClouderaStreamingOperators/` too and looks identical to `efm-deployment-persisted.yaml` at a
@@ -242,7 +242,7 @@ as a missing file on the next heartbeat. The fix is `efm-pvc.yaml` + remounting,
 
 ---
 
-## Related chapters
+## Related Chapters
 
 - Ch2 — [EFM Binaries & staging tree](ch02-efm-binaries.md): stocking the agent-binary tree that the
   deploy above expects, so the `Deploy Agent` button stops returning `400`.

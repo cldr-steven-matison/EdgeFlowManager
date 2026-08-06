@@ -16,7 +16,7 @@ Everything below runs on the live node against EFM `2.3.1.0-2` and the MiNiFi **
 
 ---
 
-## The node and its role
+## The Node and Its Role
 
 StarlinkAI is the third inference node in the array (alongside WindowsDesktop and the Mac), hostname
 `TunaStarlink`, a Beelink SER9 MAX (H260):
@@ -79,9 +79,9 @@ branch off `InvokeHTTP`'s `Failure`/`Retry`/`No Retry`/`Original` relationships.
 
 ---
 
-## Standing it up
+## Standing It Up
 
-### 1. Tailscale (Windows host)
+### 1. Tailscale (Windows Host)
 
 ```powershell
 winget install tailscale.tailscale
@@ -92,7 +92,7 @@ tailscale up
 rest of the array. This box gets a stable tailnet IP; the EFM host (WindowsDesktop, hostname
 `MINI-Gaming-G1`) tailnet IP is the `baseUrl` target for the agent-deployer call below.
 
-### 2. Lemonade Server (Windows host)
+### 2. Lemonade Server (Windows Host)
 
 ```powershell
 winget install --id AMD.LemonadeServer --silent --accept-package-agreements --accept-source-agreements
@@ -113,7 +113,7 @@ Manage with `lemonade list` / `lemonade pull <model>`. Once a model is loaded, c
 offload is actually active — `GET /api/v1/health` should return `"device": "gpu"`, not a silent CPU
 fallback.
 
-### 3. JDK + MiNiFi Java agent (router only)
+### 3. JDK + MiNiFi Java Agent (Router Only)
 
 ```powershell
 winget install Microsoft.OpenJDK.21
@@ -143,7 +143,7 @@ manifest automatically on first heartbeat; no manual class-manifest re-pointing.
 
 ---
 
-## The router flow
+## The Router Flow
 
 Built via the EFM Designer's per-component API (`POST .../processors`, `POST .../connections`,
 `GET .../validate`, `POST .../publish` — there is no whole-flow `PUT`; Chapter 16 covers the contract).
@@ -181,7 +181,7 @@ The three processors that carry the traffic:
 | HTTP Status Code | `${invokehttp.status.code:replaceEmpty('502')}` |
 | HTTP Context Map | same shared `StandardHttpContextMap` |
 
-### Error routing — the flowVersion 23 fix
+### Error Routing — The flowVersion 23 Fix
 
 The first working flow wired only `InvokeHTTP[success/Response] → HandleHttpResponse`, so anything
 that wasn't a clean 2xx (a 404, a 500, a connection failure) never got answered — the caller hung for
@@ -234,7 +234,7 @@ curl.exe -X POST http://localhost:8090/api/v1/chat/completions `
 
 ---
 
-## The transcription multipart reassembly fix
+## The Transcription Multipart Reassembly Fix
 
 Four of the five endpoints are pure pass-through — same three processors, same code path, only the
 URL differs. Transcription was the holdout, and it is the reason this node earned its own chapter.
@@ -335,7 +335,7 @@ from a second array machine follows the same path but hasn't been run here yet.
 
 ---
 
-## Related chapters
+## Related Chapters
 
 - Ch16 — [How to AI with MiNiFi](ch16-how-to-ai-with-minifi.md): the generalized edge-AI playbook
   this case study instantiates — the four options, why MiNiFi Java over C++, and the EFM Designer

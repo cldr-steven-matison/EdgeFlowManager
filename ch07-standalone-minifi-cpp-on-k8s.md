@@ -1,14 +1,16 @@
 # Chapter 7: Standalone MiNiFi C++ on Kubernetes (no EFM)
 
-This chapter proves plain Apache MiNiFi C++ v1.26.02 running in minikube on macOS with no EFM involvement at all. The flow is `ListenHTTP (8080)` → `PublishKafka` (in-cluster Strimzi topic `test-minifi`) plus `PutFile` (`/tmp/minifi-test-output`). Everything here comes from the `MiNiFi Kubernetes Playground` repo — actual scripts, actual YAML, run clean and verified.
+This chapter proves plain Apache MiNiFi C++ v1.26.02 running in minikube on macOS with no EFM involvement at all. The flow is `ListenHTTP (8080)` → `PublishKafka` (in-cluster Strimzi topic `test-minifi`) plus `PutFile` (`/tmp/minifi-test-output`). Everything here comes from the [MiNiFi Kubernetes Playground](https://github.com/cldr-steven-matison/MiNiFi-Kubernetes-Playground) repo — actual scripts, actual YAML, run clean and verified.
 
-## What this scenario proves
+The **MiNiFi Kubernetes Playground** is where this whole guide started: a public repo I opened to play with open-source MiNiFi — installing the C++ and Java agents, building flows by hand, and eventually bringing EFM in to manage them. It is the seed that grew into everything here. Each chapter in this part maps to a runnable scenario in that repo, so you can pull it and run the exact flow rather than reassemble it from prose.
+
+## What This Scenario Proves
 
 Running MiNiFi C++ standalone, with `config.yml` baked into the image, is the fastest iteration loop for flow development. No EFM, no agent registration, no class reconciliation. You edit `config.yml`, run the nuclear script, and the pod restarts with the new flow in under two minutes. It also confirms the in-cluster Kafka path works before you wire EFM into it: if `PublishKafka` delivers to `test-minifi` here, you know the broker address, topic, and `Client Name` are right — and you carry that exact config into the EFM flow designer.
 
 The image is `container.repo.cloudera.com/cloudera/apacheminificpp:latest` = v1.26.02. `MINIFI_HOME=/opt/minifi/nifi-minifi-cpp-1.26.02`, verified from running-instance logs.
 
-## The "nuclear" rebuild script
+## The "Nuclear" Rebuild Script
 
 Use this every iteration. It destroys everything first so no stale image layer or `Terminating` pod survives into the next run.
 
@@ -46,7 +48,7 @@ kubectl get pods -w
 
 Step 2 — `eval $(minikube docker-env)` — is mandatory. It is the single most common failure point. Skip it and the image builds on your Mac's Docker daemon, the minikube node never sees it, and the pod stays in `ImagePullBackOff` or `ErrImageNeverPull` indefinitely.
 
-## config.yml — the three requirements
+## config.yml — The Three Requirements
 
 The full working config for this flow:
 
@@ -100,7 +102,7 @@ Three requirements that catch everyone the first time:
 
 **3. `Client Name` is mandatory for `PublishKafka`.** Without it, Kafka rejects the connection. `minifi-test-client` is the value here; any non-empty string works. The in-cluster broker address for Strimzi in the `cld-streaming` namespace is `my-cluster-kafka-bootstrap.cld-streaming.svc:9092` — that address is only reachable from inside the cluster, which is where this pod runs.
 
-## Dockerfile — MINIFI_HOME and the readiness probe
+## Dockerfile — MINIFI_HOME and the Readiness Probe
 
 ```dockerfile
 FROM container.repo.cloudera.com/cloudera/apacheminificpp:latest
@@ -170,7 +172,7 @@ spec:
 
 `serviceAccountName: minifi-controller` is required for the pod to reach other cluster services. `imagePullPolicy: IfNotPresent` is correct here because the image was built directly into minikube's daemon — there is no registry to pull from.
 
-## Verifying Kafka delivery and PutFile
+## Verifying Kafka Delivery and PutFile
 
 **Step 1 — Open the network tunnel.** On macOS, minikube NodePorts are not directly reachable from `localhost`. Run this in a dedicated terminal and leave it open:
 
@@ -213,7 +215,7 @@ kubectl exec -it deployment/minifi-test -- /bin/sh -c "cat /tmp/minifi-test-outp
 
 The same payload appears here. Both sinks receiving the same message confirms the fan-out connection wiring in `config.yml` is correct.
 
-## What NOT to do
+## What NOT to Do
 
 **Skip `eval $(minikube docker-env)` and you build on the wrong daemon.** The image lands in your Mac's Docker cache. The minikube node has no copy. The pod goes `ErrImageNeverPull` immediately. Run `eval $(minikube docker-env)` before every `docker build` in this workflow — it does not persist across terminal sessions.
 

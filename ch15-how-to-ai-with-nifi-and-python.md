@@ -1,8 +1,10 @@
 # Chapter 15: How to AI with NiFi and Python
 
+> Published as a public blog post: **[How to AI with NiFi and Python](https://cldr-steven-matison.github.io/blog/How-to-AI-with-NiFi-and-Python/)**.
+
 I use AI to write custom NiFi processor code — and it works, as long as I follow four rules I learned the hard way. Ask an AI to produce a NiFi 2.x Python processor from scratch and it hands you something that looks right but loads as a ghost on the canvas: dashed lines, no relationships, no routing. The training data is saturated with NiFi 1.x `ExecuteScript` (Jython/Groovy) patterns. The 2.0 Python API is new enough that the model confidently misconfigures the Java-to-Python bridge every time. These rules exist to prevent that.
 
-## The problem: AI writes bad NiFi processor frameworks
+## The Problem: AI Writes Bad NiFi Processor Frameworks
 
 NiFi 2.0 Python processors use the `nifiapi` package — a proper class hierarchy (`FlowFileTransform`, `FlowFileSource`) with mandatory inner classes and a specific Java bridge registration. AI models almost always get this wrong in one of two ways: they generate a complete `ExecuteScript`-style script that NiFi refuses to load, or they generate a class that loads but does not expose `success`/`failure` relationships on the canvas — the ghost-processor failure.
 
@@ -10,7 +12,7 @@ The failure looks like this in the UI: you drag the processor onto the canvas, o
 
 The fix is not to prompt the AI harder. The fix is to own the framework yourself and give the AI a proven skeleton to work inside.
 
-## Four rules for safe AI-assisted processor development
+## Four Rules for Safe AI-Assisted Processor Development
 
 **Rule 1 — You own the framework, the AI writes the logic.**
 
@@ -83,7 +85,7 @@ Once the skeleton is proven, give the AI the skeleton and ask it to add business
 
 NiFi 2.0's Python extension loader watches the extensions directory and recompiles on file change. You do not need a pod restart to iterate. Save the `.py` file, wait 30–60 seconds for the background reload thread, then refresh the browser and check the processor list for the new version tag. The browser UI caches aggressively — the refresh is not optional.
 
-## The skeleton: GenericTransform
+## The Skeleton: GenericTransform
 
 The full `GenericTransformTemplate` class is shown verbatim in Rule 2 above. Source file: `NiFi2 Processor Playground/nifi-custom-processors/GenericTransform.py`. Use it as the starting point for every new transform processor. The pattern that matters:
 
@@ -93,7 +95,7 @@ The full `GenericTransformTemplate` class is shown verbatim in Rule 2 above. Sou
 
 These processors target NiFi 2.0 running under the CSO/CFM Kubernetes operator.
 
-## The worked example: FraudModel
+## The Worked Example: FraudModel
 
 `FraudModel.py` (v0.0.4-SNAPSHOT) is the first real processor I built on the `GenericTransform` skeleton. It replicates a CML fraud detection model natively inside NiFi — same heuristic rules, no external HTTP call — so the pipeline can run in local Kubernetes without a CML endpoint.
 
@@ -175,7 +177,7 @@ def transform(self, context, flowfile):
 
 The enriched payload appends `cml_response` to the original transaction — never replacing it. The full file with `SUSPICIOUS_CITIES`, `TOLERANCE`, and `is_suspicious_location()` lives in `NiFi2 Processor Playground/nifi-custom-processors/FraudModel.py`.
 
-## Hot-reload workflow
+## Hot-Reload Workflow
 
 NiFi 2.0 reloads Python extensions from the mounted directory automatically. No pod restart needed.
 
@@ -197,4 +199,4 @@ If the processor does not appear or the version tag does not update, check the N
 
 ## Source
 
-Primary: `blog/How to AI with NiFi and Python.md` (the full 255-line blog post with front matter and worked examples). Processor files: `NiFi2 Processor Playground/nifi-custom-processors/GenericTransform.py` and `FraudModel.py`.
+Published in full as [How to AI with NiFi and Python](https://cldr-steven-matison.github.io/blog/How-to-AI-with-NiFi-and-Python/) on the blog, with the complete worked examples.

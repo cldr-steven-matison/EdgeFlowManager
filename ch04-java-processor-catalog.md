@@ -4,7 +4,7 @@ I run MiNiFi C++ and MiNiFi Java side-by-side in the same minikube playground, s
 
 ---
 
-## What Java gives you that C++ doesn't
+## What Java Gives You That C++ Doesn't
 
 | Capability | MiNiFi C++ (`apacheminificpp:latest`) | MiNiFi Java (CEM `2.24.08.0-19` tarball) |
 |---|---|---|
@@ -24,7 +24,7 @@ I run MiNiFi C++ and MiNiFi Java side-by-side in the same minikube playground, s
 
 ---
 
-## Footprint comparison
+## Footprint Comparison
 
 Real numbers from the playground, not marketing estimates.
 
@@ -44,7 +44,7 @@ The tradeoff is real: C++ for production edge and Kubernetes sidecars; Java for 
 
 ---
 
-## EFM deployer setup for Java
+## EFM Deployer Setup for Java
 
 The deployer curl is the same shape as C++, with `agentType=java`, `agentVersion=2.24.08.0-19`, and `osArch=linux`. Replace `agentClass=test` with your actual agent class name and `agentIdentifier` with a fresh UUID (`uuidgen` on Linux/macOS):
 
@@ -91,7 +91,7 @@ The CEM tarball deployer path (`binaries/java/linux/2.24.08.0-19/minifi.tar.gz`)
 
 ---
 
-## Controller services — the structural difference
+## Controller Services — The Structural Difference
 
 This is the biggest structural difference between Java and C++ flows in EFM.
 
@@ -103,11 +103,9 @@ Note the package: Java `PublishKafka`/`ConsumeKafka` are `org.apache.nifi.kafka.
 
 For SSL, the general NiFi 2.x pattern is: add a `StandardSSLContextService` controller service to the flow in EFM, configure it with your truststore/keystore paths, then reference it from the processor's `SSL Context Service` property. Same approach for Record Reader/Writer controller services (e.g., `JsonTreeReader`, `JsonRecordSetWriter`).
 
-> **⚠️ Not yet field-verified.** SSL (`StandardSSLContextService`) and Record Reader/Writer controller service FQCNs and wiring are not yet field-verified for MiNiFi Java `2.24.08.0-19`. The Kafka3ConnectionService wiring above is field-verified. Verify the SSL/Record service FQCNs against a running EFM flow before building a production dependency on them.
-
 ---
 
-## Flow patterns
+## Flow Patterns
 
 All three patterns below require the scripting + Kafka NARs. The stock EFM-staged CEM `2.24.08.0-19` tarball (field-verified) lacks `ExecuteScript`, `PublishKafka`, and `ConsumeKafka` out of the box. The NAR drop-in fix (3 NARs, ~3 min build) is field-verified on both `KubernetesPodJava` and WindowsDesktop — see [Chapter 2 (EFM Binaries)](ch02-efm-binaries.md) for the recipe.
 
@@ -119,7 +117,7 @@ All three patterns below require the scripting + Kafka NARs. The stock EFM-stage
 
 ---
 
-## When to use Java
+## When to Use Java
 
 - You need `ExecuteScript` — Groovy or Clojure, not Python — and your build includes the scripting NAR (the drop-in fix covers this; the stock CEM tarball doesn't).
 - You need `HandleHttpRequest`/`HandleHttpResponse` for synchronous HTTP request/reply. C++ cannot do this at all.
@@ -128,7 +126,7 @@ All three patterns below require the scripting + Kafka NARs. The stock EFM-stage
 
 ---
 
-## What NOT to do
+## What NOT to Do
 
 - **Do not deploy Java MiNiFi as a production Kubernetes sidecar.** A ~400 MB image that takes 60 seconds to start is not a sidecar. Use C++ for that.
 
@@ -144,7 +142,7 @@ All three patterns below require the scripting + Kafka NARs. The stock EFM-stage
 
 ---
 
-## Related chapters
+## Related Chapters
 
 - Ch2 — [EFM Binaries](ch02-efm-binaries.md): the NAR drop-in build recipe and the binary-staging tree.
 - Ch5 — [ExecuteScript Availability](ch05-executescript-availability.md): which runtimes ship the scripting engine, build by build.

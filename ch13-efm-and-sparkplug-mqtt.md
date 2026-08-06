@@ -17,7 +17,7 @@ processors that touch it — this is that chapter.
 - Familiarity with EFM agent enrollment ([Chapter 19](ch19-efm-and-nvidia-jetson.md)) if you intend
   to run the MQTT leg on a MiNiFi C++ agent rather than only in NiFi.
 
-## What Sparkplug B is
+## What Sparkplug B Is
 
 Sparkplug B is an Eclipse-specification, protobuf-encoded MQTT payload format built for industrial
 IoT (IIoT). It layers two things on top of plain MQTT that plain MQTT does not give you on its own:
@@ -66,7 +66,7 @@ protobuf, and forwards the result (typically as JSON) to Kafka for everything el
 to consume. The pattern is the same shape as every other edge-to-NiFi flow in this guide: an
 untrusted/lightweight edge protocol in, a normalized record out.
 
-## Broker — Mosquitto in minikube
+## Broker — Mosquitto in Minikube
 
 Both the NiFi ingestion leg and any edge MQTT publisher need a broker they can both reach. This
 chapter deploys Eclipse Mosquitto into its own namespace in the same cluster NiFi runs in — no new
@@ -160,7 +160,7 @@ late subscriber gets current state immediately rather than waiting for the next 
 `allow_anonymous true` with no auth is a lab-only posture — fine for this cluster's threat model,
 not something to carry into a production deployment without revisiting.
 
-## The MiNiFi C++ side — stock MQTT, no dedicated Sparkplug processor
+## The MiNiFi C++ Side — Stock MQTT, No Dedicated Sparkplug Processor
 
 This is the detail that catches people coming from the NiFi side: **there is no
 `ConsumeMQTTIIoT`-equivalent on MiNiFi C++.** The C++ agent's MQTT support ships stock, in the base
@@ -190,7 +190,7 @@ also why the reference architecture in this chapter and in Chapter 20 puts the a
 NiFi, not at the edge. The edge agent's job is getting bytes off the wire reliably; NiFi's job is
 understanding what they mean.
 
-## The NiFi side — `ConsumeMQTTIIoT`
+## The NiFi Side — `ConsumeMQTTIIoT`
 
 NiFi ships a processor purpose-built for this: **`ConsumeMQTTIIoT`**. Unlike generic `ConsumeMQTT`,
 it understands the Sparkplug B protobuf schema natively and decodes `NBIRTH`/`NDATA`/`NDEATH`/
@@ -208,7 +208,7 @@ Two behaviors worth knowing before wiring it into a flow:
   group/node/device on the broker, or scoped narrower (`spBv1.0/FactoryLine1/#`) once you know
   which groups you actually care about.
 
-### Two-leg process-group pattern
+### Two-Leg Process-Group Pattern
 
 The field-validated NiFi process group for this chapter's material (exported at
 [`files/SparkPlug.json`](../files/SparkPlug.json)) runs **two independent consumer legs off the
@@ -249,7 +249,7 @@ message. Conversely, `ConsumeMQTT` has no protobuf decode at all, so pointing it
 would deliver undecoded binary garbage downstream. The topic filter is effectively the dispatch
 key between "spec-compliant Sparkplug" and "anything simpler that just wants a broker."
 
-### Sample flow — `files/SparkPlug.json`
+### Sample Flow — `files/SparkPlug.json`
 
 The committed export, [`files/SparkPlug.json`](../files/SparkPlug.json), is the field-run version
 of the process group above. Import it directly rather than rebuilding the two legs from scratch:
@@ -268,12 +268,12 @@ curl -k -u "$NIFI_USER:$NIFI_PASS" \
 > processor entity. See [Chapter 20](ch20-sparkplug-demo.md) for a real occurrence of this exact
 > gotcha against this exact processor pair.
 
-## Test publishers
+## Test Publishers
 
 Two publisher scripts exercise the two legs independently. Both are plain Python against a
 port-forwarded Mosquitto — no edge hardware required to validate the NiFi side of this pipeline.
 
-### Plain JSON — matches the `ConsumeMQTT` leg
+### Plain JSON — Matches the `ConsumeMQTT` Leg
 
 ```python
 # mqtt_test_publisher.py
@@ -316,7 +316,7 @@ Published: {'device_id': 'MacMockSensor-01', 'temperature': 24.88, 'humidity': 5
 Published: {'device_id': 'MacMockSensor-01', 'temperature': 21.82, 'humidity': 41.39, 'timestamp': 1781614426}
 ```
 
-### Real Sparkplug B binary — matches the `ConsumeMQTTIIoT` leg
+### Real Sparkplug B Binary — Matches the `ConsumeMQTTIIoT` Leg
 
 This is the important one for validating the actual protobuf decode path — it constructs
 spec-compliant `NBIRTH`/`NDATA` messages via `pysparkplug` and publishes them binary-encoded to the
@@ -390,7 +390,7 @@ Sparkplug B's spec defines specifically so a subscriber can detect a dropped or 
 message: a gap in that counter is a signal to request a rebirth rather than silently trust stale
 state.
 
-### Terminal history — a real field run
+### Terminal History — A Real Field Run
 
 ```terminal
 source venv/bin/activate
@@ -413,7 +413,7 @@ source venv/bin/activate
 python sparkplug_test_publisher.py
 ```
 
-## Field validation — what's confirmed and what isn't
+## Field Validation — What's Confirmed and What Isn't
 
 Being precise about what has and hasn't actually run against real infrastructure, per this guide's
 convention of not blurring designed-but-untested with field-proven:
@@ -450,22 +450,10 @@ convention of not blurring designed-but-untested with field-proven:
   not attempted; see the MiNiFi C++ section above for why this would require custom code no stock
   extension currently provides.
 
-## Edge intelligence — pointer, not scope
+## All the Ways to Learn About EFM and Sparkplug
 
-A further design exists for running Sparkplug B decode *and* a small inference model directly on
-an edge device — `ConsumeMQTTIIoT` (or a MiNiFi relay) feeding an `ExecuteScript` step doing
-TensorRT/ONNX anomaly detection, triggering a local GPIO actuator (buzzer) on an extreme reading,
-while still forwarding upstream to central Kafka. This is designed but not field-run — it's the
-Jetson/TensorRT pattern already field-proven in [Chapter 19](ch19-efm-and-nvidia-jetson.md) for a
-different (non-Sparkplug) flow, extended conceptually to a Sparkplug B input. It belongs to
-Chapters 19/20, not here — this chapter stops at the protocol and the two NiFi legs; the edge-AI
-actuation story is deliberately out of scope for a protocol-mechanics chapter. See
-[Chapter 20](ch20-sparkplug-demo.md)'s "Edge intelligence (stretch)" section for the current status.
-
-## All the ways to learn about EFM and Sparkplug
-
-Given issue #108's ask for "all the ways to learn about EFM and Sparkplug" — the concrete paths
-that exist in this lab and its source material, gathered in one place:
+All the concrete ways to learn about EFM and Sparkplug that exist in this lab and its source
+material, gathered in one place:
 
 - **This chapter** — protocol mechanics, broker deploy, both NiFi processors, test publishers.
 - **[Chapter 20](ch20-sparkplug-demo.md)** — the end-to-end demo narrative: a real device, a
@@ -488,7 +476,7 @@ that exist in this lab and its source material, gathered in one place:
   this lab; its `Metric`/`DataType`/`NBirth`/`NData` API surface is the practical on-ramp for
   writing another Sparkplug B publisher without hand-rolling protobuf encoding.
 
-## What NOT to do
+## What NOT to Do
 
 **Point `ConsumeMQTTIIoT` at a topic carrying plain JSON, or `ConsumeMQTT` at `spBv1.0/#` expecting
 decoded output.** The two processors are not interchangeable — one expects Sparkplug B protobuf,
@@ -516,7 +504,7 @@ a workstation, not embedded firmware. Say so plainly rather than implying the XI
 device has been proven to speak real Sparkplug B — it has only been proven to speak the simpler
 plain-JSON leg.
 
-## Related chapters
+## Related Chapters
 
 - Ch12 — [EFM + MicroFi](ch12-efm-and-microfi.md): the ESP32-class agent-enrollment side (device
   onboarding under EFM); this chapter assumes an already-enrolled or non-EFM edge publisher and

@@ -37,14 +37,14 @@ Which processors actually exist in each build, how `ExecuteScript` availability 
 Install and use plain MiNiFi (C++ and Java), then bring EFM in to manage the agents and resources.
 
 - **Ch7** — [Standalone MiNiFi C++ on Kubernetes](ch07-standalone-minifi-cpp-on-k8s.md)
-- **Ch8** — [MiNiFi Java setup](ch08-minifi-java-setup.md)
+- **Ch8** — [Standalone MiNiFi Java on Kubernetes](ch08-minifi-java-setup.md)
 - **Ch9** — [Introduce EFM into the Playground](ch09-efm-in-the-playground.md)
 
-### Part IV — Site-to-Site
-The two local k8s transport legs (MiNiFi → NiFi). Reference: apache `SITE_TO_SITE.md`.
+### Part IV — MiNiFi on Kubernetes
+Running both MiNiFi runtimes as EFM-managed Kubernetes pods, then moving their FlowFiles into NiFi over secure Site-to-Site.
 
-- **Ch10** — [S2S: MiNiFi C++ → NiFi K8s](ch10-minifi-cpp-site-to-site.md)
-- **Ch11** — [S2S: MiNiFi Java → NiFi K8s](ch11-minifi-java-site-to-site.md)
+- **Ch10** — [MiNiFi C++ and Java as Kubernetes Pods](ch10-minifi-on-k8s.md)
+- **Ch11** — [Site-to-Site — MiNiFi to NiFi on Kubernetes](ch11-site-to-site.md)
 
 ### Part V — EFM at the Edge
 Two real-hardware edge legs: a from-scratch ESP32 C2 agent enrolled directly in EFM, and Sparkplug B over MQTT.

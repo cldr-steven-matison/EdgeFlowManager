@@ -1,10 +1,10 @@
 # Chapter 12: EFM and MicroFi
 
-MicroFi is a clean-room, from-scratch reimplementation of the MiNiFi C2 protocol contracts — FlowFile semantics, C2 heartbeat/ack, flow-definition apply — written in C++ against ESP-IDF for the Seeed XIAO ESP32-S3. It is **not** a fork of `nifi-minifi-cpp`, and it does not behave like one once you're inside it. This chapter is the field record of turning a private research repo (`Christopheraburns/MicroFi`) into a real EFM agent class running real processors on real hardware: chip identification, the hardware/flash-size trap that ate most of a session, EFM enrollment and the implicit-ack question, building three new processors into a compile-time registry, two real engine bugs found by running actual flows against actual hardware, and a hard architectural answer to "can this run Python."
+MicroFi is a clean-room, from-scratch reimplementation of the MiNiFi C2 protocol contracts — FlowFile semantics, C2 heartbeat/ack, flow-definition apply — written in C++ against ESP-IDF for the Seeed XIAO ESP32-S3. It is **not** a fork of `nifi-minifi-cpp`, and it does not behave like one once you're inside it. This chapter is the field record of turning MicroFi into a real EFM agent class running real processors on real hardware: chip identification, the hardware/flash-size trap that ate most of a session, EFM enrollment and the implicit-ack question, building new processors into a compile-time registry, and two real engine bugs found by running actual flows against actual hardware.
 
 Everything in this chapter ran on real hardware — a single physical XIAO ESP32-S3 **Sense** unit, MAC `e0:72:a1:fb:fd:04` — moved between `StarlinkAI` and `WindowsDesktop` over the course of the work. Where SparkPlug B payload decoding and the JSON-telemetry-to-Kafka pipeline are concerned, that content lives in [Chapter 13 — EFM and SparkPlug MQTT](ch13-efm-and-sparkplug-mqtt.md) and [Chapter 20 — SparkPlug Demo](ch20-sparkplug-demo.md). This chapter owns the EFM/MicroFi-agent side only: getting a device to enroll, verifying the manifest, pushing flows, and extending the firmware itself.
 
-## Scope — read this first
+## Scope — Read This First
 
 **This chapter is about MicroFi, the custom C2 agent.** It is not about MiNiFi C++, and the two should not be conflated:
 
@@ -13,7 +13,7 @@ Everything in this chapter ran on real hardware — a single physical XIAO ESP32
 | Binary size / RAM | ~3.2 MB idling at ~5 MB RAM — Raspberry-Pi-class | Fits a 2 MB ESP32 flash budget |
 | Processor loading | `dlopen` plugin loading at runtime | Compile-time static registry, resolved by name |
 | Storage | Heap-centric, RocksDB repositories | LittleFS with watermark eviction |
-| Python | Full CPython via `libminifi-python-script-extension.so` | None — architecturally impossible, see below |
+| Python | Full CPython via `libminifi-python-script-extension.so` | None — no embedded interpreter; processors are C++, compiled into the static registry |
 | Target | Linux/ARM64, Jetson-class, k8s pods | Seeed XIAO ESP32-S3 (and C3), microcontroller-class |
 | Processors available (this work) | Dozens, catalog in [Chapter 3](ch03-cpp-processor-catalog.md) | 5, built by hand in this chapter |
 
@@ -21,20 +21,7 @@ The rationale for building something new rather than porting MiNiFi C++ down is 
 
 The repo's own `docs/Processor-Inventory-And-Roadmap.md` lists 48 proposed processors, including a WiFi-CSI sensing cluster (`GetWiFiCSI`, `WindowCSI`, `DetectMotionCSI`, `RunBistaticPair`) that is the project's actual research thesis. **None of that is built.** At the start of this work, exactly two processors existed: `GenerateFlowFile` and `LogAttribute`. Treat the roadmap as a plan, not an inventory.
 
-## Access
-
-`MicroFi` is private, readable as `steven-matison`:
-
-```bash
-gh api repos/Christopheraburns/MicroFi -q '.full_name, .private, .permissions'
-# Christopheraburns/MicroFi
-# true
-# {"admin":false,"maintain":false,"pull":true,"push":true,"triage":true}
-```
-
-The token has `push`, not just `pull` — real, but not used against the upstream repo. All dev work in this chapter lives on a fork, `steven-matison/MicroFi`, with `origin` on the fork and `upstream`/`fork` remotes pointed appropriately depending on the host. `Christopheraburns/MicroFi` stayed read-only throughout — no PR opened upstream ("when the time is right," per direction received mid-project).
-
-## The hardware problem — the XIAO's flash size is not what the docs assume
+## The Hardware Problem — The XIAO's Flash Size Is Not What the Docs Assume
 
 MicroFi ships three PlatformIO build environments:
 
@@ -72,7 +59,7 @@ Warning! Flash memory size mismatch detected. Expected 4MB, found 2MB!
 
 **The lesson generalizes**: neither of MicroFi's two sub-16 MB S3 environments fits every XIAO S3 unit. `chip-id` tells you the silicon family; it does not tell you the physical flash size the board was actually built with. Confirm both, separately, before trusting a shipped partition table.
 
-## EFM + config requirements
+## EFM + Config Requirements
 
 The array runs **EFM 2.3.1.0-2**, MiNiFi C++ `1.26.02`. MicroFi's README claims it targets "Cloudera EFM 2.x" and that the ack is *implicit* — EFM 2.x is expected to treat a heartbeat whose `flowInfo.flowId` matches the pushed flow UUID as the acknowledgement, so `CONFIG_MICROFI_C2_ACK_URL` is configured but never POSTed to. **That claim against 2.3.1.0-2 specifically was, at the start of this work, entirely unverified** — the single highest-risk assumption in the whole integration, because if EFM actually waits for an explicit POST to `/efm/api/c2-protocol/acknowledge`, a flow push looks accepted server-side and never completes on the device. (Field-validation Task 7, below, answers this for real.)
 
@@ -91,7 +78,7 @@ Those are the same two URLs the CEM/C++ agents already set as `nifi.c2.rest.url`
 
 `localhost` in MicroFi's default heartbeat URL cannot work from a real ESP32 — the device needs a routable address for EFM. Two were used across this work, for different reasons covered in the toolchain section below: `efm-host-ip:10090` over Tailscale, and later a LAN-direct `192.168.1.121:10090` when the device joined the same WiFi AP as the Windows host running EFM.
 
-## Toolchain — this runs on Windows, not WSL2
+## Toolchain — This Runs on Windows, Not WSL2
 
 The XIAO was plugged into `StarlinkAI`'s front-facing USB. Claude Code sessions on that host run in WSL2, but the board enumerates on the **Windows** side as a `COM` port (`COM5`, `USB\VID_303A&PID_1001&MI_00`). WSL2 has no native USB passthrough — reaching the device from Ubuntu would mean `usbipd-win` attach-per-boot, a workaround, not the path of least resistance. Every build/flash/monitor command in this chapter is a native-Windows PlatformIO CLI command; WSL2 was used for editing only.
 
@@ -110,15 +97,15 @@ No VS Code needed; every step below is a `pio`/`esptool` CLI command.
 pio run -e esp32s3-2mb -t upload -t monitor
 ```
 
-## Field validation — the 8-task run
+## Field Validation — The 8-Task Run
 
 Eight tasks, run against the real hardware, to confirm the whole chain from chip identification through EFM registration, manifest correctness, the implicit-ack question, and reboot persistence.
 
-### Task 1 — pin the chip
+### Task 1 — Pin the Chip
 
 Covered above: `esptool chip-id` confirmed ESP32-S3, 8 MB embedded PSRAM, MAC `e0:72:a1:fb:fd:04`.
 
-### Task 2 — confirm EFM is reachable
+### Task 2 — Confirm EFM Is Reachable
 
 First attempt **failed, 4/4 retries** — `Invoke-WebRequest` to `http://100.68.113.126:10090/efm/ui/` timed out from `StarlinkAI`. Tailscale itself was fine (`tailscale ping mini-gaming-g1` returned in ~56ms); the failure was TCP to port 10090 specifically — a flapping `kubectl port-forward` pane for `svc/efm` on `WindowsDesktop`. Per the field doc's own instruction ("if it fails, Tailscale is down or the port-forward pane died — fix that before flashing anything"), this run stopped here: no firmware built, no flash attempted, nothing done blind. Tasks 3–8 all either need EFM to actually confirm registration or would be flashing toward a C2 endpoint that can't be reached.
 
@@ -126,7 +113,7 @@ Once `WindowsDesktop` restarted the flapping port-forwards, EFM was reachable ag
 
 **Per direction received mid-run, the resumed session went LAN-direct rather than over Tailscale** — the XIAO joined a WiFi network (`ATTyjuHfEi`) on the same subnet as `WindowsDesktop`'s LAN IP (`192.168.1.121`), bypassing Starlink and Tailscale for the device's own path entirely. `sdkconfig.defaults.local` pointed both C2 URLs at `http://192.168.1.121:10090/efm/api/c2-protocol/...`. The WiFi password went directly into the gitignored local file on the Windows host, never through chat.
 
-### Task 3 — build
+### Task 3 — Build
 
 ```powershell
 pio run -e esp32s3-4mb
@@ -134,7 +121,7 @@ pio run -e esp32s3-4mb
 
 Succeeded, but over MicroFi's own stated "under 50% flash" success criterion: **Flash 66.4% (1,044,597 / 1,572,864 bytes), RAM 36.1%.** (This was before the 2 MB partition-mismatch was discovered — see the hardware section above. The eventual `esp32s3-2mb` build came in at 88.6% of the *actual* 2 MB layout's app slot, the number to trust.)
 
-### Task 4 — flash and first heartbeat
+### Task 4 — Flash and First Heartbeat
 
 ```powershell
 pio run -e esp32s3-4mb -t upload -t monitor
@@ -148,7 +135,7 @@ I (7575) microfi.c2: heartbeat #0 -> 200 (sent 5677 bytes, manifest=yes, recv 28
 
 The full manifest (3840 bytes) went out inline on this first heartbeat, exactly as designed — subsequent heartbeats send only a hash.
 
-### Task 5 — EFM registration
+### Task 5 — EFM Registration
 
 ```bash
 GET /efm/api/agent-classes
@@ -156,7 +143,7 @@ GET /efm/api/agent-classes
 
 listed a new `MicroFi` class with a real manifest id. Confirmed the existing `StarlinkAI` class's agent was present with the same manifest id it had before this test, and its `minifi-app.log` showed no renewed heartbeat failures since the connectivity fix — the live production agent was untouched by the new class registering.
 
-### Task 6 — verify the manifest
+### Task 6 — Verify the Manifest
 
 ```bash
 GET /efm/api/agent-manifests/{id}
@@ -164,7 +151,7 @@ GET /efm/api/agent-manifests/{id}
 
 returned exactly `GenerateFlowFile` and `LogAttribute` with their full property descriptors — no more, no less. This confirmed the clean-room registry design bet directly: MicroFi advertises only what's actually compiled in.
 
-### Task 7 — push a flow, test the implicit ack
+### Task 7 — Push a Flow, Test the Implicit Ack
 
 Built `GenerateFlowFile → LogAttribute` via the EFM Designer's real per-component API. This is where the exact request shapes matter, and where a wrong one produces an unhelpful error:
 
@@ -191,7 +178,7 @@ LogAttribute: running: true
 
 **With MicroFi never once POSTing to `/acknowledge`** — confirmed absent from every log across the whole session. **This answers the load-bearing question from the config section above: EFM 2.3.1.0-2 does accept the implicit ack.** A heartbeat whose `flowInfo.flowId` matches the published flow is sufficient on its own; no explicit acknowledgement POST is required or expected.
 
-### Task 8 — power-cycle persistence
+### Task 8 — Power-Cycle Persistence
 
 Two real physical unplug/replugs (a hand on the cable, not a soft reset) both resumed `GenerateFlowFile`/`LogAttribute` cleanly with reset FlowFile counters — genuine reboots. Capturing the exact boot-log line across a real disconnect turned out to be its own tooling problem: `pio device monitor` attached *before* a physical unplug reliably lost everything from the disconnect gap through the reconnect burst, across three separate attempts, even via PlatformIO's own `log2file` filter (which writes to a different file than the redirect — same loss). Root cause not nailed down; not a COM-port renumber (confirmed same `COM5` after reconnect). Reads like an internal buffer that doesn't survive the physical link actually dropping mid-session, as opposed to a tool-triggered reset which keeps the OS-level handle alive throughout.
 
@@ -204,11 +191,11 @@ microfi.flowstore: flow_id loaded: e9aac4e6-4124-45a6-92d3-ce09505974d1
 
 Exact match to the published flow's `flowId`. Persistence confirmed for real, not inferred from an absence of errors.
 
-### Summary — all 8 tasks
+### Summary — All 8 Tasks
 
 Chip: XIAO ESP32-S3 **Sense** (camera + microSD, corrected mid-session, not the base board). Actual flash: 2 MB. Custom `esp32s3-2mb`/`partitions_2mb.csv` env built for it. Firmware 1,044,597 bytes (88.6% of the 2 MB layout's app slot). Agent class `MicroFi`, isolated from the live `StarlinkAI` agent throughout. Manifest: exactly `GenerateFlowFile` + `LogAttribute`. Implicit ack: confirmed working on EFM 2.3.1.0-2. Persistence: confirmed working via LittleFS on the corrected partition table.
 
-## Building processors — design specs and build order
+## Building Processors — Design Specs and Build Order
 
 Registration alone only ever exercised MicroFi's two built-in processors, and both are synthetic: `GenerateFlowFile` fabricates payload from nothing, `LogAttribute` writes it to the serial log. The flow round-trips entirely inside the device — nothing enters from a real source and nothing leaves the board. That's enough to prove registration, the implicit ack, and persistence. It is not enough to test MicroFi as a data agent, which needs real ingress and real egress — new processors compiled into the static registry.
 
@@ -219,27 +206,27 @@ Two constraints carried over from the validation and bound all of this work:
 
 Desk-eval spec, written before any code, against the pinned `nifi-minifi-cpp` `PROCESSORS.md` property lists — with the explicit caveat that property sets drift between upstream releases and need re-confirming at build time:
 
-### 1. `PublishMQTT` — P0, the egress gap
+### 1. `PublishMQTT` — P0, the Egress Gap
 
 Upstream MiNiFi C++ `PublishMQTT` declares: **Broker URI**, **Client ID**, **MQTT Version**, **Topic**, **Quality of Service**, **Connection Timeout**, **Keep Alive Interval**, **Last Will Topic**, **Last Will Message**, **Last Will QoS**, **Last Will Retain**, **Last Will Content Type**, **Username**, **Password**, **Security Protocol**, **Security CA**, **Security Cert**, **Security Private Key**, **Security Pass Phrase**. Relationship: **success**.
 
 Minimal ESP32 subset scoped for a first cut: **Broker URI**, **Client ID**, **Topic**, **Quality of Service**, plus **Username**/**Password** for an auth'd Mosquitto. The `Security *` (TLS) props were deferred deliberately — the target Mosquitto is plaintext on the LAN, and ESP32 TLS is heavier weight than a first cut needs. This is the processor that turns the XIAO from a loopback into a real publisher: XIAO → Mosquitto → `ConsumeMQTT` → Kafka.
 
-### 2. A real ingress source
+### 2. A Real Ingress Source
 
 No MiNiFi C++ equivalent exists to mirror, so there's no upstream property schema to match — the design instead follows the existing convention (Title Case, `GenerateFlowFile`-shaped so flows stay familiar). The XIAO ESP32-S3 **Sense** variant this array actually runs has onboard sensors (mic, IMU on some carriers) and a camera. Scoped as a scheduled source: properties like **Read Interval** / **Batch Size**, emitting one FlowFile per read with the sensor value as content and/or a Title-Case attribute. Simplest proof-of-life: a periodic read of one onboard value, published via `PublishMQTT` — real ingress plus real egress, the round-trip the loopback flows couldn't test.
 
-### 3. `UpdateAttribute` — cheap, do it alongside ingress
+### 3. `UpdateAttribute` — Cheap, Do It Alongside Ingress
 
 Upstream model: **no fixed properties** — it takes **dynamic properties** (`attribute name` → `value`, Expression-Language-capable) and writes each as a FlowFile attribute. Relationships: **success**, **failure**. Scoped to accept user-defined dynamic properties from the flow def and set them as attributes; if there's no EL engine (there isn't — see the `RouteOnAttribute` deferral), support **literal values first**, which covers nearly all branch-logic test cases without an evaluator.
 
-### 4. `RouteOnAttribute` — deferred, it hides an EL dependency
+### 4. `RouteOnAttribute` — Deferred, It Hides an EL Dependency
 
 Upstream model: property **Routing Strategy** + dynamic properties mapping `relationship name` → an Expression-Language predicate; relationships: **unmatched**, **failure**, one per dynamic property. **The finding that killed this for a first pass**: `RouteOnAttribute` is fundamentally an Expression-Language evaluator — evaluating predicates against attributes is its entire job. MicroFi's tiny runtime almost certainly has no EL engine, making this the most expensive of the four to embed. Deferred until a minimal predicate evaluator (equals / exists / contains on a named attribute) is separately scoped — `PublishMQTT`, ingress, and `UpdateAttribute` already deliver "real ingress + egress + attribute mutation" without one.
 
 Build/verify order settled on: `PublishMQTT` (unblocks egress) → real ingress source → `UpdateAttribute` (literal values) → `RouteOnAttribute` (deferred). Per processor: add to the static registry at compile time, keep the Title-Case MiNiFi-C++ property names, rebuild + reflash on the fork, then on-hardware verify — register in EFM, push a flow exercising the processor, confirm the implicit ack and real data movement.
 
-## PublishMQTT — built, registered, and a real engine bug found
+## PublishMQTT — Built, Registered, and a Real Engine Bug Found
 
 `src/processors/publish_mqtt.cpp`, built on a `feature/publish-mqtt` branch off `xiao-s3-2mb-partition`, pushed to the fork. Minimal ESP32 subset per the design spec — Broker URI, Client ID, Topic, Quality of Service, Username, Password, `success` relationship — using ESP-IDF's `esp_mqtt_client_*` API. The client starts lazily on the first `on_trigger` call, once Broker URI/Topic are known from `on_configure`; a FlowFile that arrives before the broker's `CONNECTED` event lands is logged and dropped rather than retried — MicroFi's engine has no session commit/rollback, so a sink that doesn't explicitly transfer a FlowFile out loses it regardless. Acceptable for a periodic ingress source (the next tick just republishes); flagged in the file's own header comment as worth revisiting before production use.
 
@@ -249,13 +236,13 @@ Build on `esp32s3-2mb`: **Flash 91.1% (1,074,733 / 1,179,648 bytes)**, up from 8
 
 Flashed and confirmed on real hardware: boots into the previously-persisted `GenerateFlowFile → LogAttribute` flow (LittleFS untouched by a reflash), heartbeats clean, and **the manifest now advertises three processors** — `GenerateFlowFile`, `LogAttribute`, `PublishMQTT` — with `PublishMQTT`'s property descriptors matching the design spec exactly (`Broker URI`/`Topic` required, `Quality of Service` allowable values `0`/`1`/`2`, `Username`/`Password` optional). Confirmed via `GET /efm/api/agents/microfi_1`: `state: ONLINE`, `agentManifestHash` matching the new build. The existing `StarlinkAI`-class agent was re-checked and confirmed unaffected — unchanged manifest, agent still `ONLINE`, the Windows MiNiFi service still `Running`.
 
-### The manifest-config pin trap
+### The Manifest-Config Pin Trap
 
 Even with the manifest advertising `PublishMQTT`, **the EFM Designer never offered it to place.** `agent-classes/MicroFi` had no `agent-class-manifest-config` mapping, so the Designer kept resolving the class to its *original* manifest (`GenerateFlowFile` + `LogAttribute` only), even though the live agent had already registered the newer manifest that included `PublishMQTT` — confirmed via `GET /efm/api/agent-classes/MicroFi/manifest-diff` returning `newManifestAvailable: true`. Fixed with `POST /efm/api/agent-class-manifest-config`, pinning `MicroFi` to the manifest that includes `PublishMQTT`. This is the same "a manifest refresh alone doesn't expose a new type" trap [Chapter 6](ch06-minifi-custom-python-processors.md) documents for custom Python processors on real MiNiFi C++ — same failure shape, different agent runtime.
 
 A later processor (`ListenHTTP`, below) hit the same trap in a slightly different form: `POST` on the manifest-config returned "mapping already exists," and a `PUT` was needed instead — though the processor-create API itself worked before the pin took effect either way. The pin's effect seems scoped to the Designer's palette, not the write API.
 
-### Real data movement, and the `Session::transfer()` fan-out bug
+### Real Data Movement, and the `Session::transfer()` Fan-Out Bug
 
 Built `GenerateFlowFile → PublishMQTT` in the Designer (`Broker URI: mqtt://192.168.1.121:1883`, `Topic: test/sensor/data`, `QoS 0`) and published. Confirmed via live serial (not the EFM REST view — `GET /efm/api/agents/{id}` **froze on a stale snapshot** across real heartbeats and a real reboot during this check, consistent with the existing "query Postgres or live serial, not the REST heuristics" caution documented for MiNiFi/EFM generally) that the agent fetched and applied the new flow.
 
@@ -273,13 +260,13 @@ repeated disconnects, even though EFM's own LAN pane (port `10090`) was working 
 
 **Real data movement confirmed end-to-end.** Live serial showed `published 32 bytes to 'test/sensor/data'` every ~1s; an independent subscriber (a Node `mqtt` client against `mqtt://100.68.113.126:1883`, run separately, not reading the firmware's own log) received 60 consecutive `MicroFi GenerateFlowFile payload` messages on `test/sensor/data`. XIAO → Mosquitto: proven.
 
-## UpdateAttribute — shipped
+## UpdateAttribute — Shipped
 
 `feature/update-attribute` (fork commit `ad53dcf`). Literal-value attribute writes via 4 declared `Attribute N Name`/`Attribute N Value` property slots — **not** true dynamic properties. EFM's flow validation rejects any property not in a processor's declared list, confirmed on real hardware, so upstream's arbitrary-key-per-flow shape (any property name at all, resolved at publish time) isn't reachable through the Designer API today. The declared-slot design is the workaround.
 
 Verified via `GenerateFlowFile → UpdateAttribute → LogAttribute`: `verify_key = verify_value` appeared in serial output exactly as expected. This build was, at the time, the one flashed on the unit.
 
-## GetGPIO — memory corruption, root-caused and cleared
+## GetGPIO — Memory Corruption, Root-Caused and Cleared
 
 Attempted as the real-ingress-source candidate — reads the onboard BOOT/GPIO0 button. Code was correct in isolation and compiled clean, but linking the ESP-IDF `driver` component regressed the *whole binary's* stability: `PublishMQTT`, which had run error-free for many consecutive minutes elsewhere in the same session, started throwing MQTT transport errors once `driver` was linked in, and `GetGPIO`'s own state showed what looked like memory corruption — a `bool` reverting without any code path that should have touched it. Root cause not found in that session; no debugger or heap-corruption instrumentation was available to go further safely. Code sat on `feature/get-gpio` (fork commit `553688b`), pushed but **not flashed** — the device was reverted to the last known-stable build and confirmed clean (236 error-free MQTT publishes over 60s) before that session stopped.
 
@@ -287,7 +274,7 @@ Attempted as the real-ingress-source candidate — reads the onboard BOOT/GPIO0 
 
 A small real bug was found and fixed along the way: `wifi.cpp`'s disconnect handler had no visibility into *why* a disconnect happened. Adding `ESP_LOGW` on `WIFI_EVENT_STA_DISCONNECTED`'s `reason`/`rssi` fields caught `WIFI_REASON_NO_AP_FOUND` (201, `rssi=-128`, a real "scan came back empty") during this same session's own WiFi setup — distinguishing it cleanly from an auth failure, which the previous silent handler couldn't do.
 
-## ListenHTTP — shipped
+## ListenHTTP — Shipped
 
 `src/processors/listen_http.cpp` — inbound HTTP ingress, `esp_http_server`-backed, MiNiFi C++-compatible property names (`Listening Port`, `Base Path`). Fire-and-forget ack, matching MiNiFi C++'s real `ListenHTTP` — not the synchronous request/response pairing built elsewhere in the array for a different use case, which needs a request/response correlation model this single-task engine doesn't have.
 
@@ -302,7 +289,7 @@ curl -X POST http://192.168.1.198:8095/test -d "hello from windowsdesktop"
 
 `LogAttribute` logged `payload: hello from windowsdesktop` — exact content preserved.
 
-### The `kMaxFlowNodes=4` silent-drop bug
+### The `kMaxFlowNodes=4` Silent-Drop Bug
 
 Pushing the `ListenHTTP` pair on top of an existing 4-node repro flow (6 processors total) silently dropped `LogAttribute-Repro58` and `PublishMQTT` — nothing but a `WARN` log line. This is a hard-coded flow-node ceiling (`kMaxFlowNodes=4`) in the engine, and it fails silently rather than rejecting the publish or surfacing an error anywhere a Designer user would see it. **Still unfixed.** Any flow with more than 4 processors needs this checked for explicitly — count nodes before publishing, and don't trust "publish succeeded" as proof every processor in the flow actually got applied.
 
@@ -310,7 +297,7 @@ Pushing the `ListenHTTP` pair on top of an existing 4-node repro flow (6 process
 
 Flash on this unit's 2 MB layout reached **96.8% (1,141,317 / 1,179,648 bytes)** with `ListenHTTP` added — very little headroom left before either trimming a processor or moving to a bigger-flash unit. Anyone adding a sixth processor to this specific board should expect to hit the wall immediately, not eventually.
 
-## Net result against the original 3-item build order
+## Net Result Against the Original 3-Item Build Order
 
 Of the original build list (`PublishMQTT` → real ingress source → `UpdateAttribute`), **2 of 3 shipped and verified on hardware** (`PublishMQTT`, `UpdateAttribute`). The real-ingress-source slot ended up filled by `GetGPIO` after the memory-corruption detour, plus `ListenHTTP` as a bonus ingress path beyond the original three. `RouteOnAttribute` remains deferred, per the original design spec, pending a scoped Expression-Language evaluator this runtime doesn't have.
 
@@ -320,22 +307,7 @@ Of the original build list (`PublishMQTT` → real ingress source → `UpdateAtt
 - EFM's manifest store doesn't refresh a processor's property descriptors when its name is already known to the agent class, even on a genuine new manifest hash — only a fresh processor *name* reliably gets a new manifest record. This bit the `UpdateAttribute` property redesign; the workaround (temporarily rename, verify, rename back) is in the fork's commit history.
 - `kMaxFlowNodes=4` silently drops processors beyond the fourth in a flow, with no user-visible error.
 
-## Can the XIAO run custom Python processors?
-
-Short answer: **not the way NiFi and MiNiFi C++ do it. Custom processors on the XIAO are C++, compiled into the static registry — the "Python" part is exactly the piece that doesn't port.** Three layers to the answer.
-
-**1. The MiNiFi C++ Python extension cannot run on an ESP32, full stop.** MiNiFi C++ supports Python processors (and `ExecuteScript` with Python) by embedding a full CPython interpreter — it dynamically links `libpython` at runtime, needs a system Python install (`libpython3-dev` / `python3-libs`), and loads `libminifi-python-script-extension.so` through the same `.so`/`dlopen` extension mechanism (confirmed against Apache's own `extensions/python/PYTHON.md`). None of that exists on an ESP32: there is no `libpython` build for ESP-IDF, no `.so`/`dlopen` loader, and no room — CPython plus stdlib is many megabytes, and this specific unit's *entire* flash is 2 MB with firmware already north of 1 MB. It doesn't fit, and there's no port that would make it fit.
-
-**2. MicroFi's architecture rules out the delivery model, not just the size.** MicroFi resolves processors by name against a compile-time static registry — no `dlopen`, no runtime plugin load, the design bet the whole project is built on. The entire point of a NiFi/MiNiFi Python processor is *ship a script in the flow definition, no rebuild.* MicroFi is the exact opposite: adding a processor is a firmware rebuild plus a reflash, every time. So even if CPython somehow fit, the "push Python without reflashing" property — the actual reason anyone reaches for a Python processor — is precisely what MicroFi's model doesn't offer. MicroFi exists *because* MiNiFi C++'s heavier machinery doesn't shrink to a microcontroller; embedding CPython would be strictly heavier than any of that machinery.
-
-**3. What is possible.**
-
-- **Custom processors: yes, in C++, compile-time.** That's exactly the processor-dev track this chapter documents — `PublishMQTT`, `UpdateAttribute`, `GetGPIO`, `ListenHTTP`. If the goal is "extend the XIAO with our own logic," the answer is yes. Just not in Python.
-- **An embedded MicroPython scripting processor is buildable in principle, but it would not be "MiNiFi Python."** MicroPython runs on ESP32 as its own standalone firmware. A C++ MicroFi processor could in principle embed a MicroPython VM and run a script string carried in the flow definition, restoring the "push logic without reflashing" property. Three caveats keep this a distinct feature rather than a port: it's from-scratch MicroFi work, real engineering; MicroPython is not CPython — reduced stdlib, different C API, so existing NiFi/MiNiFi Python processors would not run unchanged; and its property/script contract wouldn't match MiNiFi C++'s real `ExecuteScript`, which breaks the compatibility bet this whole project is built on — an EFM flow def written for MiNiFi C++ would no longer resolve unchanged against it. Worth scoping on its own terms if wanted, but it is a MicroFi-specific scripting capability, not "MiNiFi Python on the XIAO."
-
-This is the same shape as the `RouteOnAttribute` deferral above: the tiny runtime has no embedded interpreter — whether that's a NiFi Expression-Language evaluator or a Python VM — and every "just run a script/predicate" feature hits that same wall. Ingress, egress, and attribute mutation clear it because they're native C++; anything script-driven doesn't, until an interpreter is deliberately embedded as its own project.
-
-## What NOT to do
+## What NOT to Do
 
 - **Don't push to `Christopheraburns/MicroFi`.** The fork token allows it; the work doesn't. Every dev branch lives on `steven-matison/MicroFi`.
 - **Don't register MicroFi under an agent class an existing live agent already uses** (e.g. `StarlinkAI`). A shared class means an EFM flow push aimed at one device reaches both. Use a distinct class (`MicroFi`) and verify the existing agent afterward, every time.
@@ -348,10 +320,10 @@ This is the same shape as the `RouteOnAttribute` deferral above: the tiny runtim
 - **Don't fan a single relationship out to two connections on this engine.** `Session::transfer()`'s first-match bug silently starves every connection after the first. Keep flows to one connection per relationship until `transfer()` is patched.
 - **Don't push a flow with more than 4 processors without checking for the `kMaxFlowNodes` ceiling.** It drops silently, with only a `WARN` log — "publish succeeded" is not proof every processor in the flow was actually applied.
 
-## Related chapters
+## Related Chapters
 
 - [Chapter 3 — C++ Processor Catalog](ch03-cpp-processor-catalog.md): the real MiNiFi C++ processor set MicroFi's property naming deliberately mirrors.
-- [Chapter 6 — MiNiFi Custom Python Processors](ch06-minifi-custom-python-processors.md): the real Python-processor delivery model on MiNiFi C++ — the thing this chapter's Python evaluation concludes MicroFi architecturally cannot do.
+- [Chapter 6 — MiNiFi Custom Python Processors](ch06-minifi-custom-python-processors.md): the real Python-processor delivery model on MiNiFi C++ — the `dlopen`/CPython machinery MicroFi's compile-time static registry deliberately replaces.
 - [Chapter 13 — EFM and SparkPlug MQTT](ch13-efm-and-sparkplug-mqtt.md): the SparkPlug B payload and MQTT-topology side of this same hardware pass.
 - [Chapter 19 — EFM and NVIDIA Jetson](ch19-efm-and-nvidia-jetson.md): a second real-hardware EFM agent-class chapter, same enrollment/manifest/flow-push pattern applied to a very different device class.
 - [Chapter 20 — SparkPlug Demo](ch20-sparkplug-demo.md): the field-run demo this device's `PublishMQTT` work feeds into — XIAO → Mosquitto → NiFi → Kafka, including the incident where a leftover MicroFi debug rig polluted the same MQTT topic the real device publishes on.

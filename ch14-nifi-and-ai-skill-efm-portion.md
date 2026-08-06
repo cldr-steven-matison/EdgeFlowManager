@@ -3,7 +3,7 @@
 Every flow in this Part — NiFi + Python (Ch15), MiNiFi AI at the edge (Ch16), the StarlinkAI
 router (Ch17) — was built the same way: not by hand-dragging processors around a canvas, but by
 driving NiFi, MiNiFi, and EFM programmatically, with an AI agent holding a written playbook of what
-breaks and how. That playbook is a Claude Code skill called `nifi-and-ai`. This chapter exposes it
+breaks and how. That playbook is a Claude Code skill called [`nifi-and-ai`](https://github.com/cldr-steven-matison/NiFiandAi), published as its own repo you can clone straight into `~/.claude/skills/`. This chapter exposes it
 in full, then goes deep on the part that matters most for this guide: the **EFM portion** — the
 machinery of managing agents from a central manager, which is exactly the undocumented territory the
 rest of the guide lives in.
@@ -18,7 +18,7 @@ Java `2.24.08.0-19`.
 
 ---
 
-## What the skill actually is
+## What the Skill Actually Is
 
 `nifi-and-ai` is a Claude Code skill — a `SKILL.md` and six reference files that install into
 `~/.claude/skills/` and load on demand when a session touches NiFi, MiNiFi, or EFM. It is not
@@ -39,7 +39,7 @@ calls for one:
 | `references/debugging.md` | Cross-cutting wire-up gotchas and a 10-step debugging checklist. |
 | `references/layout.md` | Canvas layout: the coordinate model, spacing constants, per-shape placement rules, and a worked example. |
 
-### The 9 rules
+### The 9 Rules
 
 The core of the skill is nine rules you read before touching any live flow. They aren't NiFi
 trivia — they're the ones that, ignored, cost an afternoon each:
@@ -70,7 +70,7 @@ trivia — they're the ones that, ignored, cost an afternoon each:
 Rules 1, 2, 5, and 6 are the ones that bite hardest at the edge, and they carry through the whole
 of Part VI.
 
-### The three deployment shapes
+### The Three Deployment Shapes
 
 The skill frames every flow by where it runs, because auth and lifecycle differ by shape:
 
@@ -85,7 +85,7 @@ middle + NiFi doing the heavier lift.**
 
 ---
 
-## EFM-directed vs direct-on-agent: the two ways to drive an edge flow
+## EFM-Directed vs Direct-on-Agent: The Two Ways to Drive an Edge Flow
 
 The single most useful distinction the skill draws is *how* a change reaches a running agent. There
 are two paths, and confusing them is how work gets silently lost.
@@ -114,7 +114,7 @@ spec, no Swagger UI, and nothing else written down.
 
 ---
 
-## Staging agent binaries into EFM
+## Staging Agent Binaries into EFM
 
 EFM deploys agents from a binaries tree with a **strict** validator: it rejects hyphens in `osArch`
 and more than one archive per leaf directory. Layout for the common four:
@@ -139,7 +139,7 @@ The full staging tree — including the Windows MSI Python black hole and the mi
 scripting NAR — is Chapter 2 (EFM Binaries). If your `Deploy Agent` button returns `400`, that's the
 chapter, not this one.
 
-## EFM persistence — three layers, or a restart wipes state
+## EFM Persistence — Three Layers, or a Restart Wipes State
 
 1. **Postgres** — metadata: `agent_class`, `flow`, `flow_content`, `agent`, `agent_manifest`,
    `asset`, `resource_metadata`.
@@ -150,7 +150,7 @@ chapter, not this one.
 Skip layer 3 and every uploaded script vanishes on pod restart even though the DB rows survive — a
 confusing failure where the resource "exists" but has no content.
 
-## The agent pod boot race
+## The Agent Pod Boot Race
 
 A MiNiFi agent pod downloads the deployer script from EFM at startup. EFM's Jetty takes ~2 minutes
 to bind its port on a cold start. A one-shot `curl` races that and exits silently — the pod stays
@@ -161,7 +161,7 @@ the top of the pod log and nothing after.
 the deployer. Diagnose with `kubectl exec <agent-pod> -- ls /nifi-minifi-cpp-<ver>/` — empty means
 the deployer never ran.
 
-## The deployer curl
+## The Deployer Curl
 
 Same shape for every arch — swap `agentType` / `agentVersion` / `osArch`:
 
@@ -186,7 +186,7 @@ Administrator**, and `cd` to a clean dir first — the deployer installs to `$PW
 
 ---
 
-## The EFM Designer API — no OpenAPI, recover it from the UI bundle
+## The EFM Designer API — No OpenAPI, Recover It from the UI Bundle
 
 EFM exposes **no** OpenAPI/Swagger doc for its flow-editing REST API — `/efm/api-docs`,
 `/v3/api-docs`, and `/efm/swagger-ui` all `404`. Guessing at body shapes produces generic `500`s or,
@@ -232,7 +232,7 @@ because the FQCNs differ (`org.apache.nifi.minifi.processors.ListenHTTP` vs the 
 Keep mixed runtimes as parallel classes — `WindowsDesktopCpp` separate from `WindowsDesktop`,
 `KubernetesPodJava` separate from `KubernetesPod` — so a Java agent never lands on a C++ canvas.
 
-### Layout at the Designer pitch
+### Layout at the Designer Pitch
 
 Building via the API means you also place every processor by `position:{x,y}` — there is no
 auto-layout. On an EFM Designer build the row pitch is **300** (not the NiFi canvas's 200), branch/
@@ -242,7 +242,7 @@ intended shape and pitch *before* the first `POST .../processors`, not after the
 
 ---
 
-## The Resource Manager API — getting scripts and assets onto an agent
+## The Resource Manager API — Getting Scripts and Assets onto an Agent
 
 The tracked, restart-durable way to put a script or asset on an agent (vs `kubectl cp`-ing it
 directly):
@@ -263,7 +263,7 @@ iteration but bypasses all of this tracking and dies with the pod.
 
 ---
 
-## Status is in Postgres, not the REST heuristics
+## Status Is in Postgres, Not the REST Heuristics
 
 EFM's `operation` table has no automatic retention. A crash-looping agent can flood it — thousands of
 rows in hours — which hangs `/efm/api/operations` entirely and breaks anything reconstructing "which
@@ -278,7 +278,7 @@ checking which agent identifier — which physical machine — you're actually l
 
 ---
 
-## When a `KubernetesPod`-class agent goes silently dark
+## When a `KubernetesPod`-class Agent Goes Silently Dark
 
 A real incident, and the sharpest EFM-portion lesson: a pod's MiNiFi agent (`KubernetesPod` class)
 had **not heartbeated to EFM in 6 days** — `last_seen` in Postgres was stale — but the pod showed
@@ -308,7 +308,7 @@ across the flow, or budget for a real `Service` if the pod will restart more tha
 
 ---
 
-## What NOT to do
+## What NOT to Do
 
 - **Don't iterate direct-on-agent and assume it sticks.** A hand-edited `config.yml` or a
   `kubectl cp`'d script is overwritten by the next EFM `publish`, with no error. Promote real changes
@@ -330,7 +330,7 @@ across the flow, or budget for a real `Service` if the pod will restart more tha
 
 ---
 
-## Related chapters
+## Related Chapters
 
 - Ch2 — [EFM Binaries](ch02-efm-binaries.md): the full binary-staging tree, Windows MSI Python, and
   the missing Java scripting NAR.

@@ -2,13 +2,13 @@
 
 This chapter brings EFM into the `MiNiFi-Kubernetes-Playground` repo alongside the Level 1 standalone pods from Chapters 7 and 8 — without touching any Level 1 file. Two new bare pods, two new EFM agent classes, a smoke flow on each, verified live. This is `Level 2`: EFM-managed, additive, proof that the same agent-deployer bootstrap pattern used in the main `cld-streaming` cluster works just as well in the `default` namespace.
 
-## What Level 2 is and isn't
+## What Level 2 Is and Isn't
 
 Level 1 (`minifi-test.yaml`, `minifi-test-java.yaml`) is Docker-baked config — `config.yml` / `config-java.yml` copied at build time, no EFM. Level 2 adds two new pods, two new EFM agent classes (`PlaygroundCpp`, `PlaygroundJava`), and a managed flow on each. None of the original six files (`Dockerfile`, `Dockerfile.java`, `config.yml`, `config-java.yml`, `minifi-test.yaml`, `minifi-test-java.yaml`) were touched.
 
 Level 2 is a smoke test, not a production routing flow. The goal is to prove the EFM C2 wiring works end-to-end from a bare pod in the `default` namespace. A real routing target — what these agents should actually route data to — is a separate question outside this chapter's scope.
 
-## Cluster topology
+## Cluster Topology
 
 Both Level 2 pods run in the same `minikube` cluster as the Level 1 pods, `default` namespace. EFM runs in `cld-streaming` namespace on the same cluster. Because it's the same cluster, the agent-deployer curl reaches EFM via ordinary cluster-internal DNS — no cross-cluster networking needed:
 
@@ -18,7 +18,7 @@ efm.cld-streaming.svc:10090
 
 The Level 1 pods live in `default` too — `serviceAccountName: minifi-controller` appears in those manifests, but the running pods actually use the `default` SA regardless (checked against the live Level 1 Java pod). Not investigated further; out of scope for this chapter.
 
-## Pod manifests
+## Pod Manifests
 
 Both manifests follow the same bare-pod bootstrap pattern proven by `minifi-agent-k8s-gaming` (`KubernetesPod`) and `minifi-agent-k8s-java` (`KubernetesPodJava`) in the `cld-streaming` cluster. No custom Docker image — a plain `ubuntu:22.04` base installs prerequisites and then runs EFM's own `agent-deployer/script` at startup:
 
@@ -71,7 +71,7 @@ spec:
 
 The health-poll before the deployer curl matters. On a cold-start EFM takes up to two minutes to bind its Jetty listener. A one-shot curl without the poll will fail and the agent never enrolls. See `skills/nifi-and-ai/references/minifi-efm.md` §3.
 
-## Creating the EFM agent classes
+## Creating the EFM Agent Classes
 
 Before applying the manifests, create the two agent classes in EFM:
 
@@ -94,11 +94,11 @@ kubectl apply -f minifi-test-efm-java.yaml
 
 Both agents come `ONLINE` in EFM within approximately two minutes of `kubectl apply` (the C++ tarball is ~39 MB, Java ~204 MB). The agent-deployer re-registers the class automatically on the first heartbeat even after a full teardown and redeploy.
 
-## Building the flow via the EFM API
+## Building the Flow via the EFM API
 
 The smoke flow on each class is `GenerateFlowFile (10 sec, Custom Text)` → `LogAttribute`. Built programmatically using the same processor-creation API contract reverse-engineered from EFM's Angular UI bundle.
 
-### Step 1 — Get the flowId for the agent class
+### Step 1 — Get the flowId for the Agent Class
 
 ```bash
 curl -s "http://efm.cld-streaming.svc:10090/efm/api/designer/flows/summaries" \
@@ -110,7 +110,7 @@ This returns two IDs you need for every subsequent call:
 - `flowId` — the top-level flow object ID
 - `pgId` — the root process group ID inside that flow
 
-### Step 2 — Create processors
+### Step 2 — Create Processors
 
 > **⚠️ Both `flowId` and `pgId` are required in the path.** The create-processor endpoint is `POST /efm/api/designer/flows/{flowId}/process-groups/{pgId}/processors`. Using only `pgId` (i.e., a path like `/efm/api/designer/flows/{pgId}/processors`) returns a generic Spring "No static resource" 404 that looks like an auth or routing problem — it is not. Both IDs must be in the path every time. The same applies to `/connections`.
 
@@ -140,7 +140,7 @@ curl -s -X POST \
   }'
 ```
 
-### Step 3 — Create the connection
+### Step 3 — Create the Connection
 
 ```bash
 curl -s -X POST \
@@ -168,7 +168,7 @@ A successful publish returns the flow version with `"validationErrors": []`. If 
 
 Repeat Steps 1–4 for `PlaygroundJava` with `FLOW_ID` and `PG_ID` for that class, and `Custom Text: "PlaygroundJava Level 2 heartbeat"`.
 
-## Layout: always use the EFM-Designer pitch
+## Layout: Always Use the EFM-Designer Pitch
 
 Place `GenerateFlowFile` at `(0, 0)` and `LogAttribute` at `(0, 300)`. The row pitch for the EFM Designer is 300, not 200. A `(0,0)→(400,0)` horizontal layout or a 200-pitch vertical layout passes `validationErrors: []` but fails visual QA in the Designer canvas. Decide the pitch before the first programmatic build, not after the canvas reads cramped.
 
@@ -186,7 +186,7 @@ Expected output for both flavors:
 { "name": "LogAttribute",     "x": 0, "y": 300 }
 ```
 
-## Verifying the agents
+## Verifying the Agents
 
 Check EFM Monitor → Agents after `kubectl apply`. Both should reach `ONLINE` status within ~2 minutes.
 
@@ -216,7 +216,7 @@ LogAttribute -- filename: <uuid>, content: PlaygroundCpp Level 2 heartbeat
 LogAttribute -- filename: <uuid>, content: PlaygroundJava Level 2 heartbeat
 ```
 
-## Exporting the flow JSON
+## Exporting the Flow JSON
 
 EFM Designer flows do not have a separate "download" endpoint the way the NiFi REST API does. Export via `GET`:
 
@@ -250,7 +250,7 @@ curl -s "http://efm.cld-streaming.svc:10090/efm/api/designer/flows/summaries" | 
 
 Neither PlaygroundCpp nor PlaygroundJava should appear in either response. The pod manifests (`minifi-test-efm-cpp.yaml`, `minifi-test-efm-java.yaml`) stay in the playground repo — they're the bootstrap, reusable for a future rebuild.
 
-## What NOT to do
+## What NOT to Do
 
 **Build the flow without reading `layout.md` first.** The first build of this chapter used `(0,0)→(400,0)`. It passed every functional check — `validationErrors: []`, `LogAttribute` output on schedule — and was still rolled back for the layout defect. `layout.md` exists precisely because this shape has been built twice wrong. Read it before any programmatic EFM Designer build.
 
@@ -260,7 +260,7 @@ Neither PlaygroundCpp nor PlaygroundJava should appear in either response. The p
 
 **Export flow JSON after class deletion.** Deleting the agent class removes the Designer flow definition. Export (`GET /efm/api/designer/flows/{id}` or the UI Export button) before teardown, not after.
 
-## Related chapters
+## Related Chapters
 
 - Ch7 — [Standalone MiNiFi C++ on Kubernetes](ch07-standalone-minifi-cpp-on-k8s.md): the Level 1 C++ pod this builds alongside.
 - Ch8 — [MiNiFi Java Setup](ch08-minifi-java-setup.md): the Level 1 Java pod this builds alongside.

@@ -13,7 +13,7 @@ Everything here is field-verified on a live EFM `2.3.1.0-2` running in minikube 
 > counts are not. Exact versions here are `nifi-minifi-cpp 1.26.02-b30` and `CEM Java 2.24.08.0-19`
 > against EFM `2.3.1.0-2`.
 
-## EFM is a coordinate-addressed binary server
+## EFM Is a Coordinate-Addressed Binary Server
 
 EFM evaluates every binary request against a strict three-level coordinate layout on disk:
 
@@ -35,7 +35,7 @@ Two validator rules bit me before I understood them, and they are the reason mos
    extra-extensions bundle, every python-components zip must live in a separate `extensions` path,
    never alongside the base archive.
 
-## The five leaves — all of them, or the deployer 400s
+## The Five Leaves — All of Them, or the Deployer 400s
 
 For a lab that serves Mac/Windows minikube pods, a native Windows desktop, WSL2 Ubuntu, and an
 NVIDIA Jetson, I need five binary leaves present at once:
@@ -78,7 +78,7 @@ files) and Python components come in separate download bundles, and rule 2 forbi
 next to the base archive. The base gets unpacked, the extensions injected into its tree, and the
 whole thing repacked into a single `minifi.tar.gz`.
 
-## Build the staging tree
+## Build the Staging Tree
 
 I stage everything locally under `~/efm-binaries/staging/` first, then ship it. For C++ that means
 unpack-inject-repack; for Windows MSI and Java it is a straight copy.
@@ -134,7 +134,7 @@ cp ~/efm-binaries/minifi-2.24.08.0-19-bin.tar.gz \
 > particular got dropped on a rebuild and cost a repeat 400 hunt. Keep the staging tree as the
 > source of truth and re-ship from it after any EFM redeploy.
 
-## Ship it into the EFM pod with a tar pipe
+## Ship It into the EFM Pod with a Tar Pipe
 
 EFM in Kubernetes stores the staging tree at `/opt/efm/efm-2.3.1.0-2/agent-deployer/`. The
 cleanest way to get the whole `binaries/` tree in there is a tar pipe straight into the running
@@ -183,7 +183,7 @@ Refresh the EFM UI and the deploy dropdown now cleanly offers `v1.26.02 - linux`
 
 ![Deploy Agent CLI Command — C++ binary version dropdown showing linux, linuxaarch64, and windows leaves](images/efm-Deploy-Agent-CLI-2.jpg)
 
-## Deploy an agent
+## Deploy an Agent
 
 The deployer is a single POST to `/efm/api/agent-deployer/script` that returns a shell (or
 PowerShell) script you pipe straight into your shell. The parameters are the coordinate plus the
@@ -234,7 +234,7 @@ Invoke-WebRequest `
 > A bare `ubuntu`/`debian` pod has no `sudo`. Run
 > `apt-get install -y curl tar sudo openjdk-21-jre-headless` in the pod before the deployer curl.
 
-## Windows C++: the MSI Python black hole
+## Windows C++: The MSI Python Black Hole
 
 This is where I lost the most time. Deploy the C++ MSI the normal way, wire up an `ExecuteScript`
 processor with `Script Engine: python`, and the agent log fills with this every 30 seconds:
@@ -317,7 +317,7 @@ curl -X POST http://127.0.0.1:10090/efm/api/agent-class-manifest-config \
 
 ![Windows extensions directory after full-feature install — both minifi-python-script-extension.dll and minifi_native.pyd present](images/efm-binaries-windows.jpg)
 
-## Windows Java: it installs clean, then you find out what's missing
+## Windows Java: It Installs Clean, Then You Find Out What's Missing
 
 Java on Windows is the opposite experience — the install is boring and the *processor set* is the
 trap. The prereq is **OpenJDK 21** on PATH (`C:\Program Files\Microsoft\jdk-21.0.11.10-hotspot` on
@@ -350,7 +350,7 @@ CFM `2.6.0.4.3.4.0-234`) — does not work. Their `META-INF/MANIFEST.MF` declare
 NiFi's NAR loader matches dependencies by exact group+id+version string with no fallback. A
 cross-build copy never resolves.
 
-## Building the missing Java NARs from source
+## Building the Missing Java NARs from Source
 
 The fix that works is building the NARs from the exact-matching MiNiFi Java source, version-pinned
 to the installed build:
@@ -405,7 +405,7 @@ For the Windows native agent, the same four NARs were copied via the WSL2 `/mnt/
 into `C:\Users\tunas\minifi-java\minifi-2.24.08.0-19\extensions\` — no `kubectl cp` needed,
 native filesystem access.
 
-## The class-manifest trap
+## The Class-Manifest Trap
 
 EFM's Designer does not validate a flow against "whatever agent is online." It validates against
 the **agent class → manifest mapping**. Put a Java agent on a class whose flow was authored for
@@ -436,7 +436,7 @@ processors that were disconnected but never deleted blocked every publish until 
 > `WindowsDesktop`, and `KubernetesPodJava` separate from the C++ `KubernetesPod`, so a Java agent
 > never lands on a C++ canvas and vice versa.
 
-## Verify the C++ agent's extensions directory
+## Verify the C++ Agent's Extensions Directory
 
 After deploying a C++ agent, confirm the full extensions set — including Python — landed:
 
@@ -455,7 +455,7 @@ A correctly staged agent shows both Python-related files:
 If those three are absent, the extra-python-components zip was not injected into the base archive
 before repacking. Rebuild the `cpp/linux` or `cpp/linuxaarch64` leaf.
 
-## Expose EFM and reach it from remote devices
+## Expose EFM and Reach It from Remote Devices
 
 EFM runs inside the `cld-streaming` namespace. For devices on the same LAN:
 
@@ -473,7 +473,7 @@ It prints two tunnel URLs; use the first (port 10090 proxy), then append `/efm/u
 EFM UI. The port number changes on every tunnel restart — update the deployer `baseUrl` parameter
 whenever you regenerate a deploy script from the UI.
 
-## When the edge has no network: the offline three-file pattern
+## When the Edge Has No Network: The Offline Three-File Pattern
 
 When an edge device cannot reach EFM to pull its binary — an air-gapped Jetson, for example —
 skip EFM's networking entirely and commit the agent as three files: the binary tarball, a
@@ -506,7 +506,7 @@ is not — either way it is installed and running.
 > this for any device that can reach EFM. Use the three-file pattern only when the edge genuinely
 > cannot pull from EFM.
 
-## What NOT to do
+## What NOT to Do
 
 - **Don't hyphenate `osArch`.** `linuxaarch64`, never `linux-arm64`. The UI validator rejects the hyphen and the deployer silently fails.
 - **Don't put two archives in one `binaries` leaf.** Extensions and python-components go in an `extensions` path, or the backend 400s.
@@ -518,7 +518,7 @@ is not — either way it is installed and running.
 - **Don't copy NiFi's NARs into the Java MiNiFi agent.** The `Nar-Dependency-Version` will not match; build from the exact-version source instead.
 - **Don't forget to remap the agent class after adding NARs.** The Designer still rejects the new processors as "not an available Processor type" until you POST the agent's new `agentManifestId` to `/efm/api/agent-class-manifest-config`.
 
-## Related chapters
+## Related Chapters
 
 - Ch4 — [MiNiFi Java Processor Catalog](ch04-java-processor-catalog.md): what the Java tarball ships and the class-manifest trap.
 - Ch5 — [ExecuteScript Availability](ch05-executescript-availability.md): the C++ Windows Python paths and the four ways to add scripting.

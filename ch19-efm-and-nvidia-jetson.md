@@ -37,7 +37,7 @@ Field-captured on WindowsDesktop (the host running the live EFM pod) — real st
 
 On a long-lived pod `--tail=50` won't reach back this far — use `--tail=1000` rather than restarting EFM.
 
-## Reaching EFM — two URLs, not interchangeable
+## Reaching EFM — Two URLs, Not Interchangeable
 
 `minikube tunnel` gives the stable local URL: `http://127.0.0.1:10090/efm/ui`. Use that from the host itself and in every command in this chapter.
 
@@ -49,7 +49,7 @@ After EFM is up, create a class to reach the **Deploy Agent CLI** screen. The bi
 
 ![Deploy Agent CLI Command — C++ binary version dropdown, including the linuxaarch64 build for the Jetson](images/efm-Deploy-Agent-CLI-2.jpg)
 
-## Windows networking: mirrored mode vs NAT mode
+## Windows Networking: Mirrored Mode vs NAT Mode
 
 Before exposing EFM to the LAN, know which WSL2 networking mode is active (PowerShell):
 
@@ -60,7 +60,7 @@ wsl hostname -I
 - First IP matches your Windows LAN IP → **mirrored mode**
 - First IP is a `172.x.x.x` address → **NAT mode**
 
-### Mirrored mode (current WindowsDesktop setup)
+### Mirrored Mode (Current WindowsDesktop Setup)
 
 WSL2 shares the Windows host IP directly. Any port bound on `0.0.0.0` inside WSL is reachable from the LAN at `gaming-pc-lan-ip:<port>` — no portproxy needed.
 
@@ -79,7 +79,7 @@ New-NetFirewallRule -DisplayName "WSL EFM 10090" -Direction Inbound -Protocol TC
 New-NetFirewallRule -DisplayName "WSL Kafka Brokers External" -Direction Inbound -Protocol TCP -LocalPort 31623,31850,31935,30336 -Action Allow
 ```
 
-### NAT mode (older WSL2 setups)
+### NAT Mode (Older WSL2 Setups)
 
 In NAT mode, portproxy rules are required. Replace `172.26.201.5` with your current WSL2 IP (`ip addr show eth0` in WSL):
 
@@ -90,7 +90,7 @@ netsh interface portproxy add v4tov4 listenport=9092 listenaddress=0.0.0.0 conne
 
 The WSL2 IP changes on every reboot in NAT mode — update portproxy entries any time the Jetson loses connectivity.
 
-## Kafka external access for the Jetson
+## Kafka External Access for the Jetson
 
 `kafka-eval.yaml` has only `internal` listeners. Off-box agents (the Jetson) can't reach Kafka brokers using internal cluster DNS. Apply `kafka-nodeport.yaml`, which adds an external NodePort listener with `advertisedHost` overrides pointing to `gaming-pc-lan-ip`:
 
@@ -138,7 +138,7 @@ ss -tlnp | grep -E "31623|31850|31935|30336"
 
 Set MiNiFi `bootstrap.servers` on the Jetson to `gaming-pc-lan-ip:31623`. No `/etc/hosts` entries or portproxy rules needed.
 
-## Enrolling a KubernetesPod agent first (optional smoke test)
+## Enrolling a KubernetesPod Agent First (Optional Smoke Test)
 
 Before touching the Jetson, it's worth proving EFM agent enrollment works using an in-cluster pod on `linux/amd64`. This is faster to iterate — no real hardware, no LAN routing — and if enrollment fails here it's an EFM or binary problem, not a Jetson-specific one.
 
@@ -247,7 +247,7 @@ sudo systemctl status minifi
 
 After reboot, MiNiFi auto-starts if the service was registered at install time.
 
-## The TensorRT inference script
+## The TensorRT Inference Script
 
 `gpu_nifi_tensorRT-3.py` is the `ExecuteScript` payload. EFM delivers it to the agent's `assets/` directory; the full flow depends on it. Source: `files/gpu_nifi_tensorRT-3.py`.
 
@@ -299,7 +299,7 @@ def onTrigger(context, session):
             session.transfer(flow_file, REL_FAILURE)
 ```
 
-## Importing the agent flow
+## Importing the Agent Flow
 
 Import and publish the flow to the `NvidiaNano` class via EFM's flow designer. Two flow variants are available:
 
@@ -315,7 +315,7 @@ Import and publish the flow to the `NvidiaNano` class via EFM's flow designer. T
 - [WindowsDesktop.json](../files/efm/WindowsDesktop.json) — Operational
 - [KubernetesPod.json](../files/efm/KubernetesPod.json) — Operational
 
-## Delivering resources to the agent
+## Delivering Resources to the Agent
 
 Agent Resources are managed from within EFM — upload files there, assign them to the agent class on the Resources tab, and they appear in the agent's `/assets/` directory.
 
@@ -325,7 +325,7 @@ Agent Resources are managed from within EFM — upload files there, assign them 
 chmod +x ~/nifi-minifi-cpp-1.26.02/asset/gpu_nifi_tensorRT-3.py
 ```
 
-## Testing the Jetson flow end to end
+## Testing the Jetson Flow End to End
 
 With the flow published to the `NvidiaNano` class and the agent online:
 
@@ -354,11 +354,11 @@ kafka-console-consumer.sh --bootstrap-server gaming-pc-lan-ip:31623 \
 
 The `tensorrt` block was appended live on the Jetson's GPU by `gpu_nifi_tensorRT-3.py`. Full `ListenHTTP → ExecuteScript → PublishKafka` chain confirmed end to end on real aarch64 hardware.
 
-## Prometheus observability for EFM and the Jetson agent
+## Prometheus Observability for EFM and the Jetson Agent
 
 Two metrics layers extend the CSO Prometheus/Grafana stack that already watches NiFi/Kafka/Flink. The full three-layer story is [Chapter 21 (Metrics & Observability)](ch21-metrics-and-observability.md); this section is the Jetson-specific slice.
 
-### Layer 1 — EFM server metrics (field-validated)
+### Layer 1 — EFM Server Metrics (Field-Validated)
 
 The actuator Prometheus endpoint is on the **`efm-ui`/`10090`** port under `/efm` — not `metrics/9092` as originally written in the source doc. `9092` accepts a TCP connection but returns an empty reply.
 
@@ -391,7 +391,7 @@ kubectl port-forward -n cld-streaming deploy/efm 10190:10090 &
 curl -s http://localhost:10190/efm/actuator/prometheus | head
 ```
 
-### Layer 2 — Jetson agent metrics (field-validated on NvidiaNano)
+### Layer 2 — Jetson Agent Metrics (Field-Validated on NvidiaNano)
 
 MiNiFi C++ has a native Prometheus publisher — no `ExecuteScript`, no sidecar — shipped as `libminifi-prometheus.so`. The correct property namespace is `nifi.metrics.publisher.*` (not `nifi.c2.enable.metrics`/`nifi.c2.metrics.publisher.*` — those don't exist in this build, confirmed against the binary and shipped config template).
 
@@ -419,7 +419,7 @@ Binds `0.0.0.0` (confirmed via `ss`), so it is LAN-reachable in principle. Confi
 
 > **⚠️ Restarting to apply metrics config.** `sudo systemctl restart minifi` is the only reliable path — see the restart section above. The same caveat applies here: `minifi.sh restart` calls systemctl internally; a direct `kill` leaves the agent inactive with no automatic respawn.
 
-## What NOT to do
+## What NOT to Do
 
 **Use `127.0.0.1` as the EFM base URL in the Jetson agent-deployer curl.** The Jetson can't reach the host's loopback. Use the host's LAN IP (`gaming-pc-lan-ip:10090`) for any agent that enrolls from off-box.
 
@@ -431,16 +431,16 @@ Binds `0.0.0.0` (confirmed via `ss`), so it is LAN-reachable in principle. Confi
 
 **Set the execute bit on delivered resources before testing the flow.** EFM drops resources without `+x`. `ExecuteScript` silently fails to run the script if the bit is not set. `chmod +x` immediately after the resource appears in `asset/`.
 
-## Appendix — reusable command forms
+## Appendix — Reusable Command Forms
 
-### Restart EFM after installing binaries
+### Restart EFM After Installing Binaries
 
 ```bash
 kubectl rollout restart deployment/efm -n cld-streaming
 kubectl wait --for=condition=ready pod -l app=efm -n cld-streaming --timeout=120s
 ```
 
-### Kafka external access (re-run after every WSL/Windows restart)
+### Kafka External Access (Re-Run After Every WSL/Windows Restart)
 
 ```bash
 kubectl port-forward --address 0.0.0.0 svc/my-cluster-kafka-external-bootstrap 31623:9094 -n cld-streaming > /tmp/pf-kafka-bootstrap.log 2>&1 &
@@ -450,7 +450,7 @@ kubectl port-forward --address 0.0.0.0 svc/my-cluster-combined-2 30336:9094 -n c
 ss -tlnp | grep -E "31623|31850|31935|30336"
 ```
 
-### Enroll the Jetson agent (linuxaarch64)
+### Enroll the Jetson Agent (linuxaarch64)
 
 ```bash
 curl -L \
@@ -472,7 +472,7 @@ sudo systemctl restart minifi
 sudo systemctl status minifi
 ```
 
-## Related chapters
+## Related Chapters
 
 - Ch1 — [EFM on Kubernetes](ch01-efm-on-kubernetes.md): persisted EFM, the base this chapter builds on.
 - Ch2 — [EFM Binaries](ch02-efm-binaries.md): installing the MiNiFi Java & C++ binaries into EFM.

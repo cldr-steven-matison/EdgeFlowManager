@@ -9,11 +9,11 @@ This is the second real-world finale demo: an edge device publishing MQTT teleme
 - The CSO stack (NiFi, Kafka/Strimzi) running in minikube under `cld-streaming`/`cfm-streaming` on `MINI-Gaming-G1` (WindowsDesktop) — the host where the live NiFi flow in this chapter actually runs.
 - Mosquitto deployed and reachable from both the edge device and NiFi — manifests in [Chapter 13](ch13-efm-and-sparkplug-mqtt.md). **This doc assumed Mosquitto was already live from an earlier pass — it wasn't.** When the edge-device plan for this chapter was first written, the live cluster had no `mqtt` namespace at all; the only Mosquitto in the fleet was on a different host entirely. It was actually deployed here for real on 2026-07-31.
 
-## NiFi ingestion — the `SparkPlug` process group
+## NiFi Ingestion — The `SparkPlug` Process Group
 
 A NiFi process group named `SparkPlug` (exported at [`files/SparkPlug.json`](../files/SparkPlug.json)) holds the two-leg pattern Chapter 13 documents in full — `ConsumeMQTT` on the plain-JSON topic, `ConsumeMQTTIIoT` on `spBv1.0/#`. Both terminated at a dead-end `EOL` output port for a long time — the PG was built far enough to prove MQTT ingestion worked, but never wired to Kafka.
 
-### Incident — the PG had been silently deleted, not just stale
+### Incident — The PG Had Been Silently Deleted, Not Just Stale
 
 Coming back to close that gap, the `SparkPlug` PG wasn't in the live flow *at all*. Dumping `mynifi-0`'s raw `flow.json.gz` and walking every process group recursively found no trace of it — the only copy left was the 2026-06-16 committed export. The pod's age lined up with a known 2026-07-10 pod-recreate incident (`data`/`flowfile`/`content` repos are `emptyDir`, not PVC-backed at the time), which is the likely cause: the PG was lost then and nobody had rebuilt it since. Live state is authoritative over docs and memory for exactly this reason — the checked-in export was right, but only because it happened to predate the loss.
 
@@ -26,7 +26,7 @@ curl -k -u "$NIFI_USER:$NIFI_PASS" \
   "https://<nifi-host>/nifi-api/process-groups/<root-pg-id>/process-groups/upload"
 ```
 
-### Wiring both legs
+### Wiring Both Legs
 
 `ConsumeMQTT`'s output was originally scoped to be the only leg wired — an earlier plan for this chapter said "leave `ConsumeMQTTIIoT`/Sparkplug B alone" and ship only the simpler plain-JSON path. That was wrong for this specific demo: this chapter *is* the SparkPlug demo, so the real Sparkplug B path needs a real downstream too, not just the JSON shortcut.
 
@@ -41,9 +41,9 @@ Both legs got their own `PublishKafka`:
 
 PG validated clean and started. Exported and committed: [`755a4d9`](https://github.com/cldr-steven-matison/DesktopShare/commit/755a4d9).
 
-## The edge publisher — three generations
+## The Edge Publisher — Three Generations
 
-### Session 1 — simulated publishers (field-run, Mac)
+### Session 1 — Simulated Publishers (Field-Run, Mac)
 
 The first confirmed end-to-end run used two plain Python scripts against a port-forwarded Mosquitto, proving both consumer legs before any real device existed. Terminal history and full scripts are in the Appendix below; the shape that matters:
 
@@ -59,11 +59,11 @@ Real Sparkplug B binary (`NBIRTH` + `NDATA`, via `pysparkplug`), matching `Consu
 Sent Sparkplug NDATA (Seq: 1) -> Temp: 28.87 | Humid: 49.59
 ```
 
-### The BME280-on-Jetson path — parked, not shipped
+### The BME280-on-Jetson Path — Parked, Not Shipped
 
 The original hardware plan called for a real BME280 environment sensor wired to the Jetson Orin Nano (`NvidiaNano`) over I2C. A full bus scan (`i2cdetect -y` across every adapter on the board) found nothing physically wired at any address — no sensor was ever attached. On top of that, the two competing drafts for this step disagreed on library: a Waveshare HAT recipe using `adafruit-circuitpython-bme280`/`board`/`busio` (Blinka), versus a leftover `~/bme280_test.py` on the box already using the different `RPi.bme280` package — and `board` wasn't even importable without installing Blinka first. Two open questions bundled into "wire a BME280," neither resolved. Parked rather than chased further; nothing here blocks the rest of the chapter.
 
-### Real hardware — Seeed XIAO ESP32-S3
+### Real Hardware — Seeed XIAO ESP32-S3
 
 The device that actually shipped real telemetry is a Seeed XIAO ESP32-S3 plugged into a third array host (`StarlinkAI`) over USB — not the Jetson, and not a wait on a not-yet-arrived sensor device. Confirmed via `esptool --port /dev/ttyACM0 chip-id`: ESP32-S3 (QFN56 rev v0.2), 8MB embedded PSRAM, MAC `e0:72:a1:fb:fd:04`, FQBN `esp32:esp32:XIAO_ESP32S3`.
 
@@ -93,7 +93,7 @@ arduino-cli upload -p /dev/ttyACM0 --fqbn esp32:esp32:XIAO_ESP32S3 xiao-telemetr
 arduino-cli monitor -p /dev/ttyACM0 -c baudrate=115200
 ```
 
-### Independent verification — don't trust the firmware's own serial log
+### Independent Verification — Don't Trust the Firmware's Own Serial Log
 
 The serial monitor showing "connected" and "published" isn't proof anything reached the broker. A real topology snag showed up doing this the right way: the host holding the XIAO isn't actually on the same LAN as WindowsDesktop/EFM despite both landing in `192.168.1.0/24` — that's a coincidental private-IP overlap across two different physical networks, not a routing bug, and `Test-NetConnection`/ARP to the broker fail from that host even though the XIAO itself (same WiFi AP as WindowsDesktop) connects fine. Verification had to go over Tailscale instead — the one path the two hosts actually share:
 
@@ -108,7 +108,7 @@ client.loop_forever()
 
 5 real messages received, matching the firmware's serial log exactly.
 
-## End-to-end test
+## End-to-End Test
 
 With the PG restored, both legs wired, and the XIAO flashed:
 
@@ -118,7 +118,7 @@ kubectl exec -n cld-streaming my-cluster-combined-0 -- \
   --topic xiao_telemetry --from-beginning
 ```
 
-## Incident — the exact topic the real device uses had a second, unrelated publisher
+## Incident — The Exact Topic the Real Device Uses Had a Second, Unrelated Publisher
 
 Checking `xiao_telemetry` directly after the wiring landed: real messages were arriving (Kafka offset climbing steadily), but every message sampled — 91 out of 91 — was a JSON blob from an unrelated `GenerateFlowFile` payload, not XIAO telemetry.
 
@@ -144,11 +144,11 @@ That silence cuts both ways — as of this chapter, it also means the real XIAO 
 
 > **⚠️ A shared MQTT topic has no per-publisher isolation.** Anything else that publishes to the same topic a `ConsumeMQTT` filters on ends up indistinguishable downstream unless the payload shape itself carries something to key on (`device_id`, in this case — the noise publisher had none, which is what made it possible to tell the two apart at all). Don't assume a topic is single-producer just because one flow was built assuming that.
 
-## Edge intelligence (stretch) — designed, not run
+## Edge Intelligence (Stretch) — Designed, Not Run
 
 The original plan for this chapter included a further phase: a MiNiFi flow running directly on the edge device, consuming its own Sparkplug B locally, running a small TensorRT/ONNX anomaly-detection model, and triggering a GPIO buzzer on an extreme reading — real edge AI, not just relay. That phase depends on the BME280-real-sensor leg above, which stayed blocked, so it was never field-run. Left here as future work rather than removed, since the architecture (`ConsumeMQTTIIoT → ExecuteScript (TensorRT/ONNX) → GPIO buzzer`, still forwarding upstream to central Kafka) is sound and matches the pattern already field-proven for the Jetson in [Chapter 19](ch19-efm-and-nvidia-jetson.md).
 
-## Live assembly toward the full architecture (#109) — in progress, not complete
+## Live Assembly Toward the Full Architecture (#109) — In Progress, Not Complete
 
 #106 asked for the real end-to-end chain: **XIAO publishes to Mosquitto → NvidiaNano runs inference on the reading → NvidiaNano Site-to-Site to NiFi K8s.** As of this pass, two of the three legs are built and one is confirmed live; the third is blocked on a live production change that needs a human decision, not a doc fix.
 
@@ -189,7 +189,7 @@ Step 1 is what's actually blocking this — a production NiFi config change with
 3. **A stale `httpd_start failed (port=8095)` on MicroFi after a live flow hot-swap.** The 4-node version of the MicroFi flow (`GenerateFlowFile`, `PublishMQTT`, `ListenHTTP`, `LogAttribute`) silently dropped `ListenHTTP`/`LogAttribute` on apply — not the previously-documented `kMaxFlowNodes` bug this time, but the *previous* `ListenHTTP` instance's socket never released on a hot flow-swap, so the new one's `httpd_start` failed silently. A real power-cycle (not just a republish) cleared it; the 3-node version bound clean on first boot. **Don't trust a live flow-swap alone to release a MicroFi processor's held OS resources (sockets, GPIO) — verify with a fresh power-cycle if a processor that binds a system resource doesn't come up.**
 4. **`RouteOnAttribute`'s dynamic-property Expression Language got mangled through the C2 push when it contained nested single quotes** (`${trigger.actuation:equals('true')}` arrived on-device as the literal expression `false`, not the real predicate — confirmed by reading the regenerated `config.yml` directly, not trusting the Designer's own echo of what it sent). Worked around by using a bare attribute reference (`${trigger.actuation}`, which evaluates to the attribute's own `"true"`/`"false"` string — NiFi/MiNiFi's route-matching contract) instead of a function call with quoted arguments. Whether this is a genuine EFM/C2 escaping bug or a config.yml-generation issue wasn't root-caused further; flagged as a real trap for the next EL expression with nested quotes pushed through this same path.
 
-## What NOT to do
+## What NOT to Do
 
 **Assume a checked-in flow export matches what's live.** The `SparkPlug` PG existed only in a 2026-06-16 export by the time this chapter's NiFi work started — the live copy had been silently lost in an unrelated pod-recreate incident weeks earlier. Dump the live `flow.json.gz` before trusting any doc or export.
 
@@ -205,11 +205,11 @@ Step 1 is what's actually blocking this — a production NiFi config change with
 
 **Assume EFM's agent-deployer's `serviceName` parameter controls the systemd unit name.** It doesn't — the deployer script hard-codes `SERVICE_NAME="minifi"` regardless of what's POSTed. A second systemd-managed C++ agent on the same host isn't possible via the deployer; run it with `bin/minifi.sh run` (foreground/backgroundable, no systemd) instead, and don't reuse an existing `nifi-minifi-cpp-*` install directory for a new class without clearing its persisted `conf/config.yml` first — a copied install boots straight into its old flow, including binding the same ports a live agent may already hold.
 
-## Appendix — reusable command forms
+## Appendix — Reusable Command Forms
 
 **Both test-publisher scripts (plain-JSON and real Sparkplug B binary via `pysparkplug`) and the raw terminal history of the first field run are in [Chapter 13](ch13-efm-and-sparkplug-mqtt.md#test-publishers)** — reproduced there in full rather than duplicated here, since Chapter 13 is now the canonical protocol/processor reference this chapter points to.
 
-### Consume the live topics
+### Consume the Live Topics
 
 ```bash
 kubectl exec -n cld-streaming my-cluster-combined-0 -- \
@@ -221,7 +221,7 @@ kubectl exec -n cld-streaming my-cluster-combined-0 -- \
   --topic sparkplug_telemetry --from-beginning
 ```
 
-## Related chapters
+## Related Chapters
 
 - Ch12 — [EFM and MicroFi](ch12-efm-and-microfi.md): the ESP32 C2-agent/EFM-enrollment side of this same XIAO device family, including the `PublishMQTT` work this demo's MQTT egress leans on and the leftover debug rig behind this chapter's topic-contamination incident.
 - Ch13 — [EFM and SparkPlug MQTT](ch13-efm-and-sparkplug-mqtt.md): the protocol and processor mechanics behind this chapter — what Sparkplug B is, the Mosquitto deploy, the two-leg process-group pattern, both test-publisher scripts.

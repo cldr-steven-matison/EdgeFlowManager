@@ -4,7 +4,7 @@ A curated, runnable set of MiNiFi flows accumulated as the guide is built. Each 
 
 The runnable home for these flows is the [`sample-gallery/`](https://github.com/cldr-steven-matison/MiNiFi-Kubernetes-Playground/tree/main/sample-gallery) directory in the MiNiFi Kubernetes Playground repo. This chapter is the plan and narrative; the Playground's `sample-gallery/README.md` is the runnable index that links the configs. Configs live once at the repo root — each card here links to them, not duplicates them.
 
-## Card format
+## Card Format
 
 Every entry uses the same card so the gallery reads consistently:
 
@@ -18,7 +18,7 @@ Every entry uses the same card so the gallery reads consistently:
 
 ---
 
-## Entry 1 — HTTP → Kafka + File (MiNiFi C++, standalone)
+## Entry 1 — HTTP → Kafka + File (MiNiFi C++, Standalone)
 
 - **Name:** `http-to-kafka-cpp`
 - **Purpose:** Accept an HTTP POST at the edge and fan it out to a Kafka topic *and* a local file in one flow.
@@ -55,7 +55,7 @@ Every entry uses the same card so the gallery reads consistently:
 
 ---
 
-## Entry 2 — HTTP → File (MiNiFi Java, standalone)
+## Entry 2 — HTTP → File (MiNiFi Java, Standalone)
 
 - **Name:** `http-to-file-java`
 - **Purpose:** Accept an HTTP POST at the edge and persist it to a local file. No Kafka — the stock Java image ships no Kafka NAR.
@@ -81,7 +81,7 @@ Every entry uses the same card so the gallery reads consistently:
 
 ---
 
-## Entry 3 — EFM-managed smoke flow (MiNiFi C++, Level 2)
+## Entry 3 — EFM-Managed Smoke Flow (MiNiFi C++, Level 2)
 
 - **Name:** `efm-level2-playground-cpp`
 - **Purpose:** Prove EFM C2 wiring end to end in the `default` namespace using a bare Ubuntu pod. `GenerateFlowFile` emits a heartbeat every 10 seconds; `LogAttribute` confirms the agent is receiving and executing EFM-published flows.
@@ -107,7 +107,7 @@ Every entry uses the same card so the gallery reads consistently:
 
 ---
 
-## Entry 4 — EFM-managed smoke flow (MiNiFi Java, Level 2)
+## Entry 4 — EFM-Managed Smoke Flow (MiNiFi Java, Level 2)
 
 - **Name:** `efm-level2-playground-java`
 - **Purpose:** The Java-flavor counterpart to Entry 3. Proves EFM C2 enrollment and flow delivery to a MiNiFi Java agent, same bare-pod bootstrap pattern.
@@ -127,7 +127,7 @@ Every entry uses the same card so the gallery reads consistently:
 
 ---
 
-## Entry 5 — TensorRT inference on Jetson (MiNiFi C++, EFM-managed)
+## Entry 5 — TensorRT Inference on Jetson (MiNiFi C++, EFM-Managed)
 
 - **Name:** `jetson-tensorrt-cpp`
 - **Purpose:** Accept an HTTP POST on a Jetson Orin Nano, run TensorRT inference via `ExecuteScript`, and publish the enriched payload to Kafka. Proves EFM-managed flow delivery to real aarch64 edge hardware and on-device GPU execution.
@@ -160,7 +160,7 @@ Every entry uses the same card so the gallery reads consistently:
 
 ---
 
-## Entry 6 — ExecuteScript Python smoke (MiNiFi C++, EFM-managed)
+## Entry 6 — ExecuteScript Python Smoke (MiNiFi C++, EFM-Managed)
 
 - **Name:** `executescript-python-smoke-cpp`
 - **Purpose:** Prove `ExecuteScript` with the Python engine is live and executing on a C++ agent. The script stamps a `python.smoke` attribute on every FlowFile; `LogAttribute` confirms delivery. This is the minimal validation pattern before wiring any real script logic.
@@ -194,7 +194,7 @@ Every entry uses the same card so the gallery reads consistently:
 
 ---
 
-## Entry 7 — Edge-AI router (MiNiFi Java, EFM-managed)
+## Entry 7 — Edge-AI Router (MiNiFi Java, EFM-Managed)
 
 - **Name:** `starlinkai-lemonade-router-java`
 - **Purpose:** Front a local Lemonade Server (AMD OpenAI-compatible inference, port 13305) with a three-processor MiNiFi Java flow that proxies all five Lemonade endpoints synchronously. The agent is tiny; the GPU model runs on the adjacent box. All five endpoints work end to end; transcription needs a multipart-reassembly branch ahead of `InvokeHTTP`.
@@ -226,7 +226,7 @@ Every entry uses the same card so the gallery reads consistently:
 
 ---
 
-## Pending entries
+## Pending Entries
 
 These flows are planned but don't yet have a folded, field-validated chapter behind them. Each becomes a full card above once its chapter lands.
 
@@ -235,7 +235,7 @@ These flows are planned but don't yet have a folded, field-validated chapter beh
 
 ---
 
-## How this gallery grows
+## How This Gallery Grows
 
 A flow earns a card here after three things are true: (1) its chapter is field-validated, (2) the config or flow export is committed to the Playground repo or `files/efm/`, and (3) the card is added both here and to `sample-gallery/README.md` in the Playground.
 

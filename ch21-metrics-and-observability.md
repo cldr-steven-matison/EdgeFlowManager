@@ -9,7 +9,7 @@ There are three metrics layers. They are independent — you can wire up any one
 3. **Layer 2 (Java) — MiNiFi Java agent metrics.** Conclusively blocked at the platform level. 🚫 Final.
 4. **Layer 3 — embedded / heartbeat metrics.** The smallest agents (ESP32/XIAO class) fold storage and health counters into the C2 heartbeat instead. 🟡 Design confirmed; Grafana panel out of scope here.
 
-## The CSO Prometheus/Grafana stack
+## The CSO Prometheus/Grafana Stack
 
 All three layers target the **existing** observability stack. The `kube-prometheus-stack` Helm install that already scrapes CFM (NiFi), CSA (Flink), and CSM (Kafka/Strimzi) runs in the `cld-streaming` namespace. EFM and the edge agents become additional scrape targets on that same stack — the edge does not need its own monitoring silo.
 
@@ -17,11 +17,11 @@ All three layers target the **existing** observability stack. The `kube-promethe
 
 For contrast on the NiFi side: the old `PrometheusReportingTask` is gone in NiFi 2.x. Metrics now come from the built-in `/nifi-api/flow/metrics/prometheus` REST endpoint. EFM and MiNiFi are the edge-side complement to that datacenter endpoint.
 
-## Layer 0 — prerequisites and deploy
+## Layer 0 — Prerequisites and Deploy
 
 Every layer below assumes EFM is actually deployed. On a CSO host that runs NiFi/Kafka/Flink but has never run EFM, stand it up from the `ClouderaStreamingOperators` repo. EFM is a Spring Boot app backed by Postgres; skipping a prerequisite is how you get a pod in `CrashLoopBackOff` instead of a clean metrics endpoint.
 
-### Verify prerequisites before applying anything
+### Verify Prerequisites Before Applying Anything
 
 The persisted deployment (`efm-deployment-persisted.yaml`) references six objects by name. Confirm each exists in `cld-streaming` first:
 
@@ -62,7 +62,7 @@ curl -s -o /dev/null -w "%{http_code}\n" http://localhost:10190/efm/actuator/hea
 
 **Field-validated.** Prerequisites already present (secrets, ConfigMap, both PVCs Bound, `efm` Postgres DB, image cached in minikube) — single `kubectl apply`, pod `Running` and health-green in ~15s (DB already migrated). The MiNiFi `KubernetesPod` agent enrolled the same session.
 
-### Why the metrics endpoint already works
+### Why the Metrics Endpoint Already Works
 
 The `efm-config` ConfigMap overrides `conf/efm.properties` and already carries the metrics block. You do not turn anything on at deploy time:
 
@@ -80,7 +80,7 @@ management.metrics.tags.application=efm
 
 Without this ConfigMap mounted, the actuator is up but the Prometheus registry is not wired — the endpoint returns `404` and Layer 1 silently scrapes nothing.
 
-### Deploy an agent so there's something to measure
+### Deploy an Agent so There's Something to Measure
 
 EFM's own metrics appear as soon as it's running, but the interesting agent-tagged series only appear once an agent is enrolled and heartbeating:
 
@@ -91,7 +91,7 @@ kubectl logs -f minifi-agent-k8s -n cld-streaming   # watch it wait for EFM, dep
 
 Once it's heartbeating, `/efm/actuator/prometheus` gains `agentClass="KubernetesPod"`-tagged series, and Layer 2 (the agent's own `9936` publisher) becomes available on the pod.
 
-## Layer 1 — EFM server metrics
+## Layer 1 — EFM Server Metrics
 
 EFM's Kubernetes `Service` exposes two named ports: `efm-ui` on `10090` (the UI/API) and `metrics` on `9092`.
 
@@ -153,11 +153,11 @@ up{container="efm",endpoint="efm-ui",instance="10.244.5.43:10090",job="efm",
 
 If you want to use `metrics/9092` (cleaner separation from the UI), set `management.server.port=9092` in the `efm-config` ConfigMap and redeploy — then `port: metrics` in the `ServiceMonitor` works. Until you do that, scrape `efm-ui`.
 
-## Layer 2 — MiNiFi C++ agent metrics
+## Layer 2 — MiNiFi C++ Agent Metrics
 
 MiNiFi C++ has a native Prometheus publisher — no `ExecuteScript`, no sidecar. It ships as a separate extension, `libminifi-prometheus.so`. Confirm it's present in the agent's `extensions/` directory before troubleshooting a "publisher never starts" symptom.
 
-### Corrected property names
+### Corrected Property Names
 
 > **⚠️ The `nifi.c2.*` property names documented in earlier revisions of this guide do not exist in MiNiFi C++ 1.26.02.** Those keys are never read by the binary — confirmed by `strings` against `libminifi-prometheus.so` and by the shipped `minifi.properties` template itself, which shows the real keys commented out under a "Publish metrics to external consumers" header. The real namespace is `nifi.metrics.publisher.*`.
 
@@ -177,7 +177,7 @@ Notes from the field:
 - **`nifi.metrics.publisher.metrics` is a comma-separated list of metric-node classes, not a boolean toggle.** `QueueMetrics` and `RepositoryMetrics` are always available. `DeviceInfoNode` and `FlowInformation` are the general per-agent and per-processor nodes. A class tied to a specific processor (e.g. `GetFileMetrics`) only emits if a processor of that type actually exists in the agent's flow — check `config.yml` first, or it is silently a no-op.
 - **The setting only takes effect on a service restart, not a config-only reload.**
 
-### Field validation — NvidiaNano (real Jetson hardware, systemd-managed)
+### Field Validation — NvidiaNano (Real Jetson Hardware, Systemd-Managed)
 
 After restarting the systemd-managed `minifi` service with the corrected config:
 
@@ -201,7 +201,7 @@ minifi_is_running{metric_class="FlowInformation",component_name="FlowController"
 
 Binds `0.0.0.0`, so it is LAN-reachable. Series carry `agent_identifier`, `metric_class`, and per-connection/per-processor tags — exactly the shape a Grafana panel needs.
 
-### Field validation — WindowsDesktopCpp
+### Field Validation — WindowsDesktopCpp
 
 Writing `95-metrics.properties` to `C:\WINDOWS\System32\nifi-minifi-cpp\conf\minifi.properties.d\` is blocked by UAC Admin Approval Mode. An admin account is in `BUILTIN\Administrators`, but the live process token returns `IsInRole(Administrator) = False` (filtered standard token). `Get-Acl` confirms `BUILTIN\Administrators` has `FullControl` but `BUILTIN\Users` (the effective group on the filtered token) only has `ReadAndExecute` — which matches the denial exactly.
 
@@ -215,7 +215,7 @@ curl http://127.0.0.1:9936/metrics   # returns real minifi_* Prometheus text
 
 The response includes `agent_identifier="40eb2f92-94c5-4478-beed-7060e41c9d7f"` on live queue/connection metrics from the running flow. The one-time UAC prompt is the entire blocker.
 
-### Wiring C++ agent metrics into CSO Prometheus (WindowsDesktop)
+### Wiring C++ Agent Metrics into CSO Prometheus (WindowsDesktop)
 
 The agent runs on the Windows host, not as a Kubernetes pod, so use the external-target pattern — a headless `Service` + `Endpoints` object pointing at the host IP, plus a `ServiceMonitor`:
 
@@ -265,7 +265,7 @@ spec:
 
 Confirm the target via Prometheus's own `/api/v1/targets` (`health: "up"`) and a live PromQL query returning real per-connection series from the running flow. Job name: `windowsdesktopcpp-minifi-metrics`.
 
-### Restarting the C++ agent — the real mechanics
+### Restarting the C++ Agent — The Real Mechanics
 
 Applying a `minifi.properties.d/*.properties` change requires restarting the `minifi` systemd service. Three paths that look equivalent are not:
 
@@ -273,14 +273,14 @@ Applying a `minifi.properties.d/*.properties` change requires restarting the `mi
 - **`~/minifi-1.26.02/bin/minifi.sh restart` is not an independent alternative.** Reading the script shows its `restart_service()` just calls `systemctl restart minifi.service` on Linux — needs the exact same sudo privilege.
 - **Killing the process directly does not reliably force a systemd respawn.** The unit file sets `Restart=on-failure` with `RestartForceExitStatus=3` — that rule fires on a specific exit code used by the agent's own C2-triggered restart path, not on an externally sent `SIGTERM`. Confirmed live: sending `SIGTERM` to the MiNiFi PID made the process exit cleanly, `systemctl is-active` immediately reported `inactive`, and the agent stayed down until a human ran `sudo systemctl start minifi`.
 
-### Networking — the port has to be reachable
+### Networking — The Port Has to Be Reachable
 
 The publisher binds `0.0.0.0`, but:
 
 - Confirm the host firewall allows the port (default `9936`) on the interface the scraper arrives on.
 - On StarlinkAI over Tailscale, Windows firewall rules for `9936` need attention — WindowsDesktop has `Allow EFM Port 10090` and generic Kafka `9092` rules, but no dedicated metrics `9936` rule, and Tailscale's adapter can land on a firewall profile the existing rules don't cover. Confirm metrics-over-tailnet is actually wanted before adding a rule.
 
-## Layer 2 — MiNiFi Java agent metrics (blocked)
+## Layer 2 — MiNiFi Java Agent Metrics (Blocked)
 
 > **⚠️ MiNiFi Java Layer 2 metrics are conclusively blocked — a confirmed platform limit. This is a final negative result, not an open question.**
 
@@ -296,13 +296,13 @@ On the C++ side, enabling Prometheus metrics is a three-line properties drop-in.
 
 **Conclusion: on this specific platform combination — an EFM/C2-managed, headless MiNiFi Java `2.24.08.0-19` agent — there is no supported channel to get NiFi 2.x's built-in Prometheus endpoint live.** Not a config mistake, not an oversight. Direct file edit reverts on restart, the C2 protocol itself blocks the properties needed to turn the embedded web API on, and no alternative NAR-based metrics path ships in this build. A different architecture (e.g. `SiteToSiteMetricsReportingTask`, which does exist in this source tree, relaying metrics to `mynifi`'s already-open web API instead of opening one on this agent) is the only remaining avenue and is out of scope here. The C++ Layer 2 pattern is the reference for what a working MiNiFi Prometheus target looks like on this stack.
 
-## Layer 3 — embedded heartbeat metrics (XIAO/microfi)
+## Layer 3 — Embedded Heartbeat Metrics (XIAO/microfi)
 
 The ESP32-class agent is too small to run a Prometheus server. Instead it puts its own health into the **C2 heartbeat**: LittleFS durable-storage counters with watermark-based eviction, reported as storage metrics in the heartbeat payload EFM already receives.
 
 Getting those heartbeat metrics onto a Grafana panel means going through EFM (Layer 1) rather than scraping the device directly — EFM holds the agent state, Prometheus scrapes EFM. Design confirmed for the ESP32 class; a Grafana panel is out of scope here.
 
-## What NOT to do
+## What NOT to Do
 
 **Don't assume EFM's `9092` and the agent's `9936` are the same thing.** One is the EFM pod's (non-functional) `metrics` port in `cld-streaming`; the other is the publisher port the MiNiFi C++ agent opens on the edge host. They are on different machines; the only way they conflict is if you pick the same number deliberately.
 

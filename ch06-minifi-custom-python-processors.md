@@ -1,10 +1,10 @@
 # Chapter 6: MiNiFi Custom Python Processors
 
-A **custom Python processor** is a *new processor type* you write in Python and load into a MiNiFi agent at the edge. It appears in the agent's manifest under its own name, with its own properties and relationships, and is wired into a flow like any stock processor. It is the MiNiFi counterpart to the NiFi 2.x custom Python processors covered in *How to AI with NiFi and Python* — the same authoring model pushed down to the edge agent.
+A **custom Python processor** is a *new processor type* you write in Python and load into a MiNiFi agent at the edge. It appears in the agent's manifest under its own name, with its own properties and relationships, and is wired into a flow like any stock processor. It is the MiNiFi counterpart to the NiFi 2.x custom Python processors covered in [Chapter 15 — *How to AI with NiFi and Python*](ch15-how-to-ai-with-nifi-and-python.md) (also published as a [public blog post](https://cldr-steven-matison.github.io/blog/How-to-AI-with-NiFi-and-Python/)) — the same authoring model pushed down to the edge agent.
 
 ---
 
-## Scope — read this first
+## Scope — Read This First
 
 **This chapter is about custom Python *processors*. It is NOT about `ExecuteScript`.** They are two different processors and two different concepts:
 
@@ -19,7 +19,7 @@ A **custom Python processor** is a *new processor type* you write in Python and 
 
 ---
 
-## Where it runs
+## Where It Runs
 
 A custom Python processor loads on any MiNiFi agent that has the Python extension runtime — the same `.so`/`.pyd` pair `ExecuteScript` uses. It works across the C++ builds and on the CEM Java agent:
 
@@ -43,7 +43,7 @@ A custom Python processor loads on any MiNiFi agent that has the Python extensio
 
 ---
 
-## Two styles of processor — and why the choice matters for delivery
+## Two Styles of Processor — And Why the Choice Matters for Delivery
 
 There are two ways to author a custom Python processor, and the choice determines which **delivery mechanism** works:
 
@@ -54,7 +54,7 @@ The class-style version **depends on the `nifiapi` framework package** shipping 
 
 ---
 
-## How it loads — scan-once-at-boot, not a hot patch
+## How It Loads — Scan-Once-At-Boot, Not a Hot Patch
 
 MiNiFi's `PythonCreator` scans the processor directory **once, at agent boot** — not on every trigger the way `ExecuteScript` re-reads its Script File. A `.py` present at boot registers (the log shows `Registering MiNiFi python processor: <name>`); a `.py` dropped in *after* the agent is running is not picked up until the next restart.
 
@@ -66,17 +66,17 @@ One subtlety: EFM's tracked manifest content-hash is *structural* (type/property
 
 ---
 
-## Getting the processor onto the agent
+## Getting the Processor onto the Agent
 
 Two delivery mechanisms, the same split as `ExecuteScript`'s Script File:
 
-### 1. Direct file placement
+### 1. Direct File Placement
 
 Copy the `.py` into `minifi-python/` (or wherever `nifi.python.processor.dir` points) and restart. Fast, no EFM involvement, but it bypasses EFM tracking and doesn't survive a fresh pod/agent rebuild.
 
 The default layout the agent ships is a **sibling-package** one: `minifi-python/nifiapi/` (the framework) alongside an empty `minifi-python/nifi_python_processors/` (where your authored `.py` goes). Both styles work here, because the `nifiapi` framework is on the scanned path.
 
-### 2. EFM Resources → asset directory (managed, restart-durable)
+### 2. EFM Resources → Asset Directory (Managed, Restart-Durable)
 
 Upload the authored `.py` as an **EFM Resource** and let EFM push it to the agent's **asset directory** over the asset-sync C2 command — no image rebuild, no manual SCP, the same managed path flows already ride. This is the tracked, C2-managed delivery.
 
@@ -92,7 +92,7 @@ Mechanics (`CONFIGURE.md#asset-directory` is the authority):
 
 ---
 
-## Wiring it into a flow
+## Wiring It into a Flow
 
 A custom type is referenced from an EFM Designer flow exactly like any stock processor — no special-casing. Build `ListenHTTP → EdgeTagger → LogAttribute` (or `PutFile`), POST a payload, and confirm the attribute lands with no drops (**set ListenHTTP Batch/Buffer Size = 1**, per MINIFICPP-2243).
 
@@ -100,7 +100,7 @@ A custom type is referenced from an EFM Designer flow exactly like any stock pro
 
 ---
 
-## The Java (CEM) leg
+## The Java (CEM) Leg
 
 Custom Python processors are not C++-only. The CEM Java agent (`2.24.08.0-19`) ships the full **py4j-based** Python processor framework — the `nifiapi` package, a bundled `py4j/`, the `nifi-py4j-nar`, and the `nifi-python-framework-api` JAR — and loads authored code. The Java-specific difference: a class must declare a `class Java: implements = ['org.apache.nifi.python.processor.FlowFileTransform']` inner class for the gateway.
 
@@ -117,7 +117,7 @@ With both in place, the py4j framework launches at boot (`Launching Python Proce
 
 ---
 
-## What NOT to do
+## What NOT to Do
 
 - **Don't conflate this with `ExecuteScript`.** Different processor, different reload semantics, different chapter. See the scope table above.
 - **Don't expect an edited `.py` to take effect without a restart** when the edit changes the type signature (properties/relationships/`describe()`). Only `onTrigger`-body edits hot-reload.
@@ -128,7 +128,7 @@ With both in place, the py4j framework launches at boot (`Launching Python Proce
 
 ---
 
-## Runnable scenario
+## Runnable Scenario
 
 Both recipes are packaged as a lift-and-run scenario — each `.py`, its `minifi.properties`/`bootstrap.conf` snippet, and an exported EFM flow (plus a one-`apply` disposable Java agent pod) — in the MiNiFi Kubernetes Playground under `sample-gallery/python-processors/`.
 
