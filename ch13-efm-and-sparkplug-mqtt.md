@@ -428,21 +428,24 @@ convention of not blurring designed-but-untested with field-proven:
   [Chapter 20](ch20-sparkplug-demo.md) for the live re-wiring and the incident that came with it.
 - A real hardware device (Seeed XIAO ESP32-S3) publishing plain JSON matching the `ConsumeMQTT`
   leg's shape — see Chapter 20.
-
-**Designed, not yet field-run:**
-- A real hardware device publishing genuine Sparkplug B binary (the `ConsumeMQTTIIoT` leg has only
-  ever been field-tested against the `pysparkplug` Mac-side simulator, never against physical
-  sensor hardware). Chapter 20 notes this explicitly: the `sparkplug_telemetry` Kafka topic is
-  "proven-consuming but not yet field-run end to end with a live binary producer."
-  <br><br>
-  **This is the one genuinely open technical question this chapter can't resolve without live
-  hardware and cluster access:** does a real embedded device (ESP32-class or similar) have a
-  practical, low-footprint path to producing spec-compliant Sparkplug B protobuf — as opposed to
-  the Python-side `pysparkplug` library used for every field run so far? Options exist (a
-  C/C++ protobuf-lite Sparkplug encoder, or a gateway pattern where the embedded device speaks
-  plain JSON/MQTT to a MiNiFi or small-script relay that re-encodes as Sparkplug B before handing
-  it to Mosquitto) but none has been tried against this lab's actual hardware. Flagging as open
-  rather than picking one and presenting it as validated.
+- **A real hardware device (the same Seeed XIAO ESP32-S3 Sense from Chapter 20) publishing genuine
+  Sparkplug B binary — confirmed 2026-08-06 on WindowsDesktop (issue #126,
+  [`efm-sparkplug-b-hardware-lab-plan.md`](https://github.com/cldr-steven-matison/DesktopShare/blob/main/efm-sparkplug-b-hardware-lab-plan.md)
+  in DesktopShare).** The open technical question below is now answered: **yes**, a practical
+  low-footprint path exists.
+  [`mkeras/EmbeddedSparkplugNode`](https://github.com/mkeras/EmbeddedSparkplugNode) (a `nanopb`-based
+  Sparkplug B encoder, MQTT-library-agnostic) dropped into the existing `xiao-telemetry.ino` sketch
+  as a second, additive publish leg — the plain-JSON leg stayed unmodified and kept working
+  side-by-side. The device published real `NBIRTH`/`NDATA` to
+  `spBv1.0/XiaoTelemetry/{NBIRTH,NDATA}/XiaoESP32-01`, with one real metric (`Sensors/Temperature`,
+  the same internal-temp sensor value the JSON leg already reports). Verified independently via NiFi
+  provenance (not the firmware's own serial log): `ConsumeMQTTIIoT` routed both messages via its
+  `Message` relationship (not `parse.failure`, i.e. NiFi's own parser validated them as real
+  Sparkplug B), the raw wire bytes sent to Kafka contain the literal metric name
+  `Sensors/Temperature` and a real float32 value (`42.79999923706055`, matching the JSON leg's
+  `42.8` from the same tick), and a `SEND` provenance event confirms delivery to
+  `my-cluster-kafka-bootstrap.cld-streaming.svc:9092/sparkplug_telemetry` — the same topic the
+  `pysparkplug` simulator already proved reachable.
 - The Primary Host Application / Rebirth-request behavior of `ConsumeMQTTIIoT` — the processor
   supports it, but no field run in this lab has exercised a live rebirth request against a
   connected edge node.
