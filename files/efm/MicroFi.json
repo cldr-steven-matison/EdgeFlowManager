@@ -4,7 +4,7 @@
         "agentClass": "MicroFi",
         "rootProcessGroupIdentifier": "383a5855-dd84-48b7-a2da-cb698dd9ba39",
         "created": 1785344892733,
-        "updated": 1785962257746,
+        "updated": 1785967528732,
         "undoEnabled": false,
         "redoEnabled": false
     },
@@ -20,6 +20,62 @@
         "processGroups": [],
         "remoteProcessGroups": [],
         "processors": [
+            {
+                "identifier": "de48a9c3-24ce-4dc9-98b0-e66ae437091a",
+                "instanceIdentifier": "73fe5333-636e-4402-901c-fe792544639b",
+                "name": "ListenHTTP-Trigger",
+                "comments": "",
+                "position": {
+                    "x": 600.0,
+                    "y": 0.0
+                },
+                "type": "ListenHTTP",
+                "bundle": {
+                    "group": "org.apache.nifi",
+                    "artifact": "microfi-system",
+                    "version": "0.1.0"
+                },
+                "properties": {
+                    "Base Path": "/test",
+                    "Listening Port": "8095"
+                },
+                "propertyDescriptors": {
+                    "Base Path": {
+                        "name": "Base Path",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Listening Port": {
+                        "name": "Listening Port",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    }
+                },
+                "style": {},
+                "annotationData": null,
+                "schedulingPeriod": "1000 ms",
+                "schedulingStrategy": "TIMER_DRIVEN",
+                "executionNode": "ALL",
+                "penaltyDuration": "30000 ms",
+                "yieldDuration": "1000 ms",
+                "bulletinLevel": "WARN",
+                "runDurationMillis": 0,
+                "concurrentlySchedulableTaskCount": 1,
+                "autoTerminatedRelationships": [
+                    "success"
+                ],
+                "scheduledState": null,
+                "retryCount": null,
+                "retriedRelationships": null,
+                "backoffMechanism": null,
+                "maxBackoffPeriod": null,
+                "componentType": "PROCESSOR",
+                "groupIdentifier": "383a5855-dd84-48b7-a2da-cb698dd9ba39"
+            },
             {
                 "identifier": "4b9279de-4e0c-4e45-a7af-8e0aaa80e658",
                 "instanceIdentifier": "9ab027c9-8484-4f40-b6a8-d9762b3181a1",
@@ -256,11 +312,11 @@
         }
     ],
     "versionInfo": {
-        "flowVersion": 17,
-        "lastPublished": 1785962257328,
+        "flowVersion": 19,
+        "lastPublished": 1785967528719,
         "lastPublishedBy": "anonymous",
         "dirty": false,
         "localChanges": false
     },
-    "localFlowRevision": 93
+    "localFlowRevision": 101
 }
