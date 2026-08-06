@@ -1,0 +1,4031 @@
+{
+  "flowMetadata": {
+    "identifier": "a05b9ca5-eddb-47e3-9182-e3d2a5ceb7f5",
+    "agentClass": "StarlinkAI",
+    "rootProcessGroupIdentifier": "a9aaf51b-1fe8-4061-b75f-53fac625b784",
+    "created": 1784335602625,
+    "updated": 1785421191394,
+    "undoEnabled": false,
+    "redoEnabled": false
+  },
+  "flowContent": {
+    "identifier": "a9aaf51b-1fe8-4061-b75f-53fac625b784",
+    "instanceIdentifier": "c71ca799-938f-4044-8e0a-1ab790878943",
+    "name": "root",
+    "comments": null,
+    "position": {
+      "x": 0.0,
+      "y": 0.0
+    },
+    "processGroups": [],
+    "remoteProcessGroups": [],
+    "processors": [
+      {
+        "identifier": "57b60645-a7d4-489a-be15-9ef436c8d0fd",
+        "instanceIdentifier": "24bea567-957c-41b3-a465-11c6303523bd",
+        "name": "InvokeHTTP",
+        "comments": "",
+        "position": {
+          "x": 230.79092767787472,
+          "y": 67.84222242007445
+        },
+        "type": "org.apache.nifi.minifi.processors.InvokeHTTP",
+        "bundle": {
+          "group": "org.apache.nifi.minifi",
+          "artifact": "minifi-standard-processors",
+          "version": "1.26.02"
+        },
+        "properties": {
+          "Proxy Host": null,
+          "Upload Speed Limit": null,
+          "Attributes to Send": "request_id",
+          "Invalid HTTP Header Field Handling Strategy": "transform",
+          "Download Speed Limit": null,
+          "Read Timeout": "10 min",
+          "invokehttp-proxy-password": null,
+          "Send Message Body": "true",
+          "Proxy Port": null,
+          "invokehttp-proxy-username": null,
+          "Put Response Body in Attribute": null,
+          "Connection Timeout": "5 min",
+          "send-message-body": "true",
+          "Content-type": "application/json",
+          "SSL Context Service": null,
+          "Always Output Response": "false",
+          "HTTP Method": "POST",
+          "Include Date Header": "true",
+          "Use Chunked Encoding": "false",
+          "Disable Peer Verification": "false",
+          "Penalize on \"No Retry\"": "false",
+          "Follow Redirects": "true",
+          "Remote URL": "http://localhost:13305/api/v1/chat/completions"
+        },
+        "propertyDescriptors": {
+          "Proxy Host": {
+            "name": "Proxy Host",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Upload Speed Limit": {
+            "name": "Upload Speed Limit",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Attributes to Send": {
+            "name": "Attributes to Send",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Invalid HTTP Header Field Handling Strategy": {
+            "name": "Invalid HTTP Header Field Handling Strategy",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Download Speed Limit": {
+            "name": "Download Speed Limit",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Read Timeout": {
+            "name": "Read Timeout",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "invokehttp-proxy-password": {
+            "name": "invokehttp-proxy-password",
+            "displayName": "Proxy Password",
+            "identifiesControllerService": false,
+            "sensitive": true,
+            "resourceDefinition": null
+          },
+          "Send Message Body": {
+            "name": "Send Message Body",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Proxy Port": {
+            "name": "Proxy Port",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "invokehttp-proxy-username": {
+            "name": "invokehttp-proxy-username",
+            "displayName": "Proxy Username",
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Put Response Body in Attribute": {
+            "name": "Put Response Body in Attribute",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Connection Timeout": {
+            "name": "Connection Timeout",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "send-message-body": {
+            "name": "send-message-body",
+            "displayName": "Send Body",
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Content-type": {
+            "name": "Content-type",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "SSL Context Service": {
+            "name": "SSL Context Service",
+            "displayName": null,
+            "identifiesControllerService": true,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Always Output Response": {
+            "name": "Always Output Response",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "HTTP Method": {
+            "name": "HTTP Method",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Include Date Header": {
+            "name": "Include Date Header",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Use Chunked Encoding": {
+            "name": "Use Chunked Encoding",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Disable Peer Verification": {
+            "name": "Disable Peer Verification",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Penalize on \"No Retry\"": {
+            "name": "Penalize on \"No Retry\"",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Follow Redirects": {
+            "name": "Follow Redirects",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Remote URL": {
+            "name": "Remote URL",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          }
+        },
+        "style": {},
+        "annotationData": null,
+        "schedulingPeriod": "1000 ms",
+        "schedulingStrategy": "TIMER_DRIVEN",
+        "executionNode": "ALL",
+        "penaltyDuration": "30000 ms",
+        "yieldDuration": "1000 ms",
+        "bulletinLevel": "WARN",
+        "runDurationMillis": 0,
+        "concurrentlySchedulableTaskCount": 1,
+        "autoTerminatedRelationships": [],
+        "scheduledState": null,
+        "retryCount": null,
+        "retriedRelationships": null,
+        "backoffMechanism": null,
+        "maxBackoffPeriod": null,
+        "componentType": "PROCESSOR",
+        "groupIdentifier": "a9aaf51b-1fe8-4061-b75f-53fac625b784"
+      },
+      {
+        "identifier": "3fc61ec3-6109-41bb-8e14-ecbbdb85e71d",
+        "instanceIdentifier": "3b866051-f5f3-4139-beaa-4be3e446455f",
+        "name": "ListenHTTP-Speech",
+        "comments": "",
+        "position": {
+          "x": -962.7817993164062,
+          "y": -335.21868896484375
+        },
+        "type": "org.apache.nifi.minifi.processors.ListenHTTP",
+        "bundle": {
+          "group": "org.apache.nifi.minifi",
+          "artifact": "minifi-civet-extensions",
+          "version": "1.26.02"
+        },
+        "properties": {
+          "Base Path": "speech",
+          "SSL Verify Peer": "no",
+          "Batch Size": "2",
+          "SSL Minimum Version": "TLS1.2",
+          "Buffer Size": "2",
+          "Listening Port": "8083",
+          "SSL Certificate": null,
+          "HTTP Headers to receive as Attributes (Regex)": null,
+          "Authorized DN Pattern": ".*",
+          "SSL Certificate Authority": null
+        },
+        "propertyDescriptors": {
+          "Base Path": {
+            "name": "Base Path",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "SSL Verify Peer": {
+            "name": "SSL Verify Peer",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Batch Size": {
+            "name": "Batch Size",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "SSL Minimum Version": {
+            "name": "SSL Minimum Version",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Buffer Size": {
+            "name": "Buffer Size",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Listening Port": {
+            "name": "Listening Port",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "SSL Certificate": {
+            "name": "SSL Certificate",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "HTTP Headers to receive as Attributes (Regex)": {
+            "name": "HTTP Headers to receive as Attributes (Regex)",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Authorized DN Pattern": {
+            "name": "Authorized DN Pattern",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "SSL Certificate Authority": {
+            "name": "SSL Certificate Authority",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          }
+        },
+        "style": {},
+        "annotationData": null,
+        "schedulingPeriod": "1000 ms",
+        "schedulingStrategy": "TIMER_DRIVEN",
+        "executionNode": "ALL",
+        "penaltyDuration": "30000 ms",
+        "yieldDuration": "1000 ms",
+        "bulletinLevel": "WARN",
+        "runDurationMillis": 0,
+        "concurrentlySchedulableTaskCount": 1,
+        "autoTerminatedRelationships": [],
+        "scheduledState": null,
+        "retryCount": null,
+        "retriedRelationships": null,
+        "backoffMechanism": null,
+        "maxBackoffPeriod": null,
+        "componentType": "PROCESSOR",
+        "groupIdentifier": "a9aaf51b-1fe8-4061-b75f-53fac625b784"
+      },
+      {
+        "identifier": "0afe0eb8-359b-4e25-bd26-07ee992fdd24",
+        "instanceIdentifier": "b31aafcc-a3a4-4af2-bf1b-253b76ca7b39",
+        "name": "InvokeHTTP-StreamScreen4",
+        "comments": "",
+        "position": {
+          "x": 230.0,
+          "y": 441.0
+        },
+        "type": "org.apache.nifi.minifi.processors.InvokeHTTP",
+        "bundle": {
+          "group": "org.apache.nifi.minifi",
+          "artifact": "minifi-standard-processors",
+          "version": "1.26.02"
+        },
+        "properties": {
+          "Proxy Host": null,
+          "Upload Speed Limit": null,
+          "Attributes to Send": null,
+          "Invalid HTTP Header Field Handling Strategy": "transform",
+          "Download Speed Limit": null,
+          "Read Timeout": "10 min",
+          "invokehttp-proxy-password": null,
+          "Send Message Body": "true",
+          "Proxy Port": null,
+          "invokehttp-proxy-username": null,
+          "Put Response Body in Attribute": null,
+          "Connection Timeout": "5 min",
+          "send-message-body": "true",
+          "Content-type": "application/json",
+          "SSL Context Service": null,
+          "Always Output Response": "false",
+          "HTTP Method": "POST",
+          "Include Date Header": "true",
+          "Use Chunked Encoding": "false",
+          "Disable Peer Verification": "false",
+          "Penalize on \"No Retry\"": "false",
+          "Follow Redirects": "true",
+          "Remote URL": "http://127.0.0.1:5902/load/screen3"
+        },
+        "propertyDescriptors": {
+          "Proxy Host": {
+            "name": "Proxy Host",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Upload Speed Limit": {
+            "name": "Upload Speed Limit",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Attributes to Send": {
+            "name": "Attributes to Send",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Invalid HTTP Header Field Handling Strategy": {
+            "name": "Invalid HTTP Header Field Handling Strategy",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Download Speed Limit": {
+            "name": "Download Speed Limit",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Read Timeout": {
+            "name": "Read Timeout",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "invokehttp-proxy-password": {
+            "name": "invokehttp-proxy-password",
+            "displayName": "Proxy Password",
+            "identifiesControllerService": false,
+            "sensitive": true,
+            "resourceDefinition": null
+          },
+          "Send Message Body": {
+            "name": "Send Message Body",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Proxy Port": {
+            "name": "Proxy Port",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "invokehttp-proxy-username": {
+            "name": "invokehttp-proxy-username",
+            "displayName": "Proxy Username",
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Put Response Body in Attribute": {
+            "name": "Put Response Body in Attribute",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Connection Timeout": {
+            "name": "Connection Timeout",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "send-message-body": {
+            "name": "send-message-body",
+            "displayName": "Send Body",
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Content-type": {
+            "name": "Content-type",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "SSL Context Service": {
+            "name": "SSL Context Service",
+            "displayName": null,
+            "identifiesControllerService": true,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Always Output Response": {
+            "name": "Always Output Response",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "HTTP Method": {
+            "name": "HTTP Method",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Include Date Header": {
+            "name": "Include Date Header",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Use Chunked Encoding": {
+            "name": "Use Chunked Encoding",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Disable Peer Verification": {
+            "name": "Disable Peer Verification",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Penalize on \"No Retry\"": {
+            "name": "Penalize on \"No Retry\"",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Follow Redirects": {
+            "name": "Follow Redirects",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Remote URL": {
+            "name": "Remote URL",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          }
+        },
+        "style": {},
+        "annotationData": null,
+        "schedulingPeriod": "1000 ms",
+        "schedulingStrategy": "TIMER_DRIVEN",
+        "executionNode": "ALL",
+        "penaltyDuration": "30000 ms",
+        "yieldDuration": "1000 ms",
+        "bulletinLevel": "WARN",
+        "runDurationMillis": 0,
+        "concurrentlySchedulableTaskCount": 1,
+        "autoTerminatedRelationships": [
+          "success",
+          "response",
+          "failure",
+          "retry",
+          "no retry"
+        ],
+        "scheduledState": null,
+        "retryCount": null,
+        "retriedRelationships": null,
+        "backoffMechanism": null,
+        "maxBackoffPeriod": null,
+        "componentType": "PROCESSOR",
+        "groupIdentifier": "a9aaf51b-1fe8-4061-b75f-53fac625b784"
+      },
+      {
+        "identifier": "094a3e11-6b64-4fde-9614-a52c2e74fc43",
+        "instanceIdentifier": "819170fa-2a24-40ca-bd9e-928a296a11a5",
+        "name": "LogAttribute",
+        "comments": "",
+        "position": {
+          "x": 1227.7404662905503,
+          "y": 247.584091564431
+        },
+        "type": "org.apache.nifi.minifi.processors.LogAttribute",
+        "bundle": {
+          "group": "org.apache.nifi.minifi",
+          "artifact": "minifi-standard-processors",
+          "version": "1.26.02"
+        },
+        "properties": {
+          "FlowFiles To Log": "1",
+          "Log Level": null,
+          "Attributes to Ignore": null,
+          "Attributes to Log": "request_id",
+          "Log Payload": "true",
+          "Log Prefix": null,
+          "Hexencode Payload": "false",
+          "Maximum Payload Line Length": "0"
+        },
+        "propertyDescriptors": {
+          "FlowFiles To Log": {
+            "name": "FlowFiles To Log",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Log Level": {
+            "name": "Log Level",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Attributes to Ignore": {
+            "name": "Attributes to Ignore",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Attributes to Log": {
+            "name": "Attributes to Log",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Log Payload": {
+            "name": "Log Payload",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Log Prefix": {
+            "name": "Log Prefix",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Hexencode Payload": {
+            "name": "Hexencode Payload",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Maximum Payload Line Length": {
+            "name": "Maximum Payload Line Length",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          }
+        },
+        "style": {},
+        "annotationData": null,
+        "schedulingPeriod": "1000 ms",
+        "schedulingStrategy": "TIMER_DRIVEN",
+        "executionNode": "ALL",
+        "penaltyDuration": "30000 ms",
+        "yieldDuration": "1000 ms",
+        "bulletinLevel": "WARN",
+        "runDurationMillis": 0,
+        "concurrentlySchedulableTaskCount": 1,
+        "autoTerminatedRelationships": [
+          "success"
+        ],
+        "scheduledState": null,
+        "retryCount": null,
+        "retriedRelationships": null,
+        "backoffMechanism": null,
+        "maxBackoffPeriod": null,
+        "componentType": "PROCESSOR",
+        "groupIdentifier": "a9aaf51b-1fe8-4061-b75f-53fac625b784"
+      },
+      {
+        "identifier": "1a43783f-7e89-4aa3-8003-d5a565537b9f",
+        "instanceIdentifier": "bf6acbce-a224-4cc0-a65d-dff92cc11890",
+        "name": "ListenHTTP-StreamScreen4",
+        "comments": "",
+        "position": {
+          "x": -963.0,
+          "y": 441.0
+        },
+        "type": "org.apache.nifi.minifi.processors.ListenHTTP",
+        "bundle": {
+          "group": "org.apache.nifi.minifi",
+          "artifact": "minifi-civet-extensions",
+          "version": "1.26.02"
+        },
+        "properties": {
+          "Base Path": "streamChatListener",
+          "SSL Verify Peer": "no",
+          "Batch Size": "1",
+          "SSL Minimum Version": "TLS1.2",
+          "Buffer Size": "1",
+          "Listening Port": "8086",
+          "SSL Certificate": null,
+          "HTTP Headers to receive as Attributes (Regex)": null,
+          "Authorized DN Pattern": ".*",
+          "SSL Certificate Authority": null
+        },
+        "propertyDescriptors": {
+          "Base Path": {
+            "name": "Base Path",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "SSL Verify Peer": {
+            "name": "SSL Verify Peer",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Batch Size": {
+            "name": "Batch Size",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "SSL Minimum Version": {
+            "name": "SSL Minimum Version",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Buffer Size": {
+            "name": "Buffer Size",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Listening Port": {
+            "name": "Listening Port",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "SSL Certificate": {
+            "name": "SSL Certificate",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "HTTP Headers to receive as Attributes (Regex)": {
+            "name": "HTTP Headers to receive as Attributes (Regex)",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Authorized DN Pattern": {
+            "name": "Authorized DN Pattern",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "SSL Certificate Authority": {
+            "name": "SSL Certificate Authority",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          }
+        },
+        "style": {},
+        "annotationData": null,
+        "schedulingPeriod": "1000 ms",
+        "schedulingStrategy": "TIMER_DRIVEN",
+        "executionNode": "ALL",
+        "penaltyDuration": "30000 ms",
+        "yieldDuration": "1000 ms",
+        "bulletinLevel": "WARN",
+        "runDurationMillis": 0,
+        "concurrentlySchedulableTaskCount": 1,
+        "autoTerminatedRelationships": [],
+        "scheduledState": null,
+        "retryCount": null,
+        "retriedRelationships": null,
+        "backoffMechanism": null,
+        "maxBackoffPeriod": null,
+        "componentType": "PROCESSOR",
+        "groupIdentifier": "a9aaf51b-1fe8-4061-b75f-53fac625b784"
+      },
+      {
+        "identifier": "0dd40719-b987-44e2-8fac-c2b6f7b5651e",
+        "instanceIdentifier": "df1366cb-a6fa-4171-8555-5c95857bcd1b",
+        "name": "InvokeHTTP-Reranking",
+        "comments": "",
+        "position": {
+          "x": 232.51014709472656,
+          "y": -517.6093444824219
+        },
+        "type": "org.apache.nifi.minifi.processors.InvokeHTTP",
+        "bundle": {
+          "group": "org.apache.nifi.minifi",
+          "artifact": "minifi-standard-processors",
+          "version": "1.26.02"
+        },
+        "properties": {
+          "Proxy Host": null,
+          "Upload Speed Limit": null,
+          "Attributes to Send": "request_id",
+          "Invalid HTTP Header Field Handling Strategy": "transform",
+          "Download Speed Limit": null,
+          "Read Timeout": "10 min",
+          "invokehttp-proxy-password": null,
+          "Send Message Body": "true",
+          "Proxy Port": null,
+          "invokehttp-proxy-username": null,
+          "Put Response Body in Attribute": null,
+          "Connection Timeout": "5 min",
+          "send-message-body": "true",
+          "Content-type": "application/json",
+          "SSL Context Service": null,
+          "Always Output Response": "false",
+          "HTTP Method": "POST",
+          "Include Date Header": "true",
+          "Use Chunked Encoding": "false",
+          "Disable Peer Verification": "false",
+          "Penalize on \"No Retry\"": "false",
+          "Follow Redirects": "true",
+          "Remote URL": "http://localhost:13305/api/v1/reranking"
+        },
+        "propertyDescriptors": {
+          "Proxy Host": {
+            "name": "Proxy Host",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Upload Speed Limit": {
+            "name": "Upload Speed Limit",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Attributes to Send": {
+            "name": "Attributes to Send",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Invalid HTTP Header Field Handling Strategy": {
+            "name": "Invalid HTTP Header Field Handling Strategy",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Download Speed Limit": {
+            "name": "Download Speed Limit",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Read Timeout": {
+            "name": "Read Timeout",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "invokehttp-proxy-password": {
+            "name": "invokehttp-proxy-password",
+            "displayName": "Proxy Password",
+            "identifiesControllerService": false,
+            "sensitive": true,
+            "resourceDefinition": null
+          },
+          "Send Message Body": {
+            "name": "Send Message Body",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Proxy Port": {
+            "name": "Proxy Port",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "invokehttp-proxy-username": {
+            "name": "invokehttp-proxy-username",
+            "displayName": "Proxy Username",
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Put Response Body in Attribute": {
+            "name": "Put Response Body in Attribute",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Connection Timeout": {
+            "name": "Connection Timeout",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "send-message-body": {
+            "name": "send-message-body",
+            "displayName": "Send Body",
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Content-type": {
+            "name": "Content-type",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "SSL Context Service": {
+            "name": "SSL Context Service",
+            "displayName": null,
+            "identifiesControllerService": true,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Always Output Response": {
+            "name": "Always Output Response",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "HTTP Method": {
+            "name": "HTTP Method",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Include Date Header": {
+            "name": "Include Date Header",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Use Chunked Encoding": {
+            "name": "Use Chunked Encoding",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Disable Peer Verification": {
+            "name": "Disable Peer Verification",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Penalize on \"No Retry\"": {
+            "name": "Penalize on \"No Retry\"",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Follow Redirects": {
+            "name": "Follow Redirects",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Remote URL": {
+            "name": "Remote URL",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          }
+        },
+        "style": {},
+        "annotationData": null,
+        "schedulingPeriod": "1000 ms",
+        "schedulingStrategy": "TIMER_DRIVEN",
+        "executionNode": "ALL",
+        "penaltyDuration": "30000 ms",
+        "yieldDuration": "1000 ms",
+        "bulletinLevel": "WARN",
+        "runDurationMillis": 0,
+        "concurrentlySchedulableTaskCount": 1,
+        "autoTerminatedRelationships": [
+          "failure",
+          "retry",
+          "no retry"
+        ],
+        "scheduledState": null,
+        "retryCount": null,
+        "retriedRelationships": null,
+        "backoffMechanism": null,
+        "maxBackoffPeriod": null,
+        "componentType": "PROCESSOR",
+        "groupIdentifier": "a9aaf51b-1fe8-4061-b75f-53fac625b784"
+      },
+      {
+        "identifier": "0e306a2a-8415-4eed-83dd-e035c79476a9",
+        "instanceIdentifier": "b999d1cb-b5cb-4483-9548-55c023bb7477",
+        "name": "EvaluateJsonPath-Reranking",
+        "comments": "",
+        "position": {
+          "x": -362.6623077392578,
+          "y": -519.2583312988281
+        },
+        "type": "org.apache.nifi.minifi.processors.EvaluateJsonPath",
+        "bundle": {
+          "group": "org.apache.nifi.minifi",
+          "artifact": "minifi-standard-processors",
+          "version": "1.26.02"
+        },
+        "properties": {
+          "Destination": "flowfile-attribute",
+          "Return Type": "auto-detect",
+          "Null Value Representation": "empty string",
+          "request_id": "$.request_id",
+          "Path Not Found Behavior": "ignore"
+        },
+        "propertyDescriptors": {
+          "Destination": {
+            "name": "Destination",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Return Type": {
+            "name": "Return Type",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Null Value Representation": {
+            "name": "Null Value Representation",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Path Not Found Behavior": {
+            "name": "Path Not Found Behavior",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          }
+        },
+        "style": {},
+        "annotationData": null,
+        "schedulingPeriod": "1000 ms",
+        "schedulingStrategy": "TIMER_DRIVEN",
+        "executionNode": "ALL",
+        "penaltyDuration": "30000 ms",
+        "yieldDuration": "1000 ms",
+        "bulletinLevel": "WARN",
+        "runDurationMillis": 0,
+        "concurrentlySchedulableTaskCount": 1,
+        "autoTerminatedRelationships": [
+          "failure",
+          "unmatched"
+        ],
+        "scheduledState": null,
+        "retryCount": null,
+        "retriedRelationships": null,
+        "backoffMechanism": null,
+        "maxBackoffPeriod": null,
+        "componentType": "PROCESSOR",
+        "groupIdentifier": "a9aaf51b-1fe8-4061-b75f-53fac625b784"
+      },
+      {
+        "identifier": "3dbd6bb3-6f49-4679-9ecf-ffc423d23e5d",
+        "instanceIdentifier": "b1fd0ca0-eb6f-474e-8910-1a054ca8daf4",
+        "name": "ListenHTTP-StreamScreen3",
+        "comments": "",
+        "position": {
+          "x": -963.0,
+          "y": 247.0
+        },
+        "type": "org.apache.nifi.minifi.processors.ListenHTTP",
+        "bundle": {
+          "group": "org.apache.nifi.minifi",
+          "artifact": "minifi-civet-extensions",
+          "version": "1.26.02"
+        },
+        "properties": {
+          "Base Path": "streamChatListener",
+          "SSL Verify Peer": "no",
+          "Batch Size": "1",
+          "SSL Minimum Version": "TLS1.2",
+          "Buffer Size": "1",
+          "Listening Port": "8085",
+          "SSL Certificate": null,
+          "HTTP Headers to receive as Attributes (Regex)": null,
+          "Authorized DN Pattern": ".*",
+          "SSL Certificate Authority": null
+        },
+        "propertyDescriptors": {
+          "Base Path": {
+            "name": "Base Path",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "SSL Verify Peer": {
+            "name": "SSL Verify Peer",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Batch Size": {
+            "name": "Batch Size",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "SSL Minimum Version": {
+            "name": "SSL Minimum Version",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Buffer Size": {
+            "name": "Buffer Size",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Listening Port": {
+            "name": "Listening Port",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "SSL Certificate": {
+            "name": "SSL Certificate",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "HTTP Headers to receive as Attributes (Regex)": {
+            "name": "HTTP Headers to receive as Attributes (Regex)",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Authorized DN Pattern": {
+            "name": "Authorized DN Pattern",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "SSL Certificate Authority": {
+            "name": "SSL Certificate Authority",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          }
+        },
+        "style": {},
+        "annotationData": null,
+        "schedulingPeriod": "1000 ms",
+        "schedulingStrategy": "TIMER_DRIVEN",
+        "executionNode": "ALL",
+        "penaltyDuration": "30000 ms",
+        "yieldDuration": "1000 ms",
+        "bulletinLevel": "WARN",
+        "runDurationMillis": 0,
+        "concurrentlySchedulableTaskCount": 1,
+        "autoTerminatedRelationships": [],
+        "scheduledState": null,
+        "retryCount": null,
+        "retriedRelationships": null,
+        "backoffMechanism": null,
+        "maxBackoffPeriod": null,
+        "componentType": "PROCESSOR",
+        "groupIdentifier": "a9aaf51b-1fe8-4061-b75f-53fac625b784"
+      },
+      {
+        "identifier": "3a4b51f5-68b2-47e8-9175-4da30f79fc3f",
+        "instanceIdentifier": "53b90e15-0ef5-4ebc-b21d-e49b6c6dc828",
+        "name": "ListenHTTP-Transcription",
+        "comments": "",
+        "position": {
+          "x": -962.7818298339844,
+          "y": -141.2849578857422
+        },
+        "type": "org.apache.nifi.minifi.processors.ListenHTTP",
+        "bundle": {
+          "group": "org.apache.nifi.minifi",
+          "artifact": "minifi-civet-extensions",
+          "version": "1.26.02"
+        },
+        "properties": {
+          "Base Path": "transcriptions",
+          "SSL Verify Peer": "no",
+          "Batch Size": "2",
+          "SSL Minimum Version": "TLS1.2",
+          "Buffer Size": "2",
+          "Listening Port": "8084",
+          "SSL Certificate": null,
+          "HTTP Headers to receive as Attributes (Regex)": "request_id",
+          "Authorized DN Pattern": ".*",
+          "SSL Certificate Authority": null
+        },
+        "propertyDescriptors": {
+          "Base Path": {
+            "name": "Base Path",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "SSL Verify Peer": {
+            "name": "SSL Verify Peer",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Batch Size": {
+            "name": "Batch Size",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "SSL Minimum Version": {
+            "name": "SSL Minimum Version",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Buffer Size": {
+            "name": "Buffer Size",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Listening Port": {
+            "name": "Listening Port",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "SSL Certificate": {
+            "name": "SSL Certificate",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "HTTP Headers to receive as Attributes (Regex)": {
+            "name": "HTTP Headers to receive as Attributes (Regex)",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Authorized DN Pattern": {
+            "name": "Authorized DN Pattern",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "SSL Certificate Authority": {
+            "name": "SSL Certificate Authority",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          }
+        },
+        "style": {},
+        "annotationData": null,
+        "schedulingPeriod": "1000 ms",
+        "schedulingStrategy": "TIMER_DRIVEN",
+        "executionNode": "ALL",
+        "penaltyDuration": "30000 ms",
+        "yieldDuration": "1000 ms",
+        "bulletinLevel": "WARN",
+        "runDurationMillis": 0,
+        "concurrentlySchedulableTaskCount": 1,
+        "autoTerminatedRelationships": [],
+        "scheduledState": null,
+        "retryCount": null,
+        "retriedRelationships": null,
+        "backoffMechanism": null,
+        "maxBackoffPeriod": null,
+        "componentType": "PROCESSOR",
+        "groupIdentifier": "a9aaf51b-1fe8-4061-b75f-53fac625b784"
+      },
+      {
+        "identifier": "642b5495-5ce2-4462-a7d6-a52af08ed60c",
+        "instanceIdentifier": "26a47c3e-86db-4290-add0-3acb93a563f7",
+        "name": "ListenHTTP",
+        "comments": "",
+        "position": {
+          "x": -963.0117037502135,
+          "y": 53.160400209744466
+        },
+        "type": "org.apache.nifi.minifi.processors.ListenHTTP",
+        "bundle": {
+          "group": "org.apache.nifi.minifi",
+          "artifact": "minifi-civet-extensions",
+          "version": "1.26.02"
+        },
+        "properties": {
+          "Base Path": "contentListener",
+          "SSL Verify Peer": "no",
+          "Batch Size": "1",
+          "SSL Minimum Version": "TLS1.2",
+          "Buffer Size": "1",
+          "Listening Port": "8080",
+          "SSL Certificate": null,
+          "HTTP Headers to receive as Attributes (Regex)": null,
+          "Authorized DN Pattern": ".*",
+          "SSL Certificate Authority": null
+        },
+        "propertyDescriptors": {
+          "Base Path": {
+            "name": "Base Path",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "SSL Verify Peer": {
+            "name": "SSL Verify Peer",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Batch Size": {
+            "name": "Batch Size",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "SSL Minimum Version": {
+            "name": "SSL Minimum Version",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Buffer Size": {
+            "name": "Buffer Size",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Listening Port": {
+            "name": "Listening Port",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "SSL Certificate": {
+            "name": "SSL Certificate",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "HTTP Headers to receive as Attributes (Regex)": {
+            "name": "HTTP Headers to receive as Attributes (Regex)",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Authorized DN Pattern": {
+            "name": "Authorized DN Pattern",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "SSL Certificate Authority": {
+            "name": "SSL Certificate Authority",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          }
+        },
+        "style": {},
+        "annotationData": null,
+        "schedulingPeriod": "1000 ms",
+        "schedulingStrategy": "TIMER_DRIVEN",
+        "executionNode": "ALL",
+        "penaltyDuration": "30000 ms",
+        "yieldDuration": "1000 ms",
+        "bulletinLevel": "WARN",
+        "runDurationMillis": 0,
+        "concurrentlySchedulableTaskCount": 1,
+        "autoTerminatedRelationships": [],
+        "scheduledState": null,
+        "retryCount": null,
+        "retriedRelationships": null,
+        "backoffMechanism": null,
+        "maxBackoffPeriod": null,
+        "componentType": "PROCESSOR",
+        "groupIdentifier": "a9aaf51b-1fe8-4061-b75f-53fac625b784"
+      },
+      {
+        "identifier": "1e2075f4-8dd8-4eb4-86fa-64de20235a89",
+        "instanceIdentifier": "f4232357-ec0b-4ec1-87bb-171de7d87002",
+        "name": "InvokeHTTP-Speech",
+        "comments": "",
+        "position": {
+          "x": 237.4571990966797,
+          "y": -330.2716369628906
+        },
+        "type": "org.apache.nifi.minifi.processors.InvokeHTTP",
+        "bundle": {
+          "group": "org.apache.nifi.minifi",
+          "artifact": "minifi-standard-processors",
+          "version": "1.26.02"
+        },
+        "properties": {
+          "Proxy Host": null,
+          "Upload Speed Limit": null,
+          "Attributes to Send": "request_id",
+          "Invalid HTTP Header Field Handling Strategy": "transform",
+          "Download Speed Limit": null,
+          "Read Timeout": "10 min",
+          "invokehttp-proxy-password": null,
+          "Send Message Body": "true",
+          "Proxy Port": null,
+          "invokehttp-proxy-username": null,
+          "Put Response Body in Attribute": null,
+          "Connection Timeout": "5 min",
+          "send-message-body": "true",
+          "Content-type": "application/json",
+          "SSL Context Service": null,
+          "Always Output Response": "false",
+          "HTTP Method": "POST",
+          "Include Date Header": "true",
+          "Use Chunked Encoding": "false",
+          "Disable Peer Verification": "false",
+          "Penalize on \"No Retry\"": "false",
+          "Follow Redirects": "true",
+          "Remote URL": "http://localhost:13305/api/v1/audio/speech"
+        },
+        "propertyDescriptors": {
+          "Proxy Host": {
+            "name": "Proxy Host",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Upload Speed Limit": {
+            "name": "Upload Speed Limit",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Attributes to Send": {
+            "name": "Attributes to Send",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Invalid HTTP Header Field Handling Strategy": {
+            "name": "Invalid HTTP Header Field Handling Strategy",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Download Speed Limit": {
+            "name": "Download Speed Limit",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Read Timeout": {
+            "name": "Read Timeout",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "invokehttp-proxy-password": {
+            "name": "invokehttp-proxy-password",
+            "displayName": "Proxy Password",
+            "identifiesControllerService": false,
+            "sensitive": true,
+            "resourceDefinition": null
+          },
+          "Send Message Body": {
+            "name": "Send Message Body",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Proxy Port": {
+            "name": "Proxy Port",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "invokehttp-proxy-username": {
+            "name": "invokehttp-proxy-username",
+            "displayName": "Proxy Username",
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Put Response Body in Attribute": {
+            "name": "Put Response Body in Attribute",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Connection Timeout": {
+            "name": "Connection Timeout",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "send-message-body": {
+            "name": "send-message-body",
+            "displayName": "Send Body",
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Content-type": {
+            "name": "Content-type",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "SSL Context Service": {
+            "name": "SSL Context Service",
+            "displayName": null,
+            "identifiesControllerService": true,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Always Output Response": {
+            "name": "Always Output Response",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "HTTP Method": {
+            "name": "HTTP Method",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Include Date Header": {
+            "name": "Include Date Header",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Use Chunked Encoding": {
+            "name": "Use Chunked Encoding",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Disable Peer Verification": {
+            "name": "Disable Peer Verification",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Penalize on \"No Retry\"": {
+            "name": "Penalize on \"No Retry\"",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Follow Redirects": {
+            "name": "Follow Redirects",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Remote URL": {
+            "name": "Remote URL",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          }
+        },
+        "style": {},
+        "annotationData": null,
+        "schedulingPeriod": "1000 ms",
+        "schedulingStrategy": "TIMER_DRIVEN",
+        "executionNode": "ALL",
+        "penaltyDuration": "30000 ms",
+        "yieldDuration": "1000 ms",
+        "bulletinLevel": "WARN",
+        "runDurationMillis": 0,
+        "concurrentlySchedulableTaskCount": 1,
+        "autoTerminatedRelationships": [
+          "failure",
+          "retry",
+          "no retry"
+        ],
+        "scheduledState": null,
+        "retryCount": null,
+        "retriedRelationships": null,
+        "backoffMechanism": null,
+        "maxBackoffPeriod": null,
+        "componentType": "PROCESSOR",
+        "groupIdentifier": "a9aaf51b-1fe8-4061-b75f-53fac625b784"
+      },
+      {
+        "identifier": "e9c1fb42-748e-4fd4-a6ac-9ceed132ba72",
+        "instanceIdentifier": "c0da752d-957d-4a9f-902e-2f75bacfc83c",
+        "name": "PublishKafka",
+        "comments": "",
+        "position": {
+          "x": 1217.8009052276611,
+          "y": -239.40892028808594
+        },
+        "type": "org.apache.nifi.minifi.processors.PublishKafka",
+        "bundle": {
+          "group": "org.apache.nifi.minifi",
+          "artifact": "minifi-rdkafka-extensions",
+          "version": "1.26.02"
+        },
+        "properties": {
+          "Max Request Size": null,
+          "Client Name": "minifi-agent",
+          "Request Timeout": "120 sec",
+          "Target Batch Payload Size": "512 KB",
+          "Compress Codec": "none",
+          "SASL Mechanism": "GSSAPI",
+          "Topic Name": "StarlinkAI-response",
+          "Delivery Guarantee": "1",
+          "Attributes to Send as Headers": null,
+          "Security CA": null,
+          "Security Pass Phrase": null,
+          "Kerberos Principal": null,
+          "Known Brokers": "my-cluster-kafka-bootstrap.cld-streaming.svc:31623",
+          "Security Cert": null,
+          "Kerberos Keytab Path": null,
+          "Debug contexts": null,
+          "Password": null,
+          "Message Timeout": "2 min",
+          "Queue Max Buffer Size": "1 MB",
+          "Kerberos Service Name": null,
+          "Queue Max Message": "1000",
+          "Security Private Key": null,
+          "Security Protocol": "plaintext",
+          "Max Flow Segment Size": "0 B",
+          "SSL Context Service": null,
+          "Kafka Key": "${request_id}",
+          "Username": null,
+          "Fail empty flow files": "true",
+          "Queue Buffering Max Time": "5 millis",
+          "Batch Size": "10",
+          "Message Key Field": null
+        },
+        "propertyDescriptors": {
+          "Max Request Size": {
+            "name": "Max Request Size",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Client Name": {
+            "name": "Client Name",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Request Timeout": {
+            "name": "Request Timeout",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Target Batch Payload Size": {
+            "name": "Target Batch Payload Size",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Compress Codec": {
+            "name": "Compress Codec",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "SASL Mechanism": {
+            "name": "SASL Mechanism",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Topic Name": {
+            "name": "Topic Name",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Delivery Guarantee": {
+            "name": "Delivery Guarantee",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Attributes to Send as Headers": {
+            "name": "Attributes to Send as Headers",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Security CA": {
+            "name": "Security CA",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Security Pass Phrase": {
+            "name": "Security Pass Phrase",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": true,
+            "resourceDefinition": null
+          },
+          "Kerberos Principal": {
+            "name": "Kerberos Principal",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Known Brokers": {
+            "name": "Known Brokers",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Security Cert": {
+            "name": "Security Cert",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Kerberos Keytab Path": {
+            "name": "Kerberos Keytab Path",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Debug contexts": {
+            "name": "Debug contexts",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Password": {
+            "name": "Password",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": true,
+            "resourceDefinition": null
+          },
+          "Message Timeout": {
+            "name": "Message Timeout",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Queue Max Buffer Size": {
+            "name": "Queue Max Buffer Size",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Kerberos Service Name": {
+            "name": "Kerberos Service Name",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Queue Max Message": {
+            "name": "Queue Max Message",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Security Private Key": {
+            "name": "Security Private Key",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Security Protocol": {
+            "name": "Security Protocol",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Max Flow Segment Size": {
+            "name": "Max Flow Segment Size",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "SSL Context Service": {
+            "name": "SSL Context Service",
+            "displayName": null,
+            "identifiesControllerService": true,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Kafka Key": {
+            "name": "Kafka Key",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Username": {
+            "name": "Username",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Fail empty flow files": {
+            "name": "Fail empty flow files",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Queue Buffering Max Time": {
+            "name": "Queue Buffering Max Time",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Batch Size": {
+            "name": "Batch Size",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Message Key Field": {
+            "name": "Message Key Field",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          }
+        },
+        "style": {},
+        "annotationData": null,
+        "schedulingPeriod": "1000 ms",
+        "schedulingStrategy": "TIMER_DRIVEN",
+        "executionNode": "ALL",
+        "penaltyDuration": "30000 ms",
+        "yieldDuration": "1000 ms",
+        "bulletinLevel": "WARN",
+        "runDurationMillis": 2000,
+        "concurrentlySchedulableTaskCount": 8,
+        "autoTerminatedRelationships": [],
+        "scheduledState": null,
+        "retryCount": null,
+        "retriedRelationships": null,
+        "backoffMechanism": null,
+        "maxBackoffPeriod": null,
+        "componentType": "PROCESSOR",
+        "groupIdentifier": "a9aaf51b-1fe8-4061-b75f-53fac625b784"
+      },
+      {
+        "identifier": "1c39b96e-48df-4b63-8a9b-16b4074f6ac7",
+        "instanceIdentifier": "fadad7da-26bb-4803-8e1b-a808c6c99347",
+        "name": "InvokeHTTP-Transcription",
+        "comments": "",
+        "position": {
+          "x": 227.5630645751953,
+          "y": -134.6889181137085
+        },
+        "type": "org.apache.nifi.minifi.processors.InvokeHTTP",
+        "bundle": {
+          "group": "org.apache.nifi.minifi",
+          "artifact": "minifi-standard-processors",
+          "version": "1.26.02"
+        },
+        "properties": {
+          "Proxy Host": null,
+          "Upload Speed Limit": null,
+          "Attributes to Send": "request_id",
+          "Invalid HTTP Header Field Handling Strategy": "transform",
+          "Download Speed Limit": null,
+          "Read Timeout": "10 min",
+          "invokehttp-proxy-password": null,
+          "Send Message Body": "true",
+          "Proxy Port": null,
+          "invokehttp-proxy-username": null,
+          "Put Response Body in Attribute": null,
+          "Connection Timeout": "5 min",
+          "send-message-body": "true",
+          "Content-type": "${mime.type}",
+          "SSL Context Service": null,
+          "Always Output Response": "false",
+          "HTTP Method": "POST",
+          "Include Date Header": "true",
+          "Use Chunked Encoding": "false",
+          "Disable Peer Verification": "false",
+          "Penalize on \"No Retry\"": "false",
+          "Follow Redirects": "true",
+          "Remote URL": "http://localhost:13305/api/v1/audio/transcriptions"
+        },
+        "propertyDescriptors": {
+          "Proxy Host": {
+            "name": "Proxy Host",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Upload Speed Limit": {
+            "name": "Upload Speed Limit",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Attributes to Send": {
+            "name": "Attributes to Send",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Invalid HTTP Header Field Handling Strategy": {
+            "name": "Invalid HTTP Header Field Handling Strategy",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Download Speed Limit": {
+            "name": "Download Speed Limit",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Read Timeout": {
+            "name": "Read Timeout",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "invokehttp-proxy-password": {
+            "name": "invokehttp-proxy-password",
+            "displayName": "Proxy Password",
+            "identifiesControllerService": false,
+            "sensitive": true,
+            "resourceDefinition": null
+          },
+          "Send Message Body": {
+            "name": "Send Message Body",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Proxy Port": {
+            "name": "Proxy Port",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "invokehttp-proxy-username": {
+            "name": "invokehttp-proxy-username",
+            "displayName": "Proxy Username",
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Put Response Body in Attribute": {
+            "name": "Put Response Body in Attribute",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Connection Timeout": {
+            "name": "Connection Timeout",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "send-message-body": {
+            "name": "send-message-body",
+            "displayName": "Send Body",
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Content-type": {
+            "name": "Content-type",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "SSL Context Service": {
+            "name": "SSL Context Service",
+            "displayName": null,
+            "identifiesControllerService": true,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Always Output Response": {
+            "name": "Always Output Response",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "HTTP Method": {
+            "name": "HTTP Method",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Include Date Header": {
+            "name": "Include Date Header",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Use Chunked Encoding": {
+            "name": "Use Chunked Encoding",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Disable Peer Verification": {
+            "name": "Disable Peer Verification",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Penalize on \"No Retry\"": {
+            "name": "Penalize on \"No Retry\"",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Follow Redirects": {
+            "name": "Follow Redirects",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Remote URL": {
+            "name": "Remote URL",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          }
+        },
+        "style": {},
+        "annotationData": null,
+        "schedulingPeriod": "1000 ms",
+        "schedulingStrategy": "TIMER_DRIVEN",
+        "executionNode": "ALL",
+        "penaltyDuration": "30000 ms",
+        "yieldDuration": "1000 ms",
+        "bulletinLevel": "WARN",
+        "runDurationMillis": 0,
+        "concurrentlySchedulableTaskCount": 1,
+        "autoTerminatedRelationships": [
+          "failure",
+          "retry",
+          "no retry"
+        ],
+        "scheduledState": null,
+        "retryCount": null,
+        "retriedRelationships": null,
+        "backoffMechanism": null,
+        "maxBackoffPeriod": null,
+        "componentType": "PROCESSOR",
+        "groupIdentifier": "a9aaf51b-1fe8-4061-b75f-53fac625b784"
+      },
+      {
+        "identifier": "d71a6201-53e2-46ba-85a3-e23ccc156445",
+        "instanceIdentifier": "640eefd2-e8f3-4059-9304-a94fd3725cfb",
+        "name": "InvokeHTTP-StreamScreen3",
+        "comments": "",
+        "position": {
+          "x": 230.0,
+          "y": 247.0
+        },
+        "type": "org.apache.nifi.minifi.processors.InvokeHTTP",
+        "bundle": {
+          "group": "org.apache.nifi.minifi",
+          "artifact": "minifi-standard-processors",
+          "version": "1.26.02"
+        },
+        "properties": {
+          "Proxy Host": null,
+          "Upload Speed Limit": null,
+          "Attributes to Send": null,
+          "Invalid HTTP Header Field Handling Strategy": "transform",
+          "Download Speed Limit": null,
+          "Read Timeout": "10 min",
+          "invokehttp-proxy-password": null,
+          "Send Message Body": "true",
+          "Proxy Port": null,
+          "invokehttp-proxy-username": null,
+          "Put Response Body in Attribute": null,
+          "Connection Timeout": "5 min",
+          "send-message-body": "true",
+          "Content-type": "application/json",
+          "SSL Context Service": null,
+          "Always Output Response": "false",
+          "HTTP Method": "POST",
+          "Include Date Header": "true",
+          "Use Chunked Encoding": "false",
+          "Disable Peer Verification": "false",
+          "Penalize on \"No Retry\"": "false",
+          "Follow Redirects": "true",
+          "Remote URL": "http://127.0.0.1:5902/load/screen2"
+        },
+        "propertyDescriptors": {
+          "Proxy Host": {
+            "name": "Proxy Host",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Upload Speed Limit": {
+            "name": "Upload Speed Limit",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Attributes to Send": {
+            "name": "Attributes to Send",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Invalid HTTP Header Field Handling Strategy": {
+            "name": "Invalid HTTP Header Field Handling Strategy",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Download Speed Limit": {
+            "name": "Download Speed Limit",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Read Timeout": {
+            "name": "Read Timeout",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "invokehttp-proxy-password": {
+            "name": "invokehttp-proxy-password",
+            "displayName": "Proxy Password",
+            "identifiesControllerService": false,
+            "sensitive": true,
+            "resourceDefinition": null
+          },
+          "Send Message Body": {
+            "name": "Send Message Body",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Proxy Port": {
+            "name": "Proxy Port",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "invokehttp-proxy-username": {
+            "name": "invokehttp-proxy-username",
+            "displayName": "Proxy Username",
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Put Response Body in Attribute": {
+            "name": "Put Response Body in Attribute",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Connection Timeout": {
+            "name": "Connection Timeout",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "send-message-body": {
+            "name": "send-message-body",
+            "displayName": "Send Body",
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Content-type": {
+            "name": "Content-type",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "SSL Context Service": {
+            "name": "SSL Context Service",
+            "displayName": null,
+            "identifiesControllerService": true,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Always Output Response": {
+            "name": "Always Output Response",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "HTTP Method": {
+            "name": "HTTP Method",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Include Date Header": {
+            "name": "Include Date Header",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Use Chunked Encoding": {
+            "name": "Use Chunked Encoding",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Disable Peer Verification": {
+            "name": "Disable Peer Verification",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Penalize on \"No Retry\"": {
+            "name": "Penalize on \"No Retry\"",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Follow Redirects": {
+            "name": "Follow Redirects",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Remote URL": {
+            "name": "Remote URL",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          }
+        },
+        "style": {},
+        "annotationData": null,
+        "schedulingPeriod": "1000 ms",
+        "schedulingStrategy": "TIMER_DRIVEN",
+        "executionNode": "ALL",
+        "penaltyDuration": "30000 ms",
+        "yieldDuration": "1000 ms",
+        "bulletinLevel": "WARN",
+        "runDurationMillis": 0,
+        "concurrentlySchedulableTaskCount": 1,
+        "autoTerminatedRelationships": [
+          "success",
+          "response",
+          "failure",
+          "retry",
+          "no retry"
+        ],
+        "scheduledState": null,
+        "retryCount": null,
+        "retriedRelationships": null,
+        "backoffMechanism": null,
+        "maxBackoffPeriod": null,
+        "componentType": "PROCESSOR",
+        "groupIdentifier": "a9aaf51b-1fe8-4061-b75f-53fac625b784"
+      },
+      {
+        "identifier": "a4e2dd6b-dea1-4d82-a473-d9955f1adece",
+        "instanceIdentifier": "a14890af-b2fa-4534-96d9-3941fbd4083a",
+        "name": "InvokeHTTP-Embeddings",
+        "comments": "",
+        "position": {
+          "x": 232.5101318359375,
+          "y": -706.5960083007812
+        },
+        "type": "org.apache.nifi.minifi.processors.InvokeHTTP",
+        "bundle": {
+          "group": "org.apache.nifi.minifi",
+          "artifact": "minifi-standard-processors",
+          "version": "1.26.02"
+        },
+        "properties": {
+          "Proxy Host": null,
+          "Upload Speed Limit": null,
+          "Attributes to Send": "request_id",
+          "Invalid HTTP Header Field Handling Strategy": "transform",
+          "Download Speed Limit": null,
+          "Read Timeout": "10 min",
+          "invokehttp-proxy-password": null,
+          "Send Message Body": "true",
+          "Proxy Port": null,
+          "invokehttp-proxy-username": null,
+          "Put Response Body in Attribute": null,
+          "Connection Timeout": "5 min",
+          "send-message-body": "true",
+          "Content-type": "application/json",
+          "SSL Context Service": null,
+          "Always Output Response": "false",
+          "HTTP Method": "POST",
+          "Include Date Header": "true",
+          "Use Chunked Encoding": "false",
+          "Disable Peer Verification": "false",
+          "Penalize on \"No Retry\"": "false",
+          "Follow Redirects": "true",
+          "Remote URL": "http://localhost:13305/api/v1/embeddings"
+        },
+        "propertyDescriptors": {
+          "Proxy Host": {
+            "name": "Proxy Host",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Upload Speed Limit": {
+            "name": "Upload Speed Limit",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Attributes to Send": {
+            "name": "Attributes to Send",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Invalid HTTP Header Field Handling Strategy": {
+            "name": "Invalid HTTP Header Field Handling Strategy",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Download Speed Limit": {
+            "name": "Download Speed Limit",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Read Timeout": {
+            "name": "Read Timeout",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "invokehttp-proxy-password": {
+            "name": "invokehttp-proxy-password",
+            "displayName": "Proxy Password",
+            "identifiesControllerService": false,
+            "sensitive": true,
+            "resourceDefinition": null
+          },
+          "Send Message Body": {
+            "name": "Send Message Body",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Proxy Port": {
+            "name": "Proxy Port",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "invokehttp-proxy-username": {
+            "name": "invokehttp-proxy-username",
+            "displayName": "Proxy Username",
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Put Response Body in Attribute": {
+            "name": "Put Response Body in Attribute",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Connection Timeout": {
+            "name": "Connection Timeout",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "send-message-body": {
+            "name": "send-message-body",
+            "displayName": "Send Body",
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Content-type": {
+            "name": "Content-type",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "SSL Context Service": {
+            "name": "SSL Context Service",
+            "displayName": null,
+            "identifiesControllerService": true,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Always Output Response": {
+            "name": "Always Output Response",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "HTTP Method": {
+            "name": "HTTP Method",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Include Date Header": {
+            "name": "Include Date Header",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Use Chunked Encoding": {
+            "name": "Use Chunked Encoding",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Disable Peer Verification": {
+            "name": "Disable Peer Verification",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Penalize on \"No Retry\"": {
+            "name": "Penalize on \"No Retry\"",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Follow Redirects": {
+            "name": "Follow Redirects",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Remote URL": {
+            "name": "Remote URL",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          }
+        },
+        "style": {},
+        "annotationData": null,
+        "schedulingPeriod": "1000 ms",
+        "schedulingStrategy": "TIMER_DRIVEN",
+        "executionNode": "ALL",
+        "penaltyDuration": "30000 ms",
+        "yieldDuration": "1000 ms",
+        "bulletinLevel": "WARN",
+        "runDurationMillis": 0,
+        "concurrentlySchedulableTaskCount": 1,
+        "autoTerminatedRelationships": [
+          "failure",
+          "retry",
+          "no retry"
+        ],
+        "scheduledState": null,
+        "retryCount": null,
+        "retriedRelationships": null,
+        "backoffMechanism": null,
+        "maxBackoffPeriod": null,
+        "componentType": "PROCESSOR",
+        "groupIdentifier": "a9aaf51b-1fe8-4061-b75f-53fac625b784"
+      },
+      {
+        "identifier": "deb0ba12-a99e-4306-a140-a5ce22a3c683",
+        "instanceIdentifier": "626d6083-86ed-45b2-b2e3-7515c2ab0304",
+        "name": "ListenHTTP-Reranking",
+        "comments": "",
+        "position": {
+          "x": -962.7818298339844,
+          "y": -529.1524047851562
+        },
+        "type": "org.apache.nifi.minifi.processors.ListenHTTP",
+        "bundle": {
+          "group": "org.apache.nifi.minifi",
+          "artifact": "minifi-civet-extensions",
+          "version": "1.26.02"
+        },
+        "properties": {
+          "Base Path": "reranking",
+          "SSL Verify Peer": "no",
+          "Batch Size": "1",
+          "SSL Minimum Version": "TLS1.2",
+          "Buffer Size": "1",
+          "Listening Port": "8082",
+          "SSL Certificate": null,
+          "HTTP Headers to receive as Attributes (Regex)": null,
+          "Authorized DN Pattern": ".*",
+          "SSL Certificate Authority": null
+        },
+        "propertyDescriptors": {
+          "Base Path": {
+            "name": "Base Path",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "SSL Verify Peer": {
+            "name": "SSL Verify Peer",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Batch Size": {
+            "name": "Batch Size",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "SSL Minimum Version": {
+            "name": "SSL Minimum Version",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Buffer Size": {
+            "name": "Buffer Size",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Listening Port": {
+            "name": "Listening Port",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "SSL Certificate": {
+            "name": "SSL Certificate",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "HTTP Headers to receive as Attributes (Regex)": {
+            "name": "HTTP Headers to receive as Attributes (Regex)",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Authorized DN Pattern": {
+            "name": "Authorized DN Pattern",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "SSL Certificate Authority": {
+            "name": "SSL Certificate Authority",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          }
+        },
+        "style": {},
+        "annotationData": null,
+        "schedulingPeriod": "1000 ms",
+        "schedulingStrategy": "TIMER_DRIVEN",
+        "executionNode": "ALL",
+        "penaltyDuration": "30000 ms",
+        "yieldDuration": "1000 ms",
+        "bulletinLevel": "WARN",
+        "runDurationMillis": 0,
+        "concurrentlySchedulableTaskCount": 1,
+        "autoTerminatedRelationships": [],
+        "scheduledState": null,
+        "retryCount": null,
+        "retriedRelationships": null,
+        "backoffMechanism": null,
+        "maxBackoffPeriod": null,
+        "componentType": "PROCESSOR",
+        "groupIdentifier": "a9aaf51b-1fe8-4061-b75f-53fac625b784"
+      },
+      {
+        "identifier": "05f5ff56-c27b-4f37-bbed-1e2ed600e5ba",
+        "instanceIdentifier": "d52314a7-ce86-4235-9d70-1b3eb752a632",
+        "name": "EvaluateJsonPath-Speech",
+        "comments": "",
+        "position": {
+          "x": -364.3113098144531,
+          "y": -320.3775968551636
+        },
+        "type": "org.apache.nifi.minifi.processors.EvaluateJsonPath",
+        "bundle": {
+          "group": "org.apache.nifi.minifi",
+          "artifact": "minifi-standard-processors",
+          "version": "1.26.02"
+        },
+        "properties": {
+          "Destination": "flowfile-attribute",
+          "Return Type": "auto-detect",
+          "Null Value Representation": "empty string",
+          "request_id": "$.request_id",
+          "Path Not Found Behavior": "ignore"
+        },
+        "propertyDescriptors": {
+          "Destination": {
+            "name": "Destination",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Return Type": {
+            "name": "Return Type",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Null Value Representation": {
+            "name": "Null Value Representation",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Path Not Found Behavior": {
+            "name": "Path Not Found Behavior",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          }
+        },
+        "style": {},
+        "annotationData": null,
+        "schedulingPeriod": "1000 ms",
+        "schedulingStrategy": "TIMER_DRIVEN",
+        "executionNode": "ALL",
+        "penaltyDuration": "30000 ms",
+        "yieldDuration": "1000 ms",
+        "bulletinLevel": "WARN",
+        "runDurationMillis": 0,
+        "concurrentlySchedulableTaskCount": 1,
+        "autoTerminatedRelationships": [
+          "failure",
+          "unmatched"
+        ],
+        "scheduledState": null,
+        "retryCount": null,
+        "retriedRelationships": null,
+        "backoffMechanism": null,
+        "maxBackoffPeriod": null,
+        "componentType": "PROCESSOR",
+        "groupIdentifier": "a9aaf51b-1fe8-4061-b75f-53fac625b784"
+      },
+      {
+        "identifier": "239773f7-0e1f-494d-852e-12b8f871b245",
+        "instanceIdentifier": "ef985f93-575e-466d-ad69-e57eaf61ccd3",
+        "name": "EvaluateJsonPath-Embeddings",
+        "comments": "",
+        "position": {
+          "x": -354.4172821044922,
+          "y": -708.2449951171875
+        },
+        "type": "org.apache.nifi.minifi.processors.EvaluateJsonPath",
+        "bundle": {
+          "group": "org.apache.nifi.minifi",
+          "artifact": "minifi-standard-processors",
+          "version": "1.26.02"
+        },
+        "properties": {
+          "Destination": "flowfile-attribute",
+          "Return Type": "auto-detect",
+          "Null Value Representation": "empty string",
+          "request_id": "$.request_id",
+          "Path Not Found Behavior": "ignore"
+        },
+        "propertyDescriptors": {
+          "Destination": {
+            "name": "Destination",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Return Type": {
+            "name": "Return Type",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Null Value Representation": {
+            "name": "Null Value Representation",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Path Not Found Behavior": {
+            "name": "Path Not Found Behavior",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          }
+        },
+        "style": {},
+        "annotationData": null,
+        "schedulingPeriod": "1000 ms",
+        "schedulingStrategy": "TIMER_DRIVEN",
+        "executionNode": "ALL",
+        "penaltyDuration": "30000 ms",
+        "yieldDuration": "1000 ms",
+        "bulletinLevel": "WARN",
+        "runDurationMillis": 0,
+        "concurrentlySchedulableTaskCount": 1,
+        "autoTerminatedRelationships": [
+          "failure",
+          "unmatched"
+        ],
+        "scheduledState": null,
+        "retryCount": null,
+        "retriedRelationships": null,
+        "backoffMechanism": null,
+        "maxBackoffPeriod": null,
+        "componentType": "PROCESSOR",
+        "groupIdentifier": "a9aaf51b-1fe8-4061-b75f-53fac625b784"
+      },
+      {
+        "identifier": "0bc3d684-c77e-4b7a-8010-b91e5de0a3e1",
+        "instanceIdentifier": "f788f660-44f2-4f2d-9bd5-d036feaa3b04",
+        "name": "EvaluateJsonPath",
+        "comments": "",
+        "position": {
+          "x": -356.1354178034867,
+          "y": 54.719525875040404
+        },
+        "type": "org.apache.nifi.minifi.processors.EvaluateJsonPath",
+        "bundle": {
+          "group": "org.apache.nifi.minifi",
+          "artifact": "minifi-standard-processors",
+          "version": "1.26.02"
+        },
+        "properties": {
+          "Destination": "flowfile-attribute",
+          "Return Type": "auto-detect",
+          "Null Value Representation": "empty string",
+          "Path Not Found Behavior": "ignore",
+          "request_id": "$.request_id"
+        },
+        "propertyDescriptors": {
+          "Destination": {
+            "name": "Destination",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Return Type": {
+            "name": "Return Type",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Null Value Representation": {
+            "name": "Null Value Representation",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Path Not Found Behavior": {
+            "name": "Path Not Found Behavior",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          }
+        },
+        "style": {},
+        "annotationData": null,
+        "schedulingPeriod": "1000 ms",
+        "schedulingStrategy": "TIMER_DRIVEN",
+        "executionNode": "ALL",
+        "penaltyDuration": "30000 ms",
+        "yieldDuration": "1000 ms",
+        "bulletinLevel": "WARN",
+        "runDurationMillis": 0,
+        "concurrentlySchedulableTaskCount": 1,
+        "autoTerminatedRelationships": [
+          "failure",
+          "unmatched"
+        ],
+        "scheduledState": null,
+        "retryCount": null,
+        "retriedRelationships": null,
+        "backoffMechanism": null,
+        "maxBackoffPeriod": null,
+        "componentType": "PROCESSOR",
+        "groupIdentifier": "a9aaf51b-1fe8-4061-b75f-53fac625b784"
+      },
+      {
+        "identifier": "e63ea57a-b6b4-4cbe-8c48-17f3093ea13e",
+        "instanceIdentifier": "283a10bd-83c6-4567-b68b-6b9ac9a9915f",
+        "name": "ListenHTTP-Embeddings",
+        "comments": "",
+        "position": {
+          "x": -957.8348388671875,
+          "y": -724.7351684570312
+        },
+        "type": "org.apache.nifi.minifi.processors.ListenHTTP",
+        "bundle": {
+          "group": "org.apache.nifi.minifi",
+          "artifact": "minifi-civet-extensions",
+          "version": "1.26.02"
+        },
+        "properties": {
+          "Base Path": "embeddings",
+          "SSL Verify Peer": "no",
+          "Batch Size": "1",
+          "SSL Minimum Version": "TLS1.2",
+          "Buffer Size": "1",
+          "Listening Port": "8081",
+          "SSL Certificate": null,
+          "HTTP Headers to receive as Attributes (Regex)": null,
+          "Authorized DN Pattern": ".*",
+          "SSL Certificate Authority": null
+        },
+        "propertyDescriptors": {
+          "Base Path": {
+            "name": "Base Path",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "SSL Verify Peer": {
+            "name": "SSL Verify Peer",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Batch Size": {
+            "name": "Batch Size",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "SSL Minimum Version": {
+            "name": "SSL Minimum Version",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Buffer Size": {
+            "name": "Buffer Size",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Listening Port": {
+            "name": "Listening Port",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "SSL Certificate": {
+            "name": "SSL Certificate",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "HTTP Headers to receive as Attributes (Regex)": {
+            "name": "HTTP Headers to receive as Attributes (Regex)",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Authorized DN Pattern": {
+            "name": "Authorized DN Pattern",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "SSL Certificate Authority": {
+            "name": "SSL Certificate Authority",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          }
+        },
+        "style": {},
+        "annotationData": null,
+        "schedulingPeriod": "1000 ms",
+        "schedulingStrategy": "TIMER_DRIVEN",
+        "executionNode": "ALL",
+        "penaltyDuration": "30000 ms",
+        "yieldDuration": "1000 ms",
+        "bulletinLevel": "WARN",
+        "runDurationMillis": 0,
+        "concurrentlySchedulableTaskCount": 1,
+        "autoTerminatedRelationships": [],
+        "scheduledState": null,
+        "retryCount": null,
+        "retriedRelationships": null,
+        "backoffMechanism": null,
+        "maxBackoffPeriod": null,
+        "componentType": "PROCESSOR",
+        "groupIdentifier": "a9aaf51b-1fe8-4061-b75f-53fac625b784"
+      }
+    ],
+    "inputPorts": [],
+    "outputPorts": [],
+    "connections": [
+      {
+        "identifier": "455e904b-db59-43fa-a7be-be1b187a300e",
+        "instanceIdentifier": "8dfb1cf9-5546-4339-83d6-8f2e7ad7c552",
+        "name": "ListenHTTP-Transcription/success/InvokeHTTP-Transcription",
+        "comments": null,
+        "position": {
+          "x": 0.0,
+          "y": 0.0
+        },
+        "source": {
+          "id": "3a4b51f5-68b2-47e8-9175-4da30f79fc3f",
+          "type": "PROCESSOR",
+          "groupId": "a9aaf51b-1fe8-4061-b75f-53fac625b784",
+          "name": "ListenHTTP-Transcription",
+          "comments": null,
+          "instanceIdentifier": "53b90e15-0ef5-4ebc-b21d-e49b6c6dc828"
+        },
+        "destination": {
+          "id": "1c39b96e-48df-4b63-8a9b-16b4074f6ac7",
+          "type": "PROCESSOR",
+          "groupId": "a9aaf51b-1fe8-4061-b75f-53fac625b784",
+          "name": "InvokeHTTP-Transcription",
+          "comments": null,
+          "instanceIdentifier": "fadad7da-26bb-4803-8e1b-a808c6c99347"
+        },
+        "labelIndex": 1,
+        "zIndex": 0,
+        "selectedRelationships": [
+          "success"
+        ],
+        "backPressureObjectThreshold": 2000,
+        "backPressureDataSizeThreshold": "100 MB",
+        "flowFileExpiration": "0 seconds",
+        "prioritizers": [],
+        "bends": [],
+        "loadBalanceStrategy": null,
+        "partitioningAttribute": null,
+        "loadBalanceCompression": null,
+        "componentType": "CONNECTION",
+        "groupIdentifier": "a9aaf51b-1fe8-4061-b75f-53fac625b784"
+      },
+      {
+        "identifier": "11738357-1450-47d3-85ac-56c679790dcc",
+        "instanceIdentifier": "00b7e08d-0979-433b-be62-5701f8d6c915",
+        "name": "InvokeHTTP/response/PublishKafka",
+        "comments": null,
+        "position": {
+          "x": 0.0,
+          "y": 0.0
+        },
+        "source": {
+          "id": "57b60645-a7d4-489a-be15-9ef436c8d0fd",
+          "type": "PROCESSOR",
+          "groupId": "a9aaf51b-1fe8-4061-b75f-53fac625b784",
+          "name": "InvokeHTTP",
+          "comments": null,
+          "instanceIdentifier": "24bea567-957c-41b3-a465-11c6303523bd"
+        },
+        "destination": {
+          "id": "e9c1fb42-748e-4fd4-a6ac-9ceed132ba72",
+          "type": "PROCESSOR",
+          "groupId": "a9aaf51b-1fe8-4061-b75f-53fac625b784",
+          "name": "PublishKafka",
+          "comments": null,
+          "instanceIdentifier": "c0da752d-957d-4a9f-902e-2f75bacfc83c"
+        },
+        "labelIndex": 1,
+        "zIndex": 0,
+        "selectedRelationships": [
+          "response"
+        ],
+        "backPressureObjectThreshold": 2000,
+        "backPressureDataSizeThreshold": "100 MB",
+        "flowFileExpiration": "0 seconds",
+        "prioritizers": [],
+        "bends": [],
+        "loadBalanceStrategy": null,
+        "partitioningAttribute": null,
+        "loadBalanceCompression": null,
+        "componentType": "CONNECTION",
+        "groupIdentifier": "a9aaf51b-1fe8-4061-b75f-53fac625b784"
+      },
+      {
+        "identifier": "1f291eba-b73d-4dd9-a4ab-28c17c35baed",
+        "instanceIdentifier": "86afe63d-35a2-438c-91d4-855f4215a586",
+        "name": "1725e5eb-e300-4091-ba81-15e7cda29579//LogAttribute",
+        "comments": null,
+        "position": {
+          "x": 0.0,
+          "y": 0.0
+        },
+        "source": {
+          "id": "1725e5eb-e300-4091-ba81-15e7cda29579",
+          "type": "FUNNEL",
+          "groupId": "a9aaf51b-1fe8-4061-b75f-53fac625b784",
+          "name": null,
+          "comments": null,
+          "instanceIdentifier": "0604f240-7e88-4146-b38a-e65906c9c491"
+        },
+        "destination": {
+          "id": "094a3e11-6b64-4fde-9614-a52c2e74fc43",
+          "type": "PROCESSOR",
+          "groupId": "a9aaf51b-1fe8-4061-b75f-53fac625b784",
+          "name": "LogAttribute",
+          "comments": null,
+          "instanceIdentifier": "819170fa-2a24-40ca-bd9e-928a296a11a5"
+        },
+        "labelIndex": 1,
+        "zIndex": 0,
+        "selectedRelationships": [],
+        "backPressureObjectThreshold": 2000,
+        "backPressureDataSizeThreshold": "100 MB",
+        "flowFileExpiration": "0 seconds",
+        "prioritizers": [],
+        "bends": [],
+        "loadBalanceStrategy": null,
+        "partitioningAttribute": null,
+        "loadBalanceCompression": null,
+        "componentType": "CONNECTION",
+        "groupIdentifier": "a9aaf51b-1fe8-4061-b75f-53fac625b784"
+      },
+      {
+        "identifier": "84f60de9-6d83-4a97-b55c-76bdd7124c66",
+        "instanceIdentifier": "00dc5f36-ccf7-4e36-a1e5-8571b860f7de",
+        "name": "ListenHTTP-StreamScreen4/success/InvokeHTTP-StreamScreen4",
+        "comments": null,
+        "position": {
+          "x": 0.0,
+          "y": 0.0
+        },
+        "source": {
+          "id": "1a43783f-7e89-4aa3-8003-d5a565537b9f",
+          "type": "PROCESSOR",
+          "groupId": "a9aaf51b-1fe8-4061-b75f-53fac625b784",
+          "name": "ListenHTTP-StreamScreen4",
+          "comments": null,
+          "instanceIdentifier": "bf6acbce-a224-4cc0-a65d-dff92cc11890"
+        },
+        "destination": {
+          "id": "0afe0eb8-359b-4e25-bd26-07ee992fdd24",
+          "type": "PROCESSOR",
+          "groupId": "a9aaf51b-1fe8-4061-b75f-53fac625b784",
+          "name": "InvokeHTTP-StreamScreen4",
+          "comments": null,
+          "instanceIdentifier": "b31aafcc-a3a4-4af2-bf1b-253b76ca7b39"
+        },
+        "labelIndex": 1,
+        "zIndex": 0,
+        "selectedRelationships": [
+          "success"
+        ],
+        "backPressureObjectThreshold": 2000,
+        "backPressureDataSizeThreshold": "100 MB",
+        "flowFileExpiration": "0 seconds",
+        "prioritizers": [],
+        "bends": [],
+        "loadBalanceStrategy": null,
+        "partitioningAttribute": null,
+        "loadBalanceCompression": null,
+        "componentType": "CONNECTION",
+        "groupIdentifier": "a9aaf51b-1fe8-4061-b75f-53fac625b784"
+      },
+      {
+        "identifier": "d8c31fd2-17f0-4250-95d2-c1f701f5aaca",
+        "instanceIdentifier": "ed6da434-0975-4f9f-810b-279f252053b9",
+        "name": "InvokeHTTP/failure/1725e5eb-e300-4091-ba81-15e7cda29579",
+        "comments": null,
+        "position": {
+          "x": 0.0,
+          "y": 0.0
+        },
+        "source": {
+          "id": "57b60645-a7d4-489a-be15-9ef436c8d0fd",
+          "type": "PROCESSOR",
+          "groupId": "a9aaf51b-1fe8-4061-b75f-53fac625b784",
+          "name": "InvokeHTTP",
+          "comments": null,
+          "instanceIdentifier": "24bea567-957c-41b3-a465-11c6303523bd"
+        },
+        "destination": {
+          "id": "1725e5eb-e300-4091-ba81-15e7cda29579",
+          "type": "FUNNEL",
+          "groupId": "a9aaf51b-1fe8-4061-b75f-53fac625b784",
+          "name": null,
+          "comments": null,
+          "instanceIdentifier": "0604f240-7e88-4146-b38a-e65906c9c491"
+        },
+        "labelIndex": 1,
+        "zIndex": 0,
+        "selectedRelationships": [
+          "failure",
+          "retry",
+          "no retry"
+        ],
+        "backPressureObjectThreshold": 2000,
+        "backPressureDataSizeThreshold": "100 MB",
+        "flowFileExpiration": "0 seconds",
+        "prioritizers": [],
+        "bends": [],
+        "loadBalanceStrategy": null,
+        "partitioningAttribute": null,
+        "loadBalanceCompression": null,
+        "componentType": "CONNECTION",
+        "groupIdentifier": "a9aaf51b-1fe8-4061-b75f-53fac625b784"
+      },
+      {
+        "identifier": "016a1b45-6a2b-49ca-ab03-49a7f6beda22",
+        "instanceIdentifier": "1daa5f32-a831-44f7-90c2-0d64df8815f8",
+        "name": "ListenHTTP-Embeddings/success/EvaluateJsonPath-Embeddings",
+        "comments": null,
+        "position": {
+          "x": 0.0,
+          "y": 0.0
+        },
+        "source": {
+          "id": "e63ea57a-b6b4-4cbe-8c48-17f3093ea13e",
+          "type": "PROCESSOR",
+          "groupId": "a9aaf51b-1fe8-4061-b75f-53fac625b784",
+          "name": "ListenHTTP-Embeddings",
+          "comments": null,
+          "instanceIdentifier": "283a10bd-83c6-4567-b68b-6b9ac9a9915f"
+        },
+        "destination": {
+          "id": "239773f7-0e1f-494d-852e-12b8f871b245",
+          "type": "PROCESSOR",
+          "groupId": "a9aaf51b-1fe8-4061-b75f-53fac625b784",
+          "name": "EvaluateJsonPath-Embeddings",
+          "comments": null,
+          "instanceIdentifier": "ef985f93-575e-466d-ad69-e57eaf61ccd3"
+        },
+        "labelIndex": 1,
+        "zIndex": 0,
+        "selectedRelationships": [
+          "success"
+        ],
+        "backPressureObjectThreshold": 2000,
+        "backPressureDataSizeThreshold": "100 MB",
+        "flowFileExpiration": "0 seconds",
+        "prioritizers": [],
+        "bends": [],
+        "loadBalanceStrategy": null,
+        "partitioningAttribute": null,
+        "loadBalanceCompression": null,
+        "componentType": "CONNECTION",
+        "groupIdentifier": "a9aaf51b-1fe8-4061-b75f-53fac625b784"
+      },
+      {
+        "identifier": "478f1023-6a52-4f0c-8e1a-b9234a513eaa",
+        "instanceIdentifier": "46aed27b-3228-4503-9125-d1ed3b9658a9",
+        "name": "ListenHTTP-Reranking/success/EvaluateJsonPath-Reranking",
+        "comments": null,
+        "position": {
+          "x": 0.0,
+          "y": 0.0
+        },
+        "source": {
+          "id": "deb0ba12-a99e-4306-a140-a5ce22a3c683",
+          "type": "PROCESSOR",
+          "groupId": "a9aaf51b-1fe8-4061-b75f-53fac625b784",
+          "name": "ListenHTTP-Reranking",
+          "comments": null,
+          "instanceIdentifier": "626d6083-86ed-45b2-b2e3-7515c2ab0304"
+        },
+        "destination": {
+          "id": "0e306a2a-8415-4eed-83dd-e035c79476a9",
+          "type": "PROCESSOR",
+          "groupId": "a9aaf51b-1fe8-4061-b75f-53fac625b784",
+          "name": "EvaluateJsonPath-Reranking",
+          "comments": null,
+          "instanceIdentifier": "b999d1cb-b5cb-4483-9548-55c023bb7477"
+        },
+        "labelIndex": 1,
+        "zIndex": 0,
+        "selectedRelationships": [
+          "success"
+        ],
+        "backPressureObjectThreshold": 2000,
+        "backPressureDataSizeThreshold": "100 MB",
+        "flowFileExpiration": "0 seconds",
+        "prioritizers": [],
+        "bends": [],
+        "loadBalanceStrategy": null,
+        "partitioningAttribute": null,
+        "loadBalanceCompression": null,
+        "componentType": "CONNECTION",
+        "groupIdentifier": "a9aaf51b-1fe8-4061-b75f-53fac625b784"
+      },
+      {
+        "identifier": "eb791c7d-8abc-4bd1-b79e-56065c2931e1",
+        "instanceIdentifier": "18d2b60e-9a37-4d4f-89c5-811cadf18862",
+        "name": "PublishKafka/success/LogAttribute",
+        "comments": null,
+        "position": {
+          "x": 0.0,
+          "y": 0.0
+        },
+        "source": {
+          "id": "e9c1fb42-748e-4fd4-a6ac-9ceed132ba72",
+          "type": "PROCESSOR",
+          "groupId": "a9aaf51b-1fe8-4061-b75f-53fac625b784",
+          "name": "PublishKafka",
+          "comments": null,
+          "instanceIdentifier": "c0da752d-957d-4a9f-902e-2f75bacfc83c"
+        },
+        "destination": {
+          "id": "094a3e11-6b64-4fde-9614-a52c2e74fc43",
+          "type": "PROCESSOR",
+          "groupId": "a9aaf51b-1fe8-4061-b75f-53fac625b784",
+          "name": "LogAttribute",
+          "comments": null,
+          "instanceIdentifier": "819170fa-2a24-40ca-bd9e-928a296a11a5"
+        },
+        "labelIndex": 1,
+        "zIndex": 0,
+        "selectedRelationships": [
+          "success"
+        ],
+        "backPressureObjectThreshold": 2000,
+        "backPressureDataSizeThreshold": "100 MB",
+        "flowFileExpiration": "0 seconds",
+        "prioritizers": [],
+        "bends": [],
+        "loadBalanceStrategy": null,
+        "partitioningAttribute": null,
+        "loadBalanceCompression": null,
+        "componentType": "CONNECTION",
+        "groupIdentifier": "a9aaf51b-1fe8-4061-b75f-53fac625b784"
+      },
+      {
+        "identifier": "1e04feed-7ab8-4620-8444-8632349b2efb",
+        "instanceIdentifier": "ae516a9f-f866-4249-acb7-e128572d7a60",
+        "name": "EvaluateJsonPath-Reranking/matched/InvokeHTTP-Reranking",
+        "comments": null,
+        "position": {
+          "x": 0.0,
+          "y": 0.0
+        },
+        "source": {
+          "id": "0e306a2a-8415-4eed-83dd-e035c79476a9",
+          "type": "PROCESSOR",
+          "groupId": "a9aaf51b-1fe8-4061-b75f-53fac625b784",
+          "name": "EvaluateJsonPath-Reranking",
+          "comments": null,
+          "instanceIdentifier": "b999d1cb-b5cb-4483-9548-55c023bb7477"
+        },
+        "destination": {
+          "id": "0dd40719-b987-44e2-8fac-c2b6f7b5651e",
+          "type": "PROCESSOR",
+          "groupId": "a9aaf51b-1fe8-4061-b75f-53fac625b784",
+          "name": "InvokeHTTP-Reranking",
+          "comments": null,
+          "instanceIdentifier": "df1366cb-a6fa-4171-8555-5c95857bcd1b"
+        },
+        "labelIndex": 1,
+        "zIndex": 0,
+        "selectedRelationships": [
+          "matched"
+        ],
+        "backPressureObjectThreshold": 2000,
+        "backPressureDataSizeThreshold": "100 MB",
+        "flowFileExpiration": "0 seconds",
+        "prioritizers": [],
+        "bends": [],
+        "loadBalanceStrategy": null,
+        "partitioningAttribute": null,
+        "loadBalanceCompression": null,
+        "componentType": "CONNECTION",
+        "groupIdentifier": "a9aaf51b-1fe8-4061-b75f-53fac625b784"
+      },
+      {
+        "identifier": "f7e49a27-f8d9-4a7c-8a77-418bd174cc40",
+        "instanceIdentifier": "f9c4b0d3-6e14-4bc4-a3f0-b70d98cf2afb",
+        "name": "ListenHTTP-Speech/success/EvaluateJsonPath-Speech",
+        "comments": null,
+        "position": {
+          "x": 0.0,
+          "y": 0.0
+        },
+        "source": {
+          "id": "3fc61ec3-6109-41bb-8e14-ecbbdb85e71d",
+          "type": "PROCESSOR",
+          "groupId": "a9aaf51b-1fe8-4061-b75f-53fac625b784",
+          "name": "ListenHTTP-Speech",
+          "comments": null,
+          "instanceIdentifier": "3b866051-f5f3-4139-beaa-4be3e446455f"
+        },
+        "destination": {
+          "id": "05f5ff56-c27b-4f37-bbed-1e2ed600e5ba",
+          "type": "PROCESSOR",
+          "groupId": "a9aaf51b-1fe8-4061-b75f-53fac625b784",
+          "name": "EvaluateJsonPath-Speech",
+          "comments": null,
+          "instanceIdentifier": "d52314a7-ce86-4235-9d70-1b3eb752a632"
+        },
+        "labelIndex": 1,
+        "zIndex": 0,
+        "selectedRelationships": [
+          "success"
+        ],
+        "backPressureObjectThreshold": 2000,
+        "backPressureDataSizeThreshold": "100 MB",
+        "flowFileExpiration": "0 seconds",
+        "prioritizers": [],
+        "bends": [],
+        "loadBalanceStrategy": null,
+        "partitioningAttribute": null,
+        "loadBalanceCompression": null,
+        "componentType": "CONNECTION",
+        "groupIdentifier": "a9aaf51b-1fe8-4061-b75f-53fac625b784"
+      },
+      {
+        "identifier": "11615efc-eceb-42ec-9313-90a1741eb320",
+        "instanceIdentifier": "e1e19ee6-44ba-47cd-9965-6a54d7a22b7e",
+        "name": "InvokeHTTP-Transcription/success/PublishKafka",
+        "comments": null,
+        "position": {
+          "x": 0.0,
+          "y": 0.0
+        },
+        "source": {
+          "id": "1c39b96e-48df-4b63-8a9b-16b4074f6ac7",
+          "type": "PROCESSOR",
+          "groupId": "a9aaf51b-1fe8-4061-b75f-53fac625b784",
+          "name": "InvokeHTTP-Transcription",
+          "comments": null,
+          "instanceIdentifier": "fadad7da-26bb-4803-8e1b-a808c6c99347"
+        },
+        "destination": {
+          "id": "e9c1fb42-748e-4fd4-a6ac-9ceed132ba72",
+          "type": "PROCESSOR",
+          "groupId": "a9aaf51b-1fe8-4061-b75f-53fac625b784",
+          "name": "PublishKafka",
+          "comments": null,
+          "instanceIdentifier": "c0da752d-957d-4a9f-902e-2f75bacfc83c"
+        },
+        "labelIndex": 1,
+        "zIndex": 0,
+        "selectedRelationships": [
+          "success",
+          "response"
+        ],
+        "backPressureObjectThreshold": 2000,
+        "backPressureDataSizeThreshold": "100 MB",
+        "flowFileExpiration": "0 seconds",
+        "prioritizers": [],
+        "bends": [],
+        "loadBalanceStrategy": null,
+        "partitioningAttribute": null,
+        "loadBalanceCompression": null,
+        "componentType": "CONNECTION",
+        "groupIdentifier": "a9aaf51b-1fe8-4061-b75f-53fac625b784"
+      },
+      {
+        "identifier": "eb4829c7-b6f5-421d-9992-55456469eb5b",
+        "instanceIdentifier": "de806908-34b7-4b56-bee6-5aaa1608e392",
+        "name": "InvokeHTTP-Embeddings/success/PublishKafka",
+        "comments": null,
+        "position": {
+          "x": 0.0,
+          "y": 0.0
+        },
+        "source": {
+          "id": "a4e2dd6b-dea1-4d82-a473-d9955f1adece",
+          "type": "PROCESSOR",
+          "groupId": "a9aaf51b-1fe8-4061-b75f-53fac625b784",
+          "name": "InvokeHTTP-Embeddings",
+          "comments": null,
+          "instanceIdentifier": "a14890af-b2fa-4534-96d9-3941fbd4083a"
+        },
+        "destination": {
+          "id": "e9c1fb42-748e-4fd4-a6ac-9ceed132ba72",
+          "type": "PROCESSOR",
+          "groupId": "a9aaf51b-1fe8-4061-b75f-53fac625b784",
+          "name": "PublishKafka",
+          "comments": null,
+          "instanceIdentifier": "c0da752d-957d-4a9f-902e-2f75bacfc83c"
+        },
+        "labelIndex": 1,
+        "zIndex": 0,
+        "selectedRelationships": [
+          "success",
+          "response"
+        ],
+        "backPressureObjectThreshold": 2000,
+        "backPressureDataSizeThreshold": "100 MB",
+        "flowFileExpiration": "0 seconds",
+        "prioritizers": [],
+        "bends": [],
+        "loadBalanceStrategy": null,
+        "partitioningAttribute": null,
+        "loadBalanceCompression": null,
+        "componentType": "CONNECTION",
+        "groupIdentifier": "a9aaf51b-1fe8-4061-b75f-53fac625b784"
+      },
+      {
+        "identifier": "c1a27c25-0f25-4995-884a-d6b9b9b19a2d",
+        "instanceIdentifier": "2bea1896-5c0c-49b6-8cdf-5f33dd8ed097",
+        "name": "EvaluateJsonPath-Speech/matched/InvokeHTTP-Speech",
+        "comments": null,
+        "position": {
+          "x": 0.0,
+          "y": 0.0
+        },
+        "source": {
+          "id": "05f5ff56-c27b-4f37-bbed-1e2ed600e5ba",
+          "type": "PROCESSOR",
+          "groupId": "a9aaf51b-1fe8-4061-b75f-53fac625b784",
+          "name": "EvaluateJsonPath-Speech",
+          "comments": null,
+          "instanceIdentifier": "d52314a7-ce86-4235-9d70-1b3eb752a632"
+        },
+        "destination": {
+          "id": "1e2075f4-8dd8-4eb4-86fa-64de20235a89",
+          "type": "PROCESSOR",
+          "groupId": "a9aaf51b-1fe8-4061-b75f-53fac625b784",
+          "name": "InvokeHTTP-Speech",
+          "comments": null,
+          "instanceIdentifier": "f4232357-ec0b-4ec1-87bb-171de7d87002"
+        },
+        "labelIndex": 1,
+        "zIndex": 0,
+        "selectedRelationships": [
+          "matched"
+        ],
+        "backPressureObjectThreshold": 2000,
+        "backPressureDataSizeThreshold": "100 MB",
+        "flowFileExpiration": "0 seconds",
+        "prioritizers": [],
+        "bends": [],
+        "loadBalanceStrategy": null,
+        "partitioningAttribute": null,
+        "loadBalanceCompression": null,
+        "componentType": "CONNECTION",
+        "groupIdentifier": "a9aaf51b-1fe8-4061-b75f-53fac625b784"
+      },
+      {
+        "identifier": "f097d4f7-c2c4-4ac1-938f-9c134f19e0b5",
+        "instanceIdentifier": "8e51cc78-f9ff-46f3-a4c7-bd789265bc60",
+        "name": "InvokeHTTP-Speech/success/PublishKafka",
+        "comments": null,
+        "position": {
+          "x": 0.0,
+          "y": 0.0
+        },
+        "source": {
+          "id": "1e2075f4-8dd8-4eb4-86fa-64de20235a89",
+          "type": "PROCESSOR",
+          "groupId": "a9aaf51b-1fe8-4061-b75f-53fac625b784",
+          "name": "InvokeHTTP-Speech",
+          "comments": null,
+          "instanceIdentifier": "f4232357-ec0b-4ec1-87bb-171de7d87002"
+        },
+        "destination": {
+          "id": "e9c1fb42-748e-4fd4-a6ac-9ceed132ba72",
+          "type": "PROCESSOR",
+          "groupId": "a9aaf51b-1fe8-4061-b75f-53fac625b784",
+          "name": "PublishKafka",
+          "comments": null,
+          "instanceIdentifier": "c0da752d-957d-4a9f-902e-2f75bacfc83c"
+        },
+        "labelIndex": 1,
+        "zIndex": 0,
+        "selectedRelationships": [
+          "success",
+          "response"
+        ],
+        "backPressureObjectThreshold": 2000,
+        "backPressureDataSizeThreshold": "100 MB",
+        "flowFileExpiration": "0 seconds",
+        "prioritizers": [],
+        "bends": [],
+        "loadBalanceStrategy": null,
+        "partitioningAttribute": null,
+        "loadBalanceCompression": null,
+        "componentType": "CONNECTION",
+        "groupIdentifier": "a9aaf51b-1fe8-4061-b75f-53fac625b784"
+      },
+      {
+        "identifier": "68f4e92f-5c4e-4db1-9c58-2ac761a8e019",
+        "instanceIdentifier": "f9895192-8931-4f85-a9b0-bb2f5b84da5c",
+        "name": "InvokeHTTP/success/1725e5eb-e300-4091-ba81-15e7cda29579",
+        "comments": null,
+        "position": {
+          "x": 0.0,
+          "y": 0.0
+        },
+        "source": {
+          "id": "57b60645-a7d4-489a-be15-9ef436c8d0fd",
+          "type": "PROCESSOR",
+          "groupId": "a9aaf51b-1fe8-4061-b75f-53fac625b784",
+          "name": "InvokeHTTP",
+          "comments": null,
+          "instanceIdentifier": "24bea567-957c-41b3-a465-11c6303523bd"
+        },
+        "destination": {
+          "id": "e9c1fb42-748e-4fd4-a6ac-9ceed132ba72",
+          "type": "PROCESSOR",
+          "groupId": "a9aaf51b-1fe8-4061-b75f-53fac625b784",
+          "name": "PublishKafka",
+          "comments": null,
+          "instanceIdentifier": null
+        },
+        "labelIndex": 0,
+        "zIndex": 0,
+        "selectedRelationships": [
+          "success"
+        ],
+        "backPressureObjectThreshold": 2000,
+        "backPressureDataSizeThreshold": "100 MB",
+        "flowFileExpiration": "0 seconds",
+        "prioritizers": [],
+        "bends": [],
+        "loadBalanceStrategy": null,
+        "partitioningAttribute": null,
+        "loadBalanceCompression": null,
+        "componentType": "CONNECTION",
+        "groupIdentifier": "a9aaf51b-1fe8-4061-b75f-53fac625b784"
+      },
+      {
+        "identifier": "e4ecc53f-60f6-49a9-adbc-da2ba60332aa",
+        "instanceIdentifier": "13c42713-e6f0-4bf7-9b23-2ad2e2e5038e",
+        "name": "EvaluateJsonPath-Embeddings/matched/InvokeHTTP-Embeddings",
+        "comments": null,
+        "position": {
+          "x": 0.0,
+          "y": 0.0
+        },
+        "source": {
+          "id": "239773f7-0e1f-494d-852e-12b8f871b245",
+          "type": "PROCESSOR",
+          "groupId": "a9aaf51b-1fe8-4061-b75f-53fac625b784",
+          "name": "EvaluateJsonPath-Embeddings",
+          "comments": null,
+          "instanceIdentifier": "ef985f93-575e-466d-ad69-e57eaf61ccd3"
+        },
+        "destination": {
+          "id": "a4e2dd6b-dea1-4d82-a473-d9955f1adece",
+          "type": "PROCESSOR",
+          "groupId": "a9aaf51b-1fe8-4061-b75f-53fac625b784",
+          "name": "InvokeHTTP-Embeddings",
+          "comments": null,
+          "instanceIdentifier": "a14890af-b2fa-4534-96d9-3941fbd4083a"
+        },
+        "labelIndex": 1,
+        "zIndex": 0,
+        "selectedRelationships": [
+          "matched"
+        ],
+        "backPressureObjectThreshold": 2000,
+        "backPressureDataSizeThreshold": "100 MB",
+        "flowFileExpiration": "0 seconds",
+        "prioritizers": [],
+        "bends": [],
+        "loadBalanceStrategy": null,
+        "partitioningAttribute": null,
+        "loadBalanceCompression": null,
+        "componentType": "CONNECTION",
+        "groupIdentifier": "a9aaf51b-1fe8-4061-b75f-53fac625b784"
+      },
+      {
+        "identifier": "ece10a85-8d11-4f7a-a586-4ed4f2a416de",
+        "instanceIdentifier": "7cd53c5f-118b-4982-acd1-4dbb66d6dd72",
+        "name": "EvaluateJsonPath/matched/InvokeHTTP",
+        "comments": null,
+        "position": {
+          "x": 0.0,
+          "y": 0.0
+        },
+        "source": {
+          "id": "0bc3d684-c77e-4b7a-8010-b91e5de0a3e1",
+          "type": "PROCESSOR",
+          "groupId": "a9aaf51b-1fe8-4061-b75f-53fac625b784",
+          "name": "EvaluateJsonPath",
+          "comments": null,
+          "instanceIdentifier": "f788f660-44f2-4f2d-9bd5-d036feaa3b04"
+        },
+        "destination": {
+          "id": "57b60645-a7d4-489a-be15-9ef436c8d0fd",
+          "type": "PROCESSOR",
+          "groupId": "a9aaf51b-1fe8-4061-b75f-53fac625b784",
+          "name": "InvokeHTTP",
+          "comments": null,
+          "instanceIdentifier": "24bea567-957c-41b3-a465-11c6303523bd"
+        },
+        "labelIndex": 1,
+        "zIndex": 0,
+        "selectedRelationships": [
+          "matched"
+        ],
+        "backPressureObjectThreshold": 2000,
+        "backPressureDataSizeThreshold": "100 MB",
+        "flowFileExpiration": "0 seconds",
+        "prioritizers": [],
+        "bends": [],
+        "loadBalanceStrategy": null,
+        "partitioningAttribute": null,
+        "loadBalanceCompression": null,
+        "componentType": "CONNECTION",
+        "groupIdentifier": "a9aaf51b-1fe8-4061-b75f-53fac625b784"
+      },
+      {
+        "identifier": "86458c16-c62f-4a65-a121-93159ef6d558",
+        "instanceIdentifier": "403ce93c-85f3-4382-8add-c083744e921b",
+        "name": "PublishKafka/failure/LogAttribute",
+        "comments": null,
+        "position": {
+          "x": 0.0,
+          "y": 0.0
+        },
+        "source": {
+          "id": "e9c1fb42-748e-4fd4-a6ac-9ceed132ba72",
+          "type": "PROCESSOR",
+          "groupId": "a9aaf51b-1fe8-4061-b75f-53fac625b784",
+          "name": "PublishKafka",
+          "comments": null,
+          "instanceIdentifier": "c0da752d-957d-4a9f-902e-2f75bacfc83c"
+        },
+        "destination": {
+          "id": "094a3e11-6b64-4fde-9614-a52c2e74fc43",
+          "type": "PROCESSOR",
+          "groupId": "a9aaf51b-1fe8-4061-b75f-53fac625b784",
+          "name": "LogAttribute",
+          "comments": null,
+          "instanceIdentifier": "819170fa-2a24-40ca-bd9e-928a296a11a5"
+        },
+        "labelIndex": 0,
+        "zIndex": 0,
+        "selectedRelationships": [
+          "failure"
+        ],
+        "backPressureObjectThreshold": 2000,
+        "backPressureDataSizeThreshold": "100 MB",
+        "flowFileExpiration": "0 seconds",
+        "prioritizers": [],
+        "bends": [],
+        "loadBalanceStrategy": null,
+        "partitioningAttribute": null,
+        "loadBalanceCompression": null,
+        "componentType": "CONNECTION",
+        "groupIdentifier": "a9aaf51b-1fe8-4061-b75f-53fac625b784"
+      },
+      {
+        "identifier": "4d0f5ac2-5578-4d2e-87ee-07f7ae29d6ab",
+        "instanceIdentifier": "32308e06-4e76-44aa-95aa-9cb27996cf1f",
+        "name": "ListenHTTP/success/ExecuteScript",
+        "comments": null,
+        "position": {
+          "x": 0.0,
+          "y": 0.0
+        },
+        "source": {
+          "id": "642b5495-5ce2-4462-a7d6-a52af08ed60c",
+          "type": "PROCESSOR",
+          "groupId": "a9aaf51b-1fe8-4061-b75f-53fac625b784",
+          "name": "ListenHTTP",
+          "comments": null,
+          "instanceIdentifier": "26a47c3e-86db-4290-add0-3acb93a563f7"
+        },
+        "destination": {
+          "id": "0bc3d684-c77e-4b7a-8010-b91e5de0a3e1",
+          "type": "PROCESSOR",
+          "groupId": "a9aaf51b-1fe8-4061-b75f-53fac625b784",
+          "name": "EvaluateJsonPath",
+          "comments": null,
+          "instanceIdentifier": null
+        },
+        "labelIndex": 1,
+        "zIndex": 0,
+        "selectedRelationships": [
+          "success"
+        ],
+        "backPressureObjectThreshold": 2000,
+        "backPressureDataSizeThreshold": "100 MB",
+        "flowFileExpiration": "0 seconds",
+        "prioritizers": [],
+        "bends": [],
+        "loadBalanceStrategy": null,
+        "partitioningAttribute": null,
+        "loadBalanceCompression": null,
+        "componentType": "CONNECTION",
+        "groupIdentifier": "a9aaf51b-1fe8-4061-b75f-53fac625b784"
+      },
+      {
+        "identifier": "5e208c78-89c6-4383-a41b-350e423f2056",
+        "instanceIdentifier": "36d4b0eb-3f14-486b-8e8a-1ffa140a5b1b",
+        "name": "ListenHTTP-StreamScreen3/success/InvokeHTTP-StreamScreen3",
+        "comments": null,
+        "position": {
+          "x": 0.0,
+          "y": 0.0
+        },
+        "source": {
+          "id": "3dbd6bb3-6f49-4679-9ecf-ffc423d23e5d",
+          "type": "PROCESSOR",
+          "groupId": "a9aaf51b-1fe8-4061-b75f-53fac625b784",
+          "name": "ListenHTTP-StreamScreen3",
+          "comments": null,
+          "instanceIdentifier": "b1fd0ca0-eb6f-474e-8910-1a054ca8daf4"
+        },
+        "destination": {
+          "id": "d71a6201-53e2-46ba-85a3-e23ccc156445",
+          "type": "PROCESSOR",
+          "groupId": "a9aaf51b-1fe8-4061-b75f-53fac625b784",
+          "name": "InvokeHTTP-StreamScreen3",
+          "comments": null,
+          "instanceIdentifier": "640eefd2-e8f3-4059-9304-a94fd3725cfb"
+        },
+        "labelIndex": 1,
+        "zIndex": 0,
+        "selectedRelationships": [
+          "success"
+        ],
+        "backPressureObjectThreshold": 2000,
+        "backPressureDataSizeThreshold": "100 MB",
+        "flowFileExpiration": "0 seconds",
+        "prioritizers": [],
+        "bends": [],
+        "loadBalanceStrategy": null,
+        "partitioningAttribute": null,
+        "loadBalanceCompression": null,
+        "componentType": "CONNECTION",
+        "groupIdentifier": "a9aaf51b-1fe8-4061-b75f-53fac625b784"
+      },
+      {
+        "identifier": "fc57e3e4-f8bb-43f8-b69b-96af6379bb67",
+        "instanceIdentifier": "2ccb0527-1341-445e-b159-21f2997becd2",
+        "name": "InvokeHTTP-Reranking/success/PublishKafka",
+        "comments": null,
+        "position": {
+          "x": 0.0,
+          "y": 0.0
+        },
+        "source": {
+          "id": "0dd40719-b987-44e2-8fac-c2b6f7b5651e",
+          "type": "PROCESSOR",
+          "groupId": "a9aaf51b-1fe8-4061-b75f-53fac625b784",
+          "name": "InvokeHTTP-Reranking",
+          "comments": null,
+          "instanceIdentifier": "df1366cb-a6fa-4171-8555-5c95857bcd1b"
+        },
+        "destination": {
+          "id": "e9c1fb42-748e-4fd4-a6ac-9ceed132ba72",
+          "type": "PROCESSOR",
+          "groupId": "a9aaf51b-1fe8-4061-b75f-53fac625b784",
+          "name": "PublishKafka",
+          "comments": null,
+          "instanceIdentifier": "c0da752d-957d-4a9f-902e-2f75bacfc83c"
+        },
+        "labelIndex": 1,
+        "zIndex": 0,
+        "selectedRelationships": [
+          "success",
+          "response"
+        ],
+        "backPressureObjectThreshold": 2000,
+        "backPressureDataSizeThreshold": "100 MB",
+        "flowFileExpiration": "0 seconds",
+        "prioritizers": [],
+        "bends": [],
+        "loadBalanceStrategy": null,
+        "partitioningAttribute": null,
+        "loadBalanceCompression": null,
+        "componentType": "CONNECTION",
+        "groupIdentifier": "a9aaf51b-1fe8-4061-b75f-53fac625b784"
+      }
+    ],
+    "labels": [],
+    "funnels": [
+      {
+        "identifier": "1725e5eb-e300-4091-ba81-15e7cda29579",
+        "instanceIdentifier": "0604f240-7e88-4146-b38a-e65906c9c491",
+        "name": null,
+        "comments": null,
+        "position": {
+          "x": 795.1077625864752,
+          "y": 450.06231069216335
+        },
+        "componentType": "FUNNEL",
+        "groupIdentifier": "a9aaf51b-1fe8-4061-b75f-53fac625b784"
+      }
+    ],
+    "controllerServices": [],
+    "versionedFlowCoordinates": null,
+    "variables": {},
+    "parameterContextName": "ba1e25bf-58fa-47bd-8801-bb297c2b5343",
+    "defaultFlowFileExpiration": null,
+    "defaultBackPressureObjectThreshold": null,
+    "defaultBackPressureDataSizeThreshold": null,
+    "logFileSuffix": null,
+    "flowFileConcurrency": null,
+    "flowFileOutboundPolicy": null,
+    "componentType": "PROCESS_GROUP",
+    "groupIdentifier": null
+  },
+  "parameterContexts": [
+    {
+      "id": "ba1e25bf-58fa-47bd-8801-bb297c2b5343",
+      "name": "ba1e25bf-58fa-47bd-8801-bb297c2b5343",
+      "parameters": [],
+      "usage": null
+    }
+  ],
+  "versionInfo": {
+    "flowVersion": 18,
+    "lastPublished": 1785421189786,
+    "lastPublishedBy": "anonymous",
+    "dirty": false,
+    "localChanges": false
+  },
+  "localFlowRevision": 179
+}
