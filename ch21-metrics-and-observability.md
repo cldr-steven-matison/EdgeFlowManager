@@ -6,7 +6,7 @@ There are three metrics layers. They are independent — you can wire up any one
 
 1. **Layer 1 — EFM server metrics.** EFM is a Spring Boot app; it exposes an actuator Prometheus endpoint. ✅ Done.
 2. **Layer 2 — MiNiFi C++ agent metrics.** The C++ agent has a native Prometheus publisher (system + processor + repository metrics). ✅ Done.
-3. **Layer 2 (Java) — MiNiFi Java agent metrics.** Conclusively blocked at the platform level. 🚫 Final.
+3. **Layer 2 (Java) — MiNiFi Java agent metrics.** The built-in Prometheus endpoint is blocked at the platform level, but the agent's metrics reach NiFi over a Site-to-Site relay instead. 🚫 Prometheus endpoint / ✅ S2S relay.
 4. **Layer 3 — embedded / heartbeat metrics.** The smallest agents (ESP32/XIAO class) fold storage and health counters into the C2 heartbeat instead. 🟡 Design confirmed; Grafana panel out of scope here.
 
 ## The CSO Prometheus/Grafana Stack
@@ -280,9 +280,9 @@ The publisher binds `0.0.0.0`, but:
 - Confirm the host firewall allows the port (default `9936`) on the interface the scraper arrives on.
 - On StarlinkAI over Tailscale, Windows firewall rules for `9936` need attention — WindowsDesktop has `Allow EFM Port 10090` and generic Kafka `9092` rules, but no dedicated metrics `9936` rule, and Tailscale's adapter can land on a firewall profile the existing rules don't cover. Confirm metrics-over-tailnet is actually wanted before adding a rule.
 
-## Layer 2 — MiNiFi Java Agent Metrics (Blocked)
+## Layer 2 — MiNiFi Java Agent Metrics (Prometheus endpoint blocked; unblocked via S2S relay)
 
-> **⚠️ MiNiFi Java Layer 2 metrics are conclusively blocked — a confirmed platform limit. This is a final negative result, not an open question.**
+> **⚠️ The *built-in Prometheus endpoint* is conclusively blocked on an EFM/C2-managed headless Java agent — a confirmed platform limit. But that is not the end of the story: the agent's metrics still reach the operator NiFi over a Site-to-Site relay. Both the block and the unblock are documented below.**
 
 On the C++ side, enabling Prometheus metrics is a three-line properties drop-in. On the Java side (`WindowsDesktop` agent, MiNiFi Java `2.24.08.0-19`), both real paths were exhausted:
 
@@ -294,7 +294,36 @@ On the C++ side, enabling Prometheus metrics is a three-line properties drop-in.
 
 **Path B is also the only path.** Searching the exact-matching `2.24.08.0-19` source tarball (`~/efm-binaries/nifi-minifi-java-2.0.0.2.24.08.0-19-source.tar.gz`) end to end: the only Prometheus code anywhere — `org.apache.nifi.prometheusutil.*`, `PrometheusMetricsWriter` — lives inside `nifi-web-api` itself, wired directly to the embedded Jetty server. There is no separate `nifi-prometheus-nar` module. `/nifi-api/flow/metrics/prometheus` is only reachable by enabling the embedded web API. What looked like two independent paths was actually the same path.
 
-**Conclusion: on this specific platform combination — an EFM/C2-managed, headless MiNiFi Java `2.24.08.0-19` agent — there is no supported channel to get NiFi 2.x's built-in Prometheus endpoint live.** Not a config mistake, not an oversight. Direct file edit reverts on restart, the C2 protocol itself blocks the properties needed to turn the embedded web API on, and no alternative NAR-based metrics path ships in this build. A different architecture (e.g. `SiteToSiteMetricsReportingTask`, which does exist in this source tree, relaying metrics to `mynifi`'s already-open web API instead of opening one on this agent) is the only remaining avenue and is out of scope here. The C++ Layer 2 pattern is the reference for what a working MiNiFi Prometheus target looks like on this stack.
+**Conclusion for the built-in endpoint: on this specific platform combination — an EFM/C2-managed, headless MiNiFi Java `2.24.08.0-19` agent — there is no supported channel to get NiFi 2.x's built-in Prometheus endpoint live.** Not a config mistake, not an oversight. Direct file edit reverts on restart, the C2 protocol itself blocks the properties needed to turn the embedded web API on, and no alternative NAR-based metrics path ships in this build. The C++ Layer 2 pattern is the reference for what a working MiNiFi *Prometheus* target looks like on this stack.
+
+But "no Prometheus endpoint" is not "no metrics." The `nifi-site-to-site-reporting-nar` that *is* present ships a Site-to-Site relay — the unblock below.
+
+### Unblocked — Java metrics over a Site-to-Site relay
+
+The metrics goal — get the Java agent's operational state back to the same NiFi Prometheus/Grafana stack — is achievable by relaying records over secure Site-to-Site into an operator NiFi input port, instead of opening a scrape endpoint on the agent. Two routes, both field-validated:
+
+**Route 1 — EFM-managed, `PutRecord → SiteToSiteReportingRecordSink`.** A formal `ReportingTask` cannot be configured through EFM at all — every `reporting-tasks` Designer endpoint returns 404 and the Designer's `flowContent` has no `reportingTasks` key. The equivalent that *is* Designer-manageable is a **controller service** from the same NAR — `org.apache.nifi.reporting.sink.SiteToSiteReportingRecordSink` — driven by a stock `PutRecord`. The working flow:
+
+```
+GenerateFlowFile (30 sec) → ExecuteStreamCommand (reads /proc/loadavg + /proc/meminfo → JSON)
+   → PutRecord (Record Reader = JsonTreeReader, Record Sink = SiteToSiteReportingRecordSink)
+```
+
+A record transiting into the target NiFi's input port:
+
+```json
+{"agent_id":"minifi-java-agent","timestamp":1786057534,"load1":5.24,"load5":5.89,"load15":6.75,
+ "mem_total_kb":32555448,"mem_free_kb":12219880,"mem_available_kb":22280236}
+```
+
+Two wiring notes that each cost a debug cycle:
+
+- **The RecordSink's SSL Context is explicit, not inherited.** Unlike an agent's own S2S client (`nifi.minifi.flow.use.parent.ssl`), this controller service has its own `SSL Context Service` property — leave it unset and the session is unauthenticated and rejected. Point it at a `StandardRestrictedSSLContextService` carrying the agent's client keystore + CA truststore (PKCS12). The transport-protocol property key is `s2s-transport-protocol` (set `HTTP`), not a display name. EFM also rejects literal sensitive values — keystore passwords must be a Parameter Context reference (`#{…}`).
+- **`ExecuteStreamCommand` mangles an inline quoted `sh -c` script**, stripping the quote grouping so the JSON keys come out unquoted. Base64-encode the script and run `sh -c "echo <b64> | base64 -d | sh"` so no quotes reach its argument tokenizer.
+
+**Route 2 — unmanaged agent, the real `SiteToSiteMetricsReportingTask`.** An agent whose config is authored directly (not EFM/C2-managed) can run the actual reporting task, bypassing the C2 denylist. It delivers the *full* JVM/NiFi internal metric set — `jvm.heap_used`, `loadAverage1min`, `FlowFilesQueued`, GC counters, thread states — into the same input port, richer than the managed RecordSink can produce (a stock processor cannot read the agent's internal metric registry without the embedded web API).
+
+**Honest scope.** This is a metrics relay, not Prometheus parity: the managed route carries host/OS metrics, and neither route exposes a scrape endpoint on the agent. Both push records into NiFi — which is exactly where the CSO Prometheus stack already scrapes, so the edge metrics land on the same Grafana as everything else.
 
 ## Layer 3 — Embedded Heartbeat Metrics (XIAO/microfi)
 
@@ -318,4 +347,4 @@ Getting those heartbeat metrics onto a Grafana panel means going through EFM (La
 
 **Don't treat "kill the MiNiFi C++ process" as a safe unattended restart.** `Restart=on-failure` does not catch a plain `SIGTERM` — confirmed live on NvidiaNano, the agent stayed down. Use `sudo systemctl restart minifi` (requires a human at the terminal; no passwordless sudo configured).
 
-**Don't attempt to enable Java Layer 2 metrics by editing the agent's `minifi.properties` directly.** EFM regenerates that file from its C2-stored config on every agent boot — the edit reverts on the next restart. The C2 protocol itself also blocks `nifi.web.http.*` properties server-side. Both paths are exhausted.
+**Don't attempt to enable the built-in Java Prometheus endpoint by editing the agent's `minifi.properties` directly.** EFM regenerates that file from its C2-stored config on every agent boot — the edit reverts on the next restart. The C2 protocol itself also blocks `nifi.web.http.*` properties server-side. Both paths to the *built-in endpoint* are exhausted — for the working alternative, use the Site-to-Site metrics relay above, not the scrape endpoint.
