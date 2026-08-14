@@ -190,36 +190,51 @@ also why the reference architecture in this chapter and in Chapter 20 puts the a
 NiFi, not at the edge. The edge agent's job is getting bytes off the wire reliably; NiFi's job is
 understanding what they mean.
 
-## The MiNiFi Java Side — MQTT Available, Native Sparkplug Decode Unconfirmed
+## The MiNiFi Java Side — Native Sparkplug Decode at the Edge
 
-MiNiFi Java presents a different picture than C++, but not a fully symmetric one to NiFi either.
+Unlike C++, MiNiFi Java can decode Sparkplug B natively at the edge — **field-confirmed**, not just
+designed. The `ConsumeMQTTIIoT` processor is not in the stock CEM `2.24.08.0-19` tarball (the Java
+processor catalog carries no MQTT/IIoT/Sparkplug component out of the box), but it loads on a Java
+agent the same way the Kafka and scripting NARs do: drop the Cloudera CDF IIoT NAR into the agent's
+`extensions/` autoload directory.
 
-**What Java gives you on MQTT:** The Java processor catalog (field-verified at 122 processors / 51
-controller services with the NAR drop-in build — see [Chapter 4](ch04-java-processor-catalog.md))
-includes MQTT processing capability. Java MiNiFi inherits the NiFi processor bundle system, so
-wherever the MQTT NAR is present in the agent's `extensions/` directory, processors from that NAR
-are available. Java also supports the Record Reader/Writer framework, which matters here: the
-`MQTTIIoTReader` controller service (the Sparkplug B protobuf decoder that backs
-`ConsumeMQTTIIoT` in full NiFi) operates through this same framework.
+**The NAR and its dependency closure.** `ConsumeMQTTIIoT` ships in the Cloudera-proprietary
+`nifi-cdf-iiot-mqtt-nar` — parcel-only, absent from the open-source `-extension` bundle (which
+carries only the Apache `nifi-mqtt-nar`). Side-load the NAR **with its full dependency closure**, all
+at the same `group:id:version` (on CFM 4.12.0, the `2.6.0.4.12.0.x` set):
 
-**What is not yet field-verified on Java:** Whether `ConsumeMQTTIIoT` is present in the
-stock CEM `2.24.08.0-19` tarball, or is loadable via a NAR drop-in on MiNiFi Java in the same way
-the Kafka and scripting NARs were added — this has not been field-tested in this lab. The Java
-processor catalog does not list MQTT processors, IIoT processors, or any Sparkplug-aware component.
-Until a live Java MiNiFi agent is tested with the relevant NAR present, whether native Sparkplug B
-decode is achievable on MiNiFi Java must be treated as an **open item**. The pattern described in
-the source planning docs for this lab (`ConsumeMQTTIIoT` on Jetson running MiNiFi) is a design
-target for that phase, not a confirmed capability.
+```
+nifi-cdf-iiot-mqtt-nar
+  └ nifi-mqtt-nar
+      └ nifi-standard-shared-nar
+          └ nifi-standard-services-api-nar
+```
 
-**What Java can do today for Sparkplug relay:** The same relay-only pattern available in C++ applies
-in Java: `ConsumeMQTT` (generic MQTT, no protobuf decode) can subscribe to `spBv1.0/#` and forward
-raw bytes to Kafka or NiFi for downstream decode. Java additionally has the `ExecuteScript` path
-(Groovy/Clojure — not Python; see Chapter 4) which could in principle implement a Sparkplug B
-protobuf decode in Groovy if the protobuf runtime JAR is added to the agent's classpath. This is a
-custom-code path, not a stock capability.
+Restart the agent (or let the autoloader pick them up) and `ConsumeMQTTIIoT` resolves as a real type
+in the agent manifest and the EFM Designer palette. `NarUnpacker` fails the *entire* batch if any one
+side-loaded NAR is malformed, so verify each is a clean archive — the same drop-in mechanics used for
+PLC4X and IIoT on Java elsewhere in this guide.
 
-**Summary for Java:** relay via generic MQTT works; native Sparkplug B decode via
-`ConsumeMQTTIIoT` on MiNiFi Java is pending field verification.
+**One thing that surprises people coming from full NiFi: there is no separate `MQTTIIoTReader`
+controller service in the CDF IIoT NAR.** The NAR ships exactly one component — the `ConsumeMQTTIIoT`
+processor — and the Sparkplug B protobuf decode is built into it. `Record Reader` and `Record Writer`
+are *optional* properties (and must be set together if used at all); none is required to decode.
+Point `ConsumeMQTTIIoT` at `spBv1.0/#` with just a Broker URI and it decodes on its own.
+
+**What decode looks like on the agent.** With the NAR loaded and a `ConsumeMQTTIIoT` → `LogAttribute`
+flow published to the agent, a `pysparkplug` publisher's `NBIRTH`/`NDATA` messages are decoded at the
+edge exactly as they are in NiFi: every message routes via the `Message` relationship (**not**
+`parse.failure` — the agent's own parser validated them as real Sparkplug B), the topic namespace is
+parsed into `mqtt.topic.segment.*` attributes (`spBv1.0` / group / message-type / edge-node), and the
+decoded output carries the correct metric names and float32 values — `Temperature`/`Humidity`
+matching the publisher's `NBIRTH` exactly and its `NDATA` value ranges. This is the same verification
+standard used for the NiFi side below.
+
+**Relay is still an option.** If you don't want to carry the CDF NAR, the C++-style relay pattern
+works on Java too: `ConsumeMQTT` (generic MQTT, no protobuf decode) subscribes to `spBv1.0/#` and
+forwards raw bytes to Kafka or NiFi for downstream decode. But native edge decode via
+`ConsumeMQTTIIoT` is a real, confirmed capability on MiNiFi Java — the design target of putting the
+decode on a Java edge agent (rather than only in NiFi) is achievable today.
 
 ## The NiFi Side — `ConsumeMQTTIIoT`
 
@@ -475,6 +490,15 @@ convention of not blurring designed-but-untested with field-proven:
   `42.8` from the same tick), and a `SEND` provenance event confirms delivery to
   `my-cluster-kafka-bootstrap.cld-streaming.svc:9092/sparkplug_telemetry` — the same topic the
   `pysparkplug` simulator already proved reachable.
+- **Native Sparkplug B decode at the edge on MiNiFi Java.** With the Cloudera CDF
+  `nifi-cdf-iiot-mqtt-nar` (plus its dependency closure) side-loaded into a Java agent's
+  `extensions/` directory, a `ConsumeMQTTIIoT` → `LogAttribute` flow published to the agent decoded a
+  `pysparkplug` publisher's `NBIRTH`/`NDATA` messages *on the agent itself* — every message routed via
+  the `Message` relationship (zero `parse.failure`), the topic namespace parsed into
+  `mqtt.topic.segment.*` attributes, and the decoded output carried the correct metric names and
+  float32 values (`NBIRTH` `Temperature=22.0`/`Humidity=50.0` matching the publisher exactly, `NDATA`
+  values in the publisher's ranges). The CDF IIoT NAR ships no separate `MQTTIIoTReader` controller
+  service — the decode is built into `ConsumeMQTTIIoT`, with `Record Reader`/`Record Writer` optional.
 - The Primary Host Application / Rebirth-request behavior of `ConsumeMQTTIIoT` — the processor
   supports it, but no field run in this lab has exercised a live rebirth request against a
   connected edge node.
@@ -517,11 +541,11 @@ topic, per-leg, not per-flow.
 
 **Assume a MiNiFi agent has a Sparkplug-aware processor because NiFi does.** It doesn't — not
 by default, and not on C++ at all. `ConsumeMQTT`/`PublishMQTT` on the C++ agent are generic MQTT:
-fine for relay, not for decode. On MiNiFi Java, whether `ConsumeMQTTIIoT` or the `MQTTIIoTReader`
-controller service can be loaded via NAR drop-in has not been field-verified in this lab — treat
-it as an open question until tested. Don't design an edge flow around native edge-side Sparkplug
-decode without first confirming the processor is actually present and loadable in your specific
-agent build.
+fine for relay, not for decode. On MiNiFi **Java**, `ConsumeMQTTIIoT` *is* loadable via a CDF IIoT
+NAR drop-in and decodes Sparkplug B natively at the edge (confirmed above) — but it is not present
+in the stock CEM tarball, so it's there only if you side-load the `nifi-cdf-iiot-mqtt-nar` closure.
+Don't design an edge flow around native edge-side Sparkplug decode without first confirming the NAR
+is actually present and loaded in your specific agent build.
 
 **GET-then-PUT `ConsumeMQTT`/`ConsumeMQTTIIoT` when a broker password is set.** Same rule as every
 other sensitive NiFi property in this guide — check `sensitive` in the descriptor before any

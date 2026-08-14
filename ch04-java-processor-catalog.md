@@ -13,6 +13,7 @@ I run MiNiFi C++ and MiNiFi Java side-by-side in the same minikube playground, s
 | **HandleHttpRequest / HandleHttpResponse** | Not available — no pair exists in C++ | **[Cloudera stock]** — synchronous request-reply HTTP (Jetty-backed); both share an `HttpContextMap` controller service |
 | **PublishKafka / ConsumeKafka** | Present (C++ extensions) | Missing from the stock `2.24.08.0-19` tarball, but NAR drop-in fix field-verified — real transactional Kafka producer confirmed connecting |
 | **Record Reader/Writer framework** | `ConvertRecord` and `SplitRecord` present but require controller services | **[Cloudera stock]** — RecordReader/RecordWriter controller services present |
+| **Sparkplug B decode (`ConsumeMQTTIIoT`)** | No IIoT/Sparkplug processor; `ConsumeMQTT` is generic MQTT relay only | Not in the stock tarball, but loadable via the Cloudera CDF `nifi-cdf-iiot-mqtt-nar` drop-in — native Sparkplug B protobuf decode at the edge, field-verified (see [Chapter 13](ch13-efm-and-sparkplug-mqtt.md)) |
 | **Scripting engines** | None without extra-extensions | Shell via `ExecuteProcess`/`ExecuteStreamCommand` in stock; Groovy/Clojure via NAR drop-in |
 | **Total processors** | 74 (stock), more via extra-extensions | 114 stock, **122 field-verified live in production** after the Kafka/scripting NAR drop-in |
 | **Image size** | ~15 MB | ~300–400 MB |
