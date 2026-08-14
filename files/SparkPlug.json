@@ -17,8 +17,8 @@
         "name": "PublishKafka-XiaoTelemetry",
         "comments": "",
         "position": {
-          "x": 240.0,
-          "y": -96.0
+          "x": 392.0,
+          "y": 120.0
         },
         "type": "org.apache.nifi.processors.kafka.pubsub.PublishKafka_2_6",
         "bundle": {
@@ -274,6 +274,91 @@
           "success",
           "failure"
         ],
+        "scheduledState": "ENABLED",
+        "retryCount": 10,
+        "retriedRelationships": [],
+        "backoffMechanism": "PENALIZE_FLOWFILE",
+        "maxBackoffPeriod": "10 mins",
+        "componentType": "PROCESSOR",
+        "groupIdentifier": "8df80367-0200-31d4-86d7-13c2d4c804d1"
+      },
+      {
+        "identifier": "8fe0099c-1bcf-3aeb-aee8-d2085027c6b5",
+        "instanceIdentifier": "028cf838-01a0-1000-ffff-ffff8a49c299",
+        "name": "ExtractDeviceId",
+        "comments": "",
+        "position": {
+          "x": 392.0,
+          "y": -88.0
+        },
+        "type": "org.apache.nifi.processors.standard.EvaluateJsonPath",
+        "bundle": {
+          "group": "org.apache.nifi",
+          "artifact": "nifi-standard-nar",
+          "version": "2.6.0.4.3.4.0-234"
+        },
+        "properties": {
+          "Destination": "flowfile-attribute",
+          "device_id": "$.device_id",
+          "Max String Length": "20 MB",
+          "Return Type": "auto-detect",
+          "Null Value Representation": "empty string",
+          "Path Not Found Behavior": "ignore"
+        },
+        "propertyDescriptors": {
+          "Destination": {
+            "name": "Destination",
+            "displayName": "Destination",
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "dynamic": false
+          },
+          "device_id": {
+            "name": "device_id",
+            "displayName": "device_id",
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "dynamic": true
+          },
+          "Max String Length": {
+            "name": "Max String Length",
+            "displayName": "Max String Length",
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "dynamic": false
+          },
+          "Return Type": {
+            "name": "Return Type",
+            "displayName": "Return Type",
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "dynamic": false
+          },
+          "Null Value Representation": {
+            "name": "Null Value Representation",
+            "displayName": "Null Value Representation",
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "dynamic": false
+          },
+          "Path Not Found Behavior": {
+            "name": "Path Not Found Behavior",
+            "displayName": "Path Not Found Behavior",
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "dynamic": false
+          }
+        },
+        "style": {},
+        "schedulingPeriod": "0 sec",
+        "schedulingStrategy": "TIMER_DRIVEN",
+        "executionNode": "ALL",
+        "penaltyDuration": "30 sec",
+        "yieldDuration": "1 sec",
+        "bulletinLevel": "WARN",
+        "runDurationMillis": 0,
+        "concurrentlySchedulableTaskCount": 1,
+        "autoTerminatedRelationships": [],
         "scheduledState": "ENABLED",
         "retryCount": 10,
         "retriedRelationships": [],
@@ -559,7 +644,7 @@
         "name": "ConsumeMQTT",
         "comments": "",
         "position": {
-          "x": 240.0,
+          "x": 392.0,
           "y": -296.0
         },
         "type": "org.apache.nifi.processors.mqtt.ConsumeMQTT",
@@ -1028,8 +1113,8 @@
         "prioritizers": [],
         "bends": [
           {
-            "x": -312.0,
-            "y": -32.0
+            "x": 40.0,
+            "y": -120.0
           }
         ],
         "loadBalanceStrategy": "DO_NOT_LOAD_BALANCE",
@@ -1068,12 +1153,82 @@
         "prioritizers": [],
         "bends": [
           {
-            "x": 488.0,
-            "y": -32.0
+            "x": 288.0,
+            "y": -120.0
           }
         ],
         "loadBalanceStrategy": "DO_NOT_LOAD_BALANCE",
         "partitioningAttribute": "",
+        "loadBalanceCompression": "DO_NOT_COMPRESS",
+        "componentType": "CONNECTION",
+        "groupIdentifier": "8df80367-0200-31d4-86d7-13c2d4c804d1"
+      },
+      {
+        "identifier": "eaa09f3d-5918-3876-891e-ca1680470bb1",
+        "instanceIdentifier": "028da237-01a0-1000-ffff-fffff1ec8421",
+        "source": {
+          "id": "8fe0099c-1bcf-3aeb-aee8-d2085027c6b5",
+          "type": "PROCESSOR",
+          "groupId": "8df80367-0200-31d4-86d7-13c2d4c804d1",
+          "name": "ExtractDeviceId",
+          "comments": "",
+          "instanceIdentifier": "028cf838-01a0-1000-ffff-ffff8a49c299"
+        },
+        "destination": {
+          "id": "bb18776f-43b7-3c78-ac1d-ef1cb25aa956",
+          "type": "PROCESSOR",
+          "groupId": "8df80367-0200-31d4-86d7-13c2d4c804d1",
+          "name": "PublishKafka-XiaoTelemetry",
+          "comments": "",
+          "instanceIdentifier": "ce83c79f-019f-1000-ffff-ffffc72a1d30"
+        },
+        "labelIndex": 1,
+        "zIndex": 0,
+        "selectedRelationships": [
+          "failure",
+          "matched",
+          "unmatched"
+        ],
+        "backPressureObjectThreshold": 10000,
+        "backPressureDataSizeThreshold": "1 GB",
+        "flowFileExpiration": "0 sec",
+        "prioritizers": [],
+        "bends": [],
+        "loadBalanceStrategy": "DO_NOT_LOAD_BALANCE",
+        "loadBalanceCompression": "DO_NOT_COMPRESS",
+        "componentType": "CONNECTION",
+        "groupIdentifier": "8df80367-0200-31d4-86d7-13c2d4c804d1"
+      },
+      {
+        "identifier": "ae13c887-7923-317d-9237-a82f60c15ef6",
+        "instanceIdentifier": "028da15d-01a0-1000-ffff-ffff8a594c51",
+        "source": {
+          "id": "9a10c8be-679c-382a-bea8-73a81d0ef55a",
+          "type": "PROCESSOR",
+          "groupId": "8df80367-0200-31d4-86d7-13c2d4c804d1",
+          "name": "ConsumeMQTT",
+          "comments": "",
+          "instanceIdentifier": "25802db8-4dfc-32fe-b9fa-d30b1e360049"
+        },
+        "destination": {
+          "id": "8fe0099c-1bcf-3aeb-aee8-d2085027c6b5",
+          "type": "PROCESSOR",
+          "groupId": "8df80367-0200-31d4-86d7-13c2d4c804d1",
+          "name": "ExtractDeviceId",
+          "comments": "",
+          "instanceIdentifier": "028cf838-01a0-1000-ffff-ffff8a49c299"
+        },
+        "labelIndex": 1,
+        "zIndex": 0,
+        "selectedRelationships": [
+          "Message"
+        ],
+        "backPressureObjectThreshold": 10000,
+        "backPressureDataSizeThreshold": "1 GB",
+        "flowFileExpiration": "0 sec",
+        "prioritizers": [],
+        "bends": [],
+        "loadBalanceStrategy": "DO_NOT_LOAD_BALANCE",
         "loadBalanceCompression": "DO_NOT_COMPRESS",
         "componentType": "CONNECTION",
         "groupIdentifier": "8df80367-0200-31d4-86d7-13c2d4c804d1"
@@ -1097,41 +1252,6 @@
           "name": "PublishKafka-SparkplugTelemetry",
           "comments": "",
           "instanceIdentifier": "ce83c7da-019f-1000-ffff-ffff9c1f31b0"
-        },
-        "labelIndex": 1,
-        "zIndex": 0,
-        "selectedRelationships": [
-          "Message"
-        ],
-        "backPressureObjectThreshold": 10000,
-        "backPressureDataSizeThreshold": "1 GB",
-        "flowFileExpiration": "0 sec",
-        "prioritizers": [],
-        "bends": [],
-        "loadBalanceStrategy": "DO_NOT_LOAD_BALANCE",
-        "loadBalanceCompression": "DO_NOT_COMPRESS",
-        "componentType": "CONNECTION",
-        "groupIdentifier": "8df80367-0200-31d4-86d7-13c2d4c804d1"
-      },
-      {
-        "identifier": "14d22de2-2062-37a2-bf46-e2cf3c4107d5",
-        "instanceIdentifier": "ce83c7f4-019f-1000-0000-0000713895c4",
-        "name": "ConsumeMQTT/Message/PublishKafka-XiaoTelemetry",
-        "source": {
-          "id": "9a10c8be-679c-382a-bea8-73a81d0ef55a",
-          "type": "PROCESSOR",
-          "groupId": "8df80367-0200-31d4-86d7-13c2d4c804d1",
-          "name": "ConsumeMQTT",
-          "comments": "",
-          "instanceIdentifier": "25802db8-4dfc-32fe-b9fa-d30b1e360049"
-        },
-        "destination": {
-          "id": "bb18776f-43b7-3c78-ac1d-ef1cb25aa956",
-          "type": "PROCESSOR",
-          "groupId": "8df80367-0200-31d4-86d7-13c2d4c804d1",
-          "name": "PublishKafka-XiaoTelemetry",
-          "comments": "",
-          "instanceIdentifier": "ce83c79f-019f-1000-ffff-ffffc72a1d30"
         },
         "labelIndex": 1,
         "zIndex": 0,

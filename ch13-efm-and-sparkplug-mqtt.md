@@ -276,8 +276,14 @@ ConsumeMQTTIIoT     (Topic Filter: spBv1.0/#)          → PublishKafka  (topic:
 Both legs terminate in their own `PublishKafka` processor, each with its own topic, keyed on
 `${device_id}`:
 
-- `ConsumeMQTT` → **`PublishKafka-XiaoTelemetry`** — topic `xiao_telemetry`.
-- `ConsumeMQTTIIoT` → **`PublishKafka-SparkplugTelemetry`** — topic `sparkplug_telemetry`.
+- `ConsumeMQTT` → **`ExtractDeviceId`** (`EvaluateJsonPath`, `device_id` from `$.device_id`) →
+  **`PublishKafka-XiaoTelemetry`** — topic `xiao_telemetry`. The JSON publisher carries its own
+  agent-class name in the payload, so the Kafka key resolves to the device's class identity
+  (verified live: records keyed `MicroFi-1`).
+- `ConsumeMQTTIIoT` → **`PublishKafka-SparkplugTelemetry`** — topic `sparkplug_telemetry`. On
+  this leg the device identity travels in the Sparkplug topic segments
+  (`spBv1.0/<group>/<type>/<edge-node>`), not a `device_id` attribute, so records currently
+  carry a null key.
 
 Both point at the same broker: `my-cluster-kafka-bootstrap.cld-streaming.svc:9092`, `PLAINTEXT`, no
 SASL — the same Kafka connection settings used by other live processors in this cluster, not

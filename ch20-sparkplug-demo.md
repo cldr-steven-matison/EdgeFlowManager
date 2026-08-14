@@ -11,7 +11,7 @@ This is the second real-world finale demo: an edge device publishing MQTT teleme
 
 ## NiFi Ingestion — The `SparkPlug` Process Group
 
-A NiFi process group named `SparkPlug` (exported at [`files/SparkPlug.json`](../files/SparkPlug.json)) holds the two-leg pattern Chapter 13 documents in full — `ConsumeMQTT` on the plain-JSON topic, `ConsumeMQTTIIoT` on `spBv1.0/#`. Both terminated at a dead-end `EOL` output port for a long time — the PG was built far enough to prove MQTT ingestion worked, but never wired to Kafka. The committed export now contains `PublishKafka` on both legs; the live running NiFi instance still dead-ends at `EOL` pending the live re-wire.
+A NiFi process group named `SparkPlug` (exported at [`files/SparkPlug.json`](../files/SparkPlug.json)) holds the two-leg pattern Chapter 13 documents in full — `ConsumeMQTT` on the plain-JSON topic, `ConsumeMQTTIIoT` on `spBv1.0/#`. Both terminated at a dead-end `EOL` output port for a long time — the PG was built far enough to prove MQTT ingestion worked, but never wired to Kafka. **As of 2026-08-14 the live instance is wired and delivering (#164):** both legs publish to Kafka with real MicroFi device traffic confirmed end-to-end, and the committed export matches the live flow.
 
 ### Incident — The PG Had Been Silently Deleted, Not Just Stale
 
@@ -32,8 +32,8 @@ curl -k -u "$NIFI_USER:$NIFI_PASS" \
 
 Both legs got their own `PublishKafka`:
 
-- `ConsumeMQTT` → **`PublishKafka-XiaoTelemetry`** — topic `xiao_telemetry`, key `${device_id}`. Replaces the `EOL` dead-end for the `Message` relationship.
-- `ConsumeMQTTIIoT` → **`PublishKafka-SparkplugTelemetry`** — topic `sparkplug_telemetry`, key `${device_id}`. The binary Sparkplug B path has since been field-validated end to end: a real XIAO ESP32-S3 producing genuine Sparkplug B binary payloads, `ConsumeMQTTIIoT` decoding them, and a `SEND` provenance event confirming delivery to `sparkplug_telemetry` — the full field-validation story is in [Chapter 13](ch13-efm-and-sparkplug-mqtt.md). Note that this wiring exists in the committed export ([`files/SparkPlug.json`](../files/SparkPlug.json)); on the live running NiFi instance both legs still dead-end at an `EOL` output port — the live re-wire and re-export are still pending.
+- `ConsumeMQTT` → **`ExtractDeviceId`** (`EvaluateJsonPath`, `device_id` from `$.device_id`) → **`PublishKafka-XiaoTelemetry`** — topic `xiao_telemetry`, key `${device_id}`. Replaces the `EOL` dead-end for the `Message` relationship. The MicroFi telemetry publisher's payload is JSON carrying its own agent-class name (`{"device_id":"MicroFi-1"}`), so the Kafka key is the device's class identity — verified live: consumed records key on `MicroFi-1`.
+- `ConsumeMQTTIIoT` → **`PublishKafka-SparkplugTelemetry`** — topic `sparkplug_telemetry`, key `${device_id}`. The binary Sparkplug B path is field-validated end to end on the live instance (2026-08-14): a real XIAO ESP32-S3 (`MicroFi-3`, running the unified MicroFi firmware's `PublishSparkplug` processor) producing genuine Sparkplug B `NBIRTH`/`NDATA` on `spBv1.0/MicroFi/…/MicroFi-3`, consumed and delivered to `sparkplug_telemetry` — the Sparkplug leg's device identity travels in its topic segments rather than a `device_id` attribute, so records on this leg currently carry a null key. The full protocol story is in [Chapter 13](ch13-efm-and-sparkplug-mqtt.md).
 - `parse.failure` on both legs still routes to `EOL`, unchanged.
 - Kafka connection settings (`my-cluster-kafka-bootstrap.cld-streaming.svc:9092`, `PLAINTEXT`, no SASL) were copied from other live processors in the same cluster, not guessed.
 
