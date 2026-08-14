@@ -295,11 +295,50 @@ Every entry uses the same card so the gallery reads consistently:
 
 ---
 
+## Entry 10 — SparkPlug / MQTT Two-Leg Ingest (MicroFi ESP32 → NiFi → Kafka)
+
+- **Name:** `sparkplug-mqtt-to-kafka`
+- **Purpose:** Ingest both kinds of edge MQTT publisher at once — plain-JSON telemetry and spec-compliant Sparkplug B (`NBIRTH`/`NDATA`, protobuf) — through one Mosquitto broker into per-kind Kafka topics, keyed by the device's agent-class identity.
+- **Agent:** **MicroFi** (ESP32-S3 XIAO, compile-time processor registry, EFM-managed) — class `MicroFi-1` publishes the JSON leg; class `MicroFi-3` publishes real Sparkplug B via the unified firmware's native `PublishSparkplug` processor (branch `feature/publish-sparkplug`, wrapping the field-proven `EmbeddedSparkplugNode`/nanopb stack). NiFi side is the `SparkPlug` PG on the CFM-operator NiFi (`cfm-streaming`/`mynifi`). EFM `2.3.1.0-2`.
+- **Shape:**
+  ```
+  # device side (EFM-pushed)
+  MicroFi-1:  GenerateFlowFile ({"device_id":"MicroFi-1"}) ─(success)─→ PublishMQTT   (test/sensor/data)
+  MicroFi-3:  GenerateFlowFile-SpbTick ─(success)─→ PublishSparkplug  (spBv1.0/MicroFi/…/MicroFi-3)
+
+  # NiFi side (SparkPlug PG)
+  ConsumeMQTT     (test/sensor/data) ─(Message)─→ ExtractDeviceId (EvaluateJsonPath $.device_id)
+                                     ─(matched…)─→ PublishKafka-XiaoTelemetry      (topic xiao_telemetry, key ${device_id})
+  ConsumeMQTTIIoT (spBv1.0/#)        ─(Message)─→ PublishKafka-SparkplugTelemetry  (topic sparkplug_telemetry)
+  ```
+- **Files:** [`files/SparkPlug.json`](../files/SparkPlug.json) (NiFi PG export, current with live) · device flow exports and proof log in [DesktopShare `files/issue-164/`](https://github.com/cldr-steven-matison/DesktopShare/tree/issue-164-sparkplug-kafka/files/issue-164)
+- **Verification:**
+  ```bash
+  # broker: both payload kinds arriving
+  kubectl exec -n mqtt deploy/mosquitto -- mosquitto_sub -v -t 'test/sensor/data' -t 'spBv1.0/#'
+
+  # Kafka: JSON leg keyed by device class
+  kubectl exec -n cld-streaming my-cluster-combined-0 -- \
+    /opt/kafka/bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 \
+    --topic xiao_telemetry --property print.key=true --property key.separator=" | " --timeout-ms 15000
+  # expected: MicroFi-1 | {"device_id":"MicroFi-1"}
+
+  # Kafka: Sparkplug B leg (binary protobuf records — NBIRTH then NDATA)
+  kubectl exec -n cld-streaming my-cluster-combined-0 -- \
+    /opt/kafka/bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 \
+    --topic sparkplug_telemetry --timeout-ms 15000
+  ```
+- **Status:** ✅ field-validated live 2026-08-14 ([#164](https://github.com/cldr-steven-matison/DesktopShare/issues/164)) with real device traffic on both legs. Protocol mechanics: [Chapter 13](ch13-efm-and-sparkplug-mqtt.md); demo narrative: [Chapter 20](ch20-sparkplug-demo.md).
+
+> **⚠️ Sparkplug B needs a real encoder, not a topic convention.** Publishing JSON to an `spBv1.0/#` topic is not Sparkplug B — the payload must be the protobuf `Payload` with `bdSeq`/`seq` lifecycle semantics, which is exactly what the MicroFi `PublishSparkplug` processor (or the retired Arduino sketch it absorbed) provides, and why `ConsumeMQTT` + `EvaluateJsonPath` can't decode this leg.
+
+---
+
 ## Pending Entries
 
 These flows are planned but don't yet have a folded, field-validated chapter behind them. Each becomes a full card above once its chapter lands.
 
-- **SparkPlug / MQTT ingest** (Ch20): the SparkPlug demo chapter.
+- *(none currently pending)*
 
 ---
 
