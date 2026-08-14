@@ -1,5 +1,7 @@
 # Chapter 19: EFM + NVIDIA Jetson use case
 
+![Local AI At the Edge with Jetson](images/efm-nvidia-jetson.png)
+
 This chapter walks through enrolling a Jetson Orin Nano (device `NvidiaNano`, hostname `tunastreet`, aarch64) as a MiNiFi C++ agent under EFM, delivering a TensorRT inference script as an agent resource, publishing an edge flow, and confirming the full `ListenHTTP → ExecuteScript → PublishKafka` chain end to end on real hardware. Everything here is field-captured on the actual board.
 
 > **⚠️ Device-class assignment note.** The `NvidiaNano` agent class used throughout this chapter is the current assignment. The device-class roster may shift over time, so do not treat `NvidiaNano` as a permanent class name — check the current class assignment before building dependent flows or tooling.
