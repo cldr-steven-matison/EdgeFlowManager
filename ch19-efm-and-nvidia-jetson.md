@@ -2,7 +2,7 @@
 
 ![Local AI At the Edge with Jetson](images/efm-nvidia-jetson.png)
 
-This chapter walks through enrolling a Jetson Orin Nano (device `NvidiaNano`, hostname `tunastreet`, aarch64) as a MiNiFi C++ agent under EFM, delivering a TensorRT inference script as an agent resource, publishing an edge flow, and confirming the full `ListenHTTP → ExecuteScript → PublishKafka` chain end to end on real hardware. Everything here is field-captured on the actual board.
+This chapter covers the full lifecycle of the Jetson Orin Nano (device `NvidiaNano`, hostname `tunastreet`, aarch64) as an EFM-managed edge agent. The board was first brought up running a MiNiFi C++ agent — enrolled against the `NvidiaNano` class, validated end to end with a `ListenHTTP → ExecuteScript → PublishKafka` TensorRT flow. The class has since been repurposed: the C++ agent went stale and is currently `MISSING`; the `NvidiaNano` class today runs a MiNiFi Java agent delivering a three-leg `HandleHttpRequest → InvokeHTTP → HandleHttpResponse` synchronous inference flow. Both runtimes are documented here in historical order: the C++ bring-up first, then the current Java production flow. Everything is field-captured on the actual board.
 
 > **⚠️ Device-class assignment note.** The `NvidiaNano` agent class used throughout this chapter is the current assignment. The device-class roster may shift over time, so do not treat `NvidiaNano` as a permanent class name — check the current class assignment before building dependent flows or tooling.
 
@@ -200,7 +200,9 @@ Field-captured on WindowsDesktop from the live pod — the C++ build only logs *
 
 The `KubernetesPod` class shows **Good Health** with `minifi-agent-k8s-gaming` enrolled and reporting.
 
-## Enrolling the Jetson Orin Nano
+## Enrolling the Jetson Orin Nano (Historical — C++ First Bring-Up)
+
+> **Note:** This section records the original C++ agent enrollment — the `agentType=cpp`, `linuxaarch64` recipe that first brought the Jetson up under EFM. The `NvidiaNano` class now runs the Java agent described later in this chapter; the C++ agent is currently retired/`MISSING`. Keep this section as the bring-up reference; do not treat it as the current production path.
 
 Generate a unique agent identifier and fetch the agent CLI command for `linuxaarch64`. Replace `<YOUR_EFM_HOST_IP>` with your actual lab machine LAN IP:
 
@@ -232,7 +234,7 @@ The agent appears in EFM → **Monitor** → **Agents** under class `NvidiaNano`
 
 ![NvidiaNano class in EFM → Monitor → Agents — Good Health, Jetson agent enrolled](images/efm-NvidiaNano-Class.jpg)
 
-The `NvidiaNano` class shows **Good Health** with the Jetson Orin Nano's C++ agent enrolled and reporting. The `NvidiaNano` class is field-confirmed operational.
+The `NvidiaNano` class showed **Good Health** with the Jetson Orin Nano's C++ agent enrolled and reporting at first bring-up. The C++ agent has since gone stale/`MISSING`; the class was repurposed for the Java agent described later in this chapter.
 
 > **⚠️ Device-class reminder.** As noted above, the `NvidiaNano` class name may change if the device-class roster shifts. Update any automation or flow references at that point.
 
@@ -488,7 +490,9 @@ kubectl port-forward -n cld-streaming deploy/efm 10190:10090 &
 curl -s http://localhost:10190/efm/actuator/prometheus | head
 ```
 
-### Layer 2 — Jetson Agent Metrics (Field-Validated on NvidiaNano)
+### Layer 2 — Jetson Agent Metrics
+
+#### C++ Agent Path (Field-Validated at First Bring-Up)
 
 MiNiFi C++ has a native Prometheus publisher — no `ExecuteScript`, no sidecar — shipped as `libminifi-prometheus.so`. The correct property namespace is `nifi.metrics.publisher.*` (not `nifi.c2.enable.metrics`/`nifi.c2.metrics.publisher.*` — those don't exist in this build, confirmed against the binary and shipped config template).
 
@@ -502,7 +506,7 @@ nifi.metrics.publisher.PrometheusMetricsPublisher.port=9936
 nifi.metrics.publisher.metrics=QueueMetrics,RepositoryMetrics,DeviceInfoNode,FlowInformation
 ```
 
-Confirmed live on the Jetson after restart:
+Confirmed live on the Jetson (C++ agent) after restart:
 
 ```text
 [...] [PrometheusExposerWrapper] [info] Started Prometheus metrics publisher on port 9936
@@ -515,6 +519,10 @@ $ curl -s http://127.0.0.1:9936/metrics | wc -l
 Binds `0.0.0.0` (confirmed via `ss`), so it is LAN-reachable in principle. Confirm the host firewall allows `9936` inbound on this device's `ufw` before wiring the CSO Prometheus scrape side — don't add the rule reflexively until the scrape target is actually wanted. The CSO Prometheus scrape-target wiring and Grafana panel are covered in [Chapter 21 (Metrics & Observability)](ch21-metrics-and-observability.md).
 
 > **⚠️ Restarting to apply metrics config.** `sudo systemctl restart minifi` is the only reliable path — see the restart section above. The same caveat applies here: `minifi.sh restart` calls systemctl internally; a direct `kill` leaves the agent inactive with no automatic respawn.
+
+#### Java Agent Metrics Path (Pending)
+
+The above C++ path (`libminifi-prometheus.so`, `nifi.metrics.publisher.*`, port 9936) applies only to the MiNiFi C++ runtime. The current production agent on this class is MiNiFi Java. MiNiFi Java does not use `libminifi-prometheus.so` or the `nifi.metrics.publisher.*` property namespace. The metrics wiring for the Java agent — property configuration, scrape target, and Grafana panel — has not yet been documented or validated on this device and remains an open item. See [Chapter 21 (Metrics & Observability)](ch21-metrics-and-observability.md) for the in-progress work on that path.
 
 ## What NOT to Do
 
@@ -547,7 +555,9 @@ kubectl port-forward --address 0.0.0.0 svc/my-cluster-combined-2 30336:9094 -n c
 ss -tlnp | grep -E "31623|31850|31935|30336"
 ```
 
-### Enroll the Jetson Agent (linuxaarch64)
+### Enroll the Jetson Agent — C++ (Historical First Bring-Up, linuxaarch64)
+
+> **Note:** This is the original C++ enrollment recipe (`agentType=cpp`). The `NvidiaNano` class today runs the Java agent; this command is retained as the bring-up reference for the C++ runtime only.
 
 ```bash
 curl -L \

@@ -1,12 +1,12 @@
 # Chapter 13: EFM and Sparkplug MQTT
 
 This chapter is the protocol-and-processor reference for Sparkplug B: what the spec actually
-defines, how it rides on MQTT, what MiNiFi C++ can and cannot do with it natively, and how NiFi's
-`ConsumeMQTTIIoT` processor decodes the binary payload. It's written to be read *before* Chapter
-20's demo narrative — that chapter tells the story of one specific edge device shipping real
-telemetry through this pipeline (device swaps, an incident, live verification); this chapter is
-the mechanics that story depends on. If you want the protocol explained once, correctly, with the
-processors that touch it — this is that chapter.
+defines, how it rides on MQTT, what MiNiFi C++ and MiNiFi Java can and cannot do with it natively,
+and how NiFi's `ConsumeMQTTIIoT` processor decodes the binary payload. It's written to be read
+*before* Chapter 20's demo narrative — that chapter tells the story of one specific edge device
+shipping real telemetry through this pipeline (device swaps, an incident, live verification); this
+chapter is the mechanics that story depends on. If you want the protocol explained once, correctly,
+with the processors that touch it — this is that chapter.
 
 ## Prerequisites
 
@@ -15,7 +15,7 @@ processors that touch it — this is that chapter.
 - A namespace to deploy Mosquitto into (this chapter uses `mqtt`, reachable from both NiFi and any
   MiNiFi/edge agent).
 - Familiarity with EFM agent enrollment ([Chapter 19](ch19-efm-and-nvidia-jetson.md)) if you intend
-  to run the MQTT leg on a MiNiFi C++ agent rather than only in NiFi.
+  to run the MQTT leg on a MiNiFi C++ or MiNiFi Java agent rather than only in NiFi.
 
 ## What Sparkplug B Is
 
@@ -189,6 +189,37 @@ This asymmetry — full protocol support on the NiFi side, relay-only on the MiN
 also why the reference architecture in this chapter and in Chapter 20 puts the actual decode in
 NiFi, not at the edge. The edge agent's job is getting bytes off the wire reliably; NiFi's job is
 understanding what they mean.
+
+## The MiNiFi Java Side — MQTT Available, Native Sparkplug Decode Unconfirmed
+
+MiNiFi Java presents a different picture than C++, but not a fully symmetric one to NiFi either.
+
+**What Java gives you on MQTT:** The Java processor catalog (field-verified at 122 processors / 51
+controller services with the NAR drop-in build — see [Chapter 4](ch04-java-processor-catalog.md))
+includes MQTT processing capability. Java MiNiFi inherits the NiFi processor bundle system, so
+wherever the MQTT NAR is present in the agent's `extensions/` directory, processors from that NAR
+are available. Java also supports the Record Reader/Writer framework, which matters here: the
+`MQTTIIoTReader` controller service (the Sparkplug B protobuf decoder that backs
+`ConsumeMQTTIIoT` in full NiFi) operates through this same framework.
+
+**What is not yet field-verified on Java:** Whether `ConsumeMQTTIIoT` is present in the
+stock CEM `2.24.08.0-19` tarball, or is loadable via a NAR drop-in on MiNiFi Java in the same way
+the Kafka and scripting NARs were added — this has not been field-tested in this lab. The Java
+processor catalog does not list MQTT processors, IIoT processors, or any Sparkplug-aware component.
+Until a live Java MiNiFi agent is tested with the relevant NAR present, whether native Sparkplug B
+decode is achievable on MiNiFi Java must be treated as an **open item**. The pattern described in
+the source planning docs for this lab (`ConsumeMQTTIIoT` on Jetson running MiNiFi) is a design
+target for that phase, not a confirmed capability.
+
+**What Java can do today for Sparkplug relay:** The same relay-only pattern available in C++ applies
+in Java: `ConsumeMQTT` (generic MQTT, no protobuf decode) can subscribe to `spBv1.0/#` and forward
+raw bytes to Kafka or NiFi for downstream decode. Java additionally has the `ExecuteScript` path
+(Groovy/Clojure — not Python; see Chapter 4) which could in principle implement a Sparkplug B
+protobuf decode in Groovy if the protobuf runtime JAR is added to the agent's classpath. This is a
+custom-code path, not a stock capability.
+
+**Summary for Java:** relay via generic MQTT works; native Sparkplug B decode via
+`ConsumeMQTTIIoT` on MiNiFi Java is pending field verification.
 
 ## The NiFi Side — `ConsumeMQTTIIoT`
 
@@ -429,10 +460,8 @@ convention of not blurring designed-but-untested with field-proven:
 - A real hardware device (Seeed XIAO ESP32-S3) publishing plain JSON matching the `ConsumeMQTT`
   leg's shape — see Chapter 20.
 - **A real hardware device (the same Seeed XIAO ESP32-S3 Sense from Chapter 20) publishing genuine
-  Sparkplug B binary — confirmed 2026-08-06 on WindowsDesktop (issue #126,
-  [`efm-sparkplug-b-hardware-lab-plan.md`](https://github.com/cldr-steven-matison/DesktopShare/blob/main/efm-sparkplug-b-hardware-lab-plan.md)
-  in DesktopShare).** The open technical question below is now answered: **yes**, a practical
-  low-footprint path exists.
+  Sparkplug B binary.** A practical low-footprint path for embedded Sparkplug B is confirmed: real
+  firmware on a production microcontroller can speak spec-compliant Sparkplug B.
   [`mkeras/EmbeddedSparkplugNode`](https://github.com/mkeras/EmbeddedSparkplugNode) (a `nanopb`-based
   Sparkplug B encoder, MQTT-library-agnostic) dropped into the existing `xiao-telemetry.ino` sketch
   as a second, additive publish leg — the plain-JSON leg stayed unmodified and kept working
@@ -486,10 +515,13 @@ decoded output.** The two processors are not interchangeable — one expects Spa
 the other has no protobuf decode at all. Match the processor to the actual wire format on that
 topic, per-leg, not per-flow.
 
-**Assume MiNiFi C++ has a Sparkplug-aware processor because NiFi does.** It doesn't.
-`ConsumeMQTT`/`PublishMQTT` on the C++ agent are generic MQTT — fine for relay, not for decode.
-Don't design an edge flow around edge-side Sparkplug decode without first confirming you're
-prepared to write and maintain the custom processor that would require.
+**Assume a MiNiFi agent has a Sparkplug-aware processor because NiFi does.** It doesn't — not
+by default, and not on C++ at all. `ConsumeMQTT`/`PublishMQTT` on the C++ agent are generic MQTT:
+fine for relay, not for decode. On MiNiFi Java, whether `ConsumeMQTTIIoT` or the `MQTTIIoTReader`
+controller service can be loaded via NAR drop-in has not been field-verified in this lab — treat
+it as an open question until tested. Don't design an edge flow around native edge-side Sparkplug
+decode without first confirming the processor is actually present and loadable in your specific
+agent build.
 
 **GET-then-PUT `ConsumeMQTT`/`ConsumeMQTTIIoT` when a broker password is set.** Same rule as every
 other sensitive NiFi property in this guide — check `sensitive` in the descriptor before any
@@ -501,11 +533,11 @@ state model depends on the birth certificate establishing the full metric set fi
 already be wrong. This is what the Primary Host / Rebirth-request mechanism exists to correct —
 don't build downstream logic that ignores `seq` gaps.
 
-**Present the ESP32/embedded Sparkplug B producer question as solved.** As of this chapter, every
-field-validated binary-payload publisher in this lab is the Python `pysparkplug` script running on
-a workstation, not embedded firmware. Say so plainly rather than implying the XIAO or any other
-device has been proven to speak real Sparkplug B — it has only been proven to speak the simpler
-plain-JSON leg.
+**Treat embedded Sparkplug B publish as unverified when the field record says otherwise.** The
+Seeed XIAO ESP32-S3 has been verified publishing genuine Sparkplug B (`NBIRTH`/`NDATA`), decoded
+by `ConsumeMQTTIIoT` in NiFi provenance — not inferred from the device's own serial log, but
+confirmed via NiFi's own parse routing and the raw wire bytes arriving in Kafka. If a claim about
+an embedded publisher doesn't cite NiFi-side verification, it isn't verified.
 
 ## Related Chapters
 

@@ -1,11 +1,18 @@
 # Chapter 17: Edge-AI Router Case Study — StarlinkAI
 
 Chapter 16 introduced the four AI-at-edge options and used the StarlinkAI router as its canonical
-"route to a nearby inference server" example. This chapter is the deep dive behind that summary: one
-real node, end to end — the hardware, why it runs the stack it does, how it joins the array, the
-exact router flow, and the one endpoint that needed real engineering rather than pass-through
-plumbing. Where Chapter 16 states the shape, this chapter is the field record of building it,
-including the two bugs behind it.
+"route to a nearby inference server" example. This chapter is the full field record of that node's
+history and current state: the hardware, why it runs the stack it does, how it joins the array, and
+every functional leg the single agent now carries.
+
+The node began with a C++ MiNiFi agent handling Twitch stream and matrix screen control. When
+Lemonade inference was added, it enrolled on a separate Java class to avoid mixing runtimes on the
+same EFM canvas. Both classes were eventually unified: the C++ agent was retired and everything was
+consolidated onto a single recreated `StarlinkAI` Java agent. That single agent now handles both the
+Lemonade inference router (five endpoints on port `:8090`) and the screen/matrix control endpoint
+(port `:8096`). Where Chapter 16 states the shape, this chapter is the record of building it —
+including the two bugs that needed real engineering, the screen/matrix flow's own evolution, and the
+consolidation that brought it all together.
 
 > **⚠️ Read Chapter 16 first for the generalized patterns.** The "why MiNiFi Java, not C++"
 > reasoning, the EFM Designer write contract (no whole-flow PUT), and the edge traps are covered
@@ -53,12 +60,24 @@ Other array machines (over Tailscale)
 Tailscale (Windows host) — stable tailnet IP for this box
         │
         ▼
-EFM / MiNiFi Java agent  (StarlinkAIJava class, Windows-native process)
-  - HandleHttpRequest   : single entry point, port 8090, all 5 Lemonade
-                          endpoints on one port, distinguished by path
-  - InvokeHTTP          : pure reverse-proxy pass-through —
-                          HTTP URL = http://localhost:13305${http.request.uri}
-  - HandleHttpResponse  : returns Lemonade's real answer synchronously
+EFM / MiNiFi Java agent  (StarlinkAI class, Windows-native process)
+        │
+        ├─── Lemonade inference router  (port :8090)
+        │      - HandleHttpRequest-Lemonade   : single entry point, all 5
+        │                                       endpoints distinguished by path
+        │      - InvokeHTTP-Lemonade          : pure reverse-proxy pass-through —
+        │                                       http://localhost:13305${http.request.uri}
+        │      - HandleHttpResponse-Lemonade  : returns Lemonade's real answer
+        │                                       synchronously
+        │
+        └─── Screen/matrix control  (port :8096, JSON body)
+               - HandleHttpRequest-ScreenControl : accepts JSON with action/screen/
+                                                   streamer fields
+               - EvaluateJsonPath                : extracts action, screen, streamer
+                                                   from the request body
+               - ExecuteStreamCommand            : invokes starlinkai_screen_control.py
+                                                   per request (no persistent listener)
+               - HandleHttpResponse-ScreenControl: returns result synchronously
         │
         ▼
 Lemonade Server  (Windows-native, localhost:13305)
@@ -67,9 +86,9 @@ Lemonade Server  (Windows-native, localhost:13305)
     /v1/reranking, /v1/audio/speech, /v1/audio/transcriptions
 ```
 
-Three processors, one port, no Kafka, no `request_id` correlation — the caller gets Lemonade's real
-response directly and synchronously. Everything in the serving path runs **natively on Windows** —
-no containers, no WSL2 (WSL2 on this box is only used for repo/doc access).
+One agent, two endpoint groups, no Kafka, no `request_id` correlation — callers get real responses
+directly and synchronously on both legs. Everything in the serving path runs **natively on Windows**
+— no containers, no WSL2 (WSL2 on this box is only used for repo/doc access).
 
 ![HandleHttpRequest-Lemonade → InvokeHTTP-Lemonade → HandleHttpResponse-Lemonade, live per-processor throughput in the EFM Flow Designer](images/efm-starlink-ai-unified-lemonade-flow.png)
 
@@ -121,13 +140,13 @@ $env:JAVA_HOME = 'C:\Program Files\Microsoft\jdk-21.0.12.8-hotspot'
 $env:Path = "$env:JAVA_HOME\bin;" + $env:Path
 ```
 
-Deploy via the EFM agent-deployer script, targeting the **Java** agent type and a **dedicated
-class** (`StarlinkAIJava`, kept separate from any C++ class so the two never share a canvas — see
-Chapter 16's "EFM Designer write contract" on why mixed runtimes stay parallel classes):
+Deploy via the EFM agent-deployer script, targeting the **Java** agent type and the `StarlinkAI`
+class (see Chapter 16's "EFM Designer write contract" on why mixed runtimes stay on parallel classes
+and why the Java and C++ agents were consolidated rather than merged at the runtime level):
 
 ```powershell
 Invoke-WebRequest -Uri 'http://<EFM_HOST>:10090/efm/api/agent-deployer/script' -Method Post -Body @{
-  agentClass   = 'StarlinkAIJava'
+  agentClass   = 'StarlinkAI'
   agentType    = 'java'
   agentVersion = '2.24.08.0-19'
   osArch       = 'windows'
@@ -137,9 +156,13 @@ Invoke-WebRequest -Uri 'http://<EFM_HOST>:10090/efm/api/agent-deployer/script' -
 .\deploy.ps1
 ```
 
-The agent lands at `~\minifi-java\minifi-2.24.08.0-19\` and runs as a plain background process via
-`bin\run-minifi.bat` — no Windows-service install needed on this box. A fresh class picks up the Java
-manifest automatically on first heartbeat; no manual class-manifest re-pointing.
+The agent lands at `C:\Users\tunas\efm-agent\StarlinkAI-java\minifi-2.24.08.0-19\` and runs as a
+plain background process via `bin\run-minifi.bat`. A fresh class picks up the Java manifest
+automatically on first heartbeat; no manual class-manifest re-pointing.
+
+The agent persists across reboots via a Windows **Scheduled Task named `StarlinkAI-MiNiFi-AutoStart`**
+(trigger: `AtLogOn`, user `tunas`) — not a Windows service install. The task runs `run-minifi.bat`
+at logon, matching the shape of the existing stream-launcher tasks on the same host.
 
 ---
 
@@ -231,6 +254,44 @@ curl.exe -X POST http://localhost:8090/api/v1/chat/completions `
   -H 'Content-Type: application/json' `
   --data '@chat_body.json'
 ```
+
+---
+
+## Screen and Matrix Control (Port :8096)
+
+### History
+
+Screen and matrix control on this node predates the Lemonade router. The original C++ MiNiFi agent
+(class `StarlinkAI`) handled Twitch-chat-driven commands to load streams onto the two monitors and
+launch the matrix kiosk. When the Lemonade Java router was added on a separate class, screen/matrix
+control stayed on the C++ side.
+
+After the C++ and Java agents were unified into a single Java `StarlinkAI` class, the screen/matrix
+control leg was rebuilt natively on the Java agent using the same
+`HandleHttpRequest → EvaluateJsonPath → ExecuteStreamCommand → HandleHttpResponse` pattern already
+proven on the WindowsDesktop node. Four port-per-command endpoints were created
+(`:8091`–`:8094`) covering `mpv-load`/`matrix-load` on each of the two monitors, and
+`ExecuteStreamCommand` invoked `starlinkai_screen_control.py` (deployed to `C:\minifi-manual\`)
+directly per request — no persistent listener process needed.
+
+Those four ports were subsequently consolidated onto a single endpoint. The `:8091`–`:8094`
+pipelines were replaced by one endpoint on **`:8096`** accepting a JSON body with `action`, `screen`,
+and `streamer` fields. The `starlinkai_screen_control.py` script's entry point moved to a uniform
+3-argument dispatch to match. Central NiFi's `TwitchChatBot` `InvokeHTTP` processors
+(`InvokeStarlinkScreen3`/`InvokeStarlinkScreen4`), which had been pointing at the pre-consolidation
+ports (`:8085`/`:8086`), were repointed to the new consolidated `:8096` endpoint.
+
+### The Flow
+
+| Processor | Key config |
+|---|---|
+| `HandleHttpRequest-ScreenControl` | Listening Port `8096`, POST only |
+| `EvaluateJsonPath` | Extracts `action`, `screen`, and `streamer` from the JSON request body |
+| `ExecuteStreamCommand` | Invokes `starlinkai_screen_control.py` directly per request; no persistent listener |
+| `HandleHttpResponse-ScreenControl` | Returns result synchronously |
+
+The `:8096` endpoint shares the same `StarlinkAI` class canvas as the Lemonade router leg — one
+MiNiFi process on the host, two endpoint groups, all EFM-managed.
 
 ---
 

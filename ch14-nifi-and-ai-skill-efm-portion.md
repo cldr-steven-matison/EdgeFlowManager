@@ -3,7 +3,7 @@
 Every flow in this Part — NiFi + Python (Ch15), MiNiFi AI at the edge (Ch16), the StarlinkAI
 router (Ch17) — was built the same way: not by hand-dragging processors around a canvas, but by
 driving NiFi, MiNiFi, and EFM programmatically, with an AI agent holding a written playbook of what
-breaks and how. That playbook is a Claude Code skill called [`nifi-and-ai`](https://github.com/cldr-steven-matison/NiFiandAi), published as its own repo you can clone straight into `~/.claude/skills/`. This chapter exposes it
+breaks and how. That playbook is a Claude Code skill called [`nifi-and-ai`](https://github.com/cldr-steven-matison/NiFiandAi), published as its own repo you can clone into `~/.claude/skills/nifi-and-ai/`. This chapter exposes it
 in full, then goes deep on the part that matters most for this guide: the **EFM portion** — the
 machinery of managing agents from a central manager, which is exactly the undocumented territory the
 rest of the guide lives in.

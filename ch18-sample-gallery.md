@@ -127,7 +127,76 @@ Every entry uses the same card so the gallery reads consistently:
 
 ---
 
-## Entry 5 — TensorRT Inference on Jetson (MiNiFi C++, EFM-Managed)
+## Entry 5 — S2S Source (MiNiFi C++, EFM-Managed, K8s → NiFi)
+
+- **Name:** `s2s-cpp-to-nifi-k8s`
+- **Purpose:** Transmit FlowFiles from a MiNiFi C++ agent running in Kubernetes to a CFM-operator-managed NiFi in the same cluster over secure HTTP Site-to-Site. Proves the full C++ S2S path: EFM-authored flow, cert-mounted client identity, and `User` CR authorization on NiFi.
+- **Agent:** MiNiFi **C++** `1.26.02`, EFM-managed (any C++ agent class with the S2S props in `minifi.properties`). Client SSL is global — `nifi.security.client.certificate/private.key/ca.certificate` in `minifi.properties`; there is no per-RPG SSL context service field in C++.
+- **Shape:**
+  ```
+  GenerateFlowFile
+    ─(success)─→ RemoteProcessGroup  (targetUris: https://nifi-web.<ns>.svc.cluster.local:8443,
+                                      transportProtocol: HTTP,
+                                      destination: from-minifi input port UUID)
+  ```
+- **Files:** No committed C++-specific flow file — the EFM-authored flow is built in the Designer and published per agent class. See [`files/site-to-site/`](files/site-to-site/) for the shared S2S reference assets and [`files/site-to-site/SITE_TO_SITE.md`](files/site-to-site/SITE_TO_SITE.md) for the directory guide. NiFi-side manifests (cert, user CR, web service) live in [`files/site-to-site/ch11-java/`](files/site-to-site/ch11-java/) and apply unchanged to the C++ leg.
+- **Verification:**
+  ```bash
+  # agent log confirms each transaction
+  grep "Site to Site transaction" /path/to/minifi-app.log
+  # expected: "sent flow 1 flow records, with total size <N>"
+  # expected: "peer finished transaction"
+
+  # NiFi side: queued count climbs on the from-minifi input port
+  curl -s --cert /certs/tls.crt --key /certs/tls.key --cacert /certs/ca.crt \
+    "https://nifi-web.<ns>.svc.cluster.local:8443/nifi-api/flow/process-groups/root/status?recursive=true" \
+    | grep -oE '"(flowFilesReceived|queued)":("[^"]*"|[0-9]+)'
+  ```
+- **Status:** ✅ field-validated on playground Minikube. Full walkthrough: [Chapter 11](ch11-site-to-site.md).
+
+> **⚠️ C++ S2S client SSL is global, not per-processor.** Set `nifi.security.client.certificate`, `nifi.security.client.private.key`, and `nifi.security.client.ca.certificate` in `minifi.properties`. The EFM deployer may overwrite `minifi.properties` on pod restart — bake the keys into your boot script. The `from-minifi` input port must be RUNNING and the `User` CR must reference the cert's **SAN** (not subject DN) and the exact port UUID before the agent can complete its first transaction.
+
+---
+
+## Entry 6 — S2S Source (MiNiFi Java, Standalone K8s → NiFi)
+
+- **Name:** `s2s-java-to-nifi-k8s`
+- **Purpose:** Transmit FlowFiles from a MiNiFi Java agent running as a standalone Kubernetes pod to a CFM-operator-managed NiFi in the same cluster over secure HTTP Site-to-Site. The agent runs without EFM — flow and config are baked into a custom image. Proves the Java S2S path: `bootstrap.conf` SSL wiring, `flow.json.raw` bake-in, and `User` CR authorization on NiFi.
+- **Agent:** MiNiFi **Java** `2.24.08.0-19`, standalone (no EFM). Client SSL is set in `bootstrap.conf` with `nifi.minifi.flow.use.parent.ssl=true` — MiNiFi Java regenerates `minifi.properties` from `bootstrap.conf` on every start; direct edits to `minifi.properties` are wiped.
+- **Shape:**
+  ```
+  GenerateFlowFile
+    ─(success)─→ RemoteProcessGroup  (targetUris: https://nifi-web.<ns>.svc.cluster.local:8443,
+                                      transportProtocol: HTTP,
+                                      destination: from-minifi input port UUID)
+  ```
+- **Files:**
+  - [`files/site-to-site/ch11-java/bootstrap.conf`](files/site-to-site/ch11-java/bootstrap.conf) — SSL config with `use.parent.ssl=true`
+  - [`files/site-to-site/ch11-java/Dockerfile`](files/site-to-site/ch11-java/Dockerfile) — bakes `flow.json.raw`, `flow.json.gz`, `flow-identifier`, `bootstrap.conf`, and the truststore
+  - [`files/site-to-site/ch11-java/minifi-java-unmanaged.yaml`](files/site-to-site/ch11-java/minifi-java-unmanaged.yaml) — pod manifest, mounts the client keystore from a Secret
+  - [`files/site-to-site/ch11-java/minifi-s2s-cert.yaml`](files/site-to-site/ch11-java/minifi-s2s-cert.yaml) — cert-manager Certificate for the agent client identity (SAN `minifi-s2s`)
+  - [`files/site-to-site/ch11-java/minifi-s2s-user.yaml`](files/site-to-site/ch11-java/minifi-s2s-user.yaml) — `User` CR granting write on the `from-minifi` input port and read on `/site-to-site`
+  - [`files/site-to-site/ch11-java/nifi-web-svc.yaml`](files/site-to-site/ch11-java/nifi-web-svc.yaml) — the `nifi-web` ClusterIP service (the operator does not create this)
+  - [`files/site-to-site/ch11-java/README.md`](files/site-to-site/ch11-java/README.md) — build and apply sequence
+- **Verification:**
+  ```bash
+  # Java agent log — peer refresh and each send
+  kubectl logs <minifi-java-pod> | grep -E "Successfully refreshed|Successfully sent"
+  # expected: "Successfully refreshed Flow Contents for RemoteProcessGroup[https://nifi-web…]"
+  # expected: "Successfully sent [...] (32 bytes) to …/nifi-api in <N> milliseconds"
+
+  # NiFi side: queue count on from-minifi climbs
+  curl -s --cert /certs/tls.crt --key /certs/tls.key --cacert /certs/ca.crt \
+    "https://nifi-web.<ns>.svc.cluster.local:8443/nifi-api/flow/process-groups/root/status?recursive=true" \
+    | grep -oE '"(flowFilesReceived|queued)":("[^"]*"|[0-9]+)'
+  ```
+- **Status:** ✅ field-validated on playground Minikube. Full walkthrough: [Chapter 11](ch11-site-to-site.md).
+
+> **⚠️ `flow.json.raw` is authoritative.** Bake only `flow.json.gz` and MiNiFi regenerates an empty default flow, recompresses over your file, and starts **zero** processors. Bake `flow.json.raw` and `flow-identifier` alongside the `.gz`. Also: **don't edit `minifi.properties` directly** — every start regenerates it from `bootstrap.conf`. Set `nifi.minifi.security.*` and `nifi.minifi.flow.use.parent.ssl=true` in `bootstrap.conf`. `PKIX path building failed` means the *client* can't trust the server — chase the SSL context wiring, not the authorization policy.
+
+---
+
+## Entry 7 — TensorRT Inference on Jetson (MiNiFi C++, EFM-Managed)
 
 - **Name:** `jetson-tensorrt-cpp`
 - **Purpose:** Accept an HTTP POST on a Jetson Orin Nano, run TensorRT inference via `ExecuteScript`, and publish the enriched payload to Kafka. Proves EFM-managed flow delivery to real aarch64 edge hardware and on-device GPU execution.
@@ -160,7 +229,7 @@ Every entry uses the same card so the gallery reads consistently:
 
 ---
 
-## Entry 6 — ExecuteScript Python Smoke (MiNiFi C++, EFM-Managed)
+## Entry 8 — ExecuteScript Python Smoke (MiNiFi C++, EFM-Managed)
 
 - **Name:** `executescript-python-smoke-cpp`
 - **Purpose:** Prove `ExecuteScript` with the Python engine is live and executing on a C++ agent. The script stamps a `python.smoke` attribute on every FlowFile; `LogAttribute` confirms delivery. This is the minimal validation pattern before wiring any real script logic.
@@ -194,7 +263,7 @@ Every entry uses the same card so the gallery reads consistently:
 
 ---
 
-## Entry 7 — Edge-AI Router (MiNiFi Java, EFM-Managed)
+## Entry 9 — Edge-AI Router (MiNiFi Java, EFM-Managed)
 
 - **Name:** `starlinkai-lemonade-router-java`
 - **Purpose:** Front a local Lemonade Server (AMD OpenAI-compatible inference, port 13305) with a three-processor MiNiFi Java flow that proxies all five Lemonade endpoints synchronously. The agent is tiny; the GPU model runs on the adjacent box. All five endpoints work end to end; transcription needs a multipart-reassembly branch ahead of `InvokeHTTP`.
@@ -220,7 +289,7 @@ Every entry uses the same card so the gallery reads consistently:
        -d '{"model":"Qwen3-Embedding-0.6B-GGUF","input":["test sentence"]}'
   ```
   Expected: real synchronous response from Lemonade, `invokehttp.status.code=200` on `LogAttribute`.
-- **Status:** ✅ all 5 endpoints work (chat, embeddings, reranking, TTS, transcription). Transcription needs a multipart-reassembly branch ahead of `InvokeHTTP`. Full walkthrough: [Chapter 16](ch16-how-to-ai-with-minifi.md).
+- **Status:** ✅ all 5 endpoints work (chat, embeddings, reranking, TTS, transcription). Transcription needs a multipart-reassembly branch ahead of `InvokeHTTP`. Full walkthrough: [Chapter 17](ch17-edge-ai-router.md).
 
 > **⚠️ `InvokeHTTP` socket timeouts.** LLM inference routinely takes 10–25s; the framework default `Socket Read Timeout` of 15 secs fails every real call. Set Read and Write timeouts to `10 mins`. `HTTP Method` silently defaults to `GET` — set it to `POST` explicitly.
 
@@ -230,7 +299,6 @@ Every entry uses the same card so the gallery reads consistently:
 
 These flows are planned but don't yet have a folded, field-validated chapter behind them. Each becomes a full card above once its chapter lands.
 
-- **S2S source flows — MiNiFi → NiFi K8s** (Ch10 C++, Ch11 Java): the Site-to-Site chapter pair.
 - **SparkPlug / MQTT ingest** (Ch20): the SparkPlug demo chapter.
 
 ---

@@ -2,7 +2,7 @@
 
 Once a MiNiFi agent is running out at the edge — on a Jetson, a Windows box over Tailscale, a Kubernetes pod with no persistent identity — the next question is: how do I see it? What is EFM's own health, what are the agents doing, and how do I get all of it onto the same Prometheus/Grafana stack I already run for NiFi, Kafka, Flink, and Schema Registry via the CSO operators?
 
-There are three metrics layers. They are independent — you can wire up any one without the others:
+There are three metrics layers (Layer 2 covers both the C++ and Java agent variants). They are independent — you can wire up any one without the others:
 
 1. **Layer 1 — EFM server metrics.** EFM is a Spring Boot app; it exposes an actuator Prometheus endpoint. ✅ Done.
 2. **Layer 2 — MiNiFi C++ agent metrics.** The C++ agent has a native Prometheus publisher (system + processor + repository metrics). ✅ Done.
