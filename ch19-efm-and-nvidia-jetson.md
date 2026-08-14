@@ -2,9 +2,44 @@
 
 ![Local AI At the Edge with Jetson](images/efm-nvidia-jetson.png)
 
-This chapter covers the full lifecycle of the Jetson Orin Nano (device `NvidiaNano`, hostname `tunastreet`, aarch64) as an EFM-managed edge agent. The board was first brought up running a MiNiFi C++ agent — enrolled against the `NvidiaNano` class, validated end to end with a `ListenHTTP → ExecuteScript → PublishKafka` TensorRT flow. The class has since been repurposed: the C++ agent went stale and is currently `MISSING`; the `NvidiaNano` class today runs a MiNiFi Java agent delivering a three-leg `HandleHttpRequest → InvokeHTTP → HandleHttpResponse` synchronous inference flow. Both runtimes are documented here in historical order: the C++ bring-up first, then the current Java production flow. Everything is field-captured on the actual board.
+This chapter covers the full lifecycle of the Jetson Orin Nano (device `NvidiaNano`, hostname `tunastreet`, aarch64) as an EFM-managed edge agent. The board was first brought up running a MiNiFi C++ agent — enrolled against the `NvidiaNano` class, validated end to end with a `ListenHTTP → ExecuteScript → PublishKafka` TensorRT flow. The class was then repurposed to a MiNiFi Java agent delivering a three-leg `HandleHttpRequest → InvokeHTTP → HandleHttpResponse` synchronous inference flow. Both runtimes are documented here in historical order: the C++ bring-up first, then the Java flow. Everything is field-captured on the actual board.
 
 > **⚠️ Device-class assignment note.** The `NvidiaNano` agent class used throughout this chapter is the current assignment. The device-class roster may shift over time, so do not treat `NvidiaNano` as a permanent class name — check the current class assignment before building dependent flows or tooling.
+
+> **⚠️ The class and its live agent disagree as of 2026-08-14.** The `NvidiaNano` class is *configured* for Java — its manifest is `minifi-java 2.24.08.0-19` and its published flow is the three-leg HandleHttp flow below. But the Java agent is no longer installed on the Jetson, and the only agent enrolled and online under the class is the **C++** one (manifest `cpp 1.26.02`). EFM shows the class `GOOD` with one agent online, which is true and misleading at the same time: the agent heartbeats fine, then rejects the flow on every push. That mismatch is the subject of the next section. Read the Java sections below as the design and the field measurements taken when the Java agent *was* running, not as a description of what is on the board today.
+
+### The Symptom of That Mismatch — A C++ Agent Handed a Java Flow
+
+EFM's alert feed carries this on every flow push to the class:
+
+```
+Operation with ID a68dc8e8-8864-4d08-8e9e-8f813a47c35e failed.  Details: Error while applying flow:
+Invalid configuration payload, type: St16invalid_argument, what: Could not create processor
+HandleHttpRequest-Inference
+```
+
+The agent's own log says why, and it's the more useful line of the two:
+
+```
+[error] No Processor defined for org.apache.nifi.processors.standard.HandleHttpRequest
+[error] Could not create a processor HandleHttpRequest-Inference with id d74140a1-...
+[error] Invalid configuration payload, type: St16invalid_argument, what: Could not create processor
+```
+
+`St16invalid_argument` is a mangled C++ type name — that alone identifies which runtime is failing.
+**MiNiFi C++ has no `HandleHttpRequest`/`HandleHttpResponse` pair; only the Java agent ships them**
+(see [Chapter 3](ch03-cpp-processor-catalog.md) and [Chapter 4](ch04-java-processor-catalog.md)). A
+class carries one manifest, so pointing a C++ agent at a class whose flow was authored against the
+Java manifest fails at flow-apply every time, forever, while the agent stays green in the dashboard.
+Check the agent's manifest type against the class's before assuming a `GOOD` class is actually
+running its flow:
+
+```bash
+curl -s http://<efm-host>:10090/efm/api/agents/<agent-id>       | jq .agentManifestId
+curl -s http://<efm-host>:10090/efm/api/agent-classes/NvidiaNano | jq .agentManifests
+```
+
+Two different IDs means the live agent is not running the class's flow, whatever the health badge says.
 
 ## Prerequisites
 
@@ -202,7 +237,7 @@ The `KubernetesPod` class shows **Good Health** with `minifi-agent-k8s-gaming` e
 
 ## Enrolling the Jetson Orin Nano (Historical — C++ First Bring-Up)
 
-> **Note:** This section records the original C++ agent enrollment — the `agentType=cpp`, `linuxaarch64` recipe that first brought the Jetson up under EFM. The `NvidiaNano` class now runs the Java agent described later in this chapter; the C++ agent is currently retired/`MISSING`. Keep this section as the bring-up reference; do not treat it as the current production path.
+> **Note:** This section records the original C++ agent enrollment — the `agentType=cpp`, `linuxaarch64` recipe that first brought the Jetson up under EFM. The `NvidiaNano` class was later repurposed for the Java agent described later in this chapter, and its manifest and flow are still Java. The C++ agent, however, is the one running on the board and enrolled under the class today — which is the mismatch described at the top of this chapter. Keep this section as the bring-up reference; do not treat it as the current production path.
 
 Generate a unique agent identifier and fetch the agent CLI command for `linuxaarch64`. Replace `<YOUR_EFM_HOST_IP>` with your actual lab machine LAN IP:
 
@@ -234,7 +269,7 @@ The agent appears in EFM → **Monitor** → **Agents** under class `NvidiaNano`
 
 ![NvidiaNano class in EFM → Monitor → Agents — Good Health, Jetson agent enrolled](images/efm-NvidiaNano-Class.jpg)
 
-The `NvidiaNano` class showed **Good Health** with the Jetson Orin Nano's C++ agent enrolled and reporting at first bring-up. The C++ agent has since gone stale/`MISSING`; the class was repurposed for the Java agent described later in this chapter.
+The `NvidiaNano` class showed **Good Health** with the Jetson Orin Nano's C++ agent enrolled and reporting at first bring-up. The class was later repurposed for the Java agent described later in this chapter. It still shows **Good Health** with one agent online today — but that agent is the C++ one, which is why the health badge is not proof the class's flow is running.
 
 > **⚠️ Device-class reminder.** As noted above, the `NvidiaNano` class name may change if the device-class roster shifts. Update any automation or flow references at that point.
 
@@ -364,7 +399,7 @@ The fire-and-forget `ListenHTTP → ExecuteScript → PublishKafka` pattern docu
 
 A second, current-choice pattern for synchronous request/response is a MiNiFi **Java** agent on the same Jetson hardware, dedicated to serving requests with a real answer in the HTTP response body. This is necessary for scenarios where the caller (e.g. a microcontroller or edge device) expects to POST and get an immediate answer without needing to poll Kafka or handle correlation IDs.
 
-> **⚠️ Class history — read this before cross-referencing "Enrolling the Jetson Orin Nano" above.** This Java agent originally enrolled under its own field-test class, `NvidiaNanoJava`. That class is now retired. The production Java agent and its real flow run under the **`NvidiaNano`** class — the same class name the C++ agent enrollment earlier in this chapter uses. The C++ agent has since gone stale/`MISSING` and the class was repurposed; `NvidiaNano` today means the Java runtime described in this section, not the C++ agent from "Enrolling the Jetson Orin Nano." This is exactly the device-class-roster shift the callout at the top of this chapter warned about — confirm the live class assignment (`GET /efm/api/agents/page?agentClass=NvidiaNano`) before building anything that assumes a fixed runtime per class name.
+> **⚠️ Class history — read this before cross-referencing "Enrolling the Jetson Orin Nano" above.** This Java agent originally enrolled under its own field-test class, `NvidiaNanoJava`. That class is now retired. The production Java agent and its real flow run under the **`NvidiaNano`** class — the same class name the C++ agent enrollment earlier in this chapter uses. `NvidiaNano`'s *manifest and flow* mean the Java runtime described in this section, not the C++ agent from "Enrolling the Jetson Orin Nano" — but as of 2026-08-14 the agent actually enrolled under the class is the C++ one, and it cannot run this flow. This is exactly the device-class-roster shift the callout at the top of this chapter warned about, and then some: the class name, the class manifest, and the live agent's runtime are three separate facts that can all disagree. Confirm all three before building anything that assumes a fixed runtime per class name.
 
 ### Deploying the Java Agent
 
@@ -449,9 +484,32 @@ The HTTP 502 (Bad Gateway) is returned within 28 milliseconds, preventing the ca
 
 The `HandleHttpRequest` processor binds to `*:8090` (all interfaces), not `127.0.0.1`, making it reachable from any device on the LAN. This allows microcontrollers and other edge devices to POST directly to `http://<jetson-ip>:8090/classify` without requiring them to reach a centralized message broker.
 
-A live request/response provenance trace for the Inference leg is still outstanding — the Designer canvas and per-leg screenshots above confirm the flow topology and its live per-processor task counters (46,225+ tasks on `HandleHttpRequest-Inference` alone), but a dedicated provenance-view capture of one round trip hasn't been taken yet:
+### EFM Has No Provenance View — Don't Go Looking For One
 
-<!-- TODO: screenshot pending — NvidiaNano HandleHttp round-trip verification in EFM provenance view -->
+Earlier drafts of this chapter promised a provenance-view capture of one round trip through the
+Inference leg. That figure is not coming, because the view doesn't exist. EFM's entire REST surface
+is `agent-manager`, `designer`, `events`, `flows`, `heartbeats`, `monitor`, `operations`,
+`resource-manager`, and `transfer` — there is no provenance or lineage endpoint, and the UI's route
+table has no page for one. The single place the word appears in EFM is the **provenance
+repository's** size and usage row in Monitor → agent detail, next to the FlowFile repository:
+
+```json
+"repositoryDetails": [{"id": "flowfile", "name": "FlowFile"},
+                      {"id": "provenance", "name": "Provenance"}]
+```
+
+That's a disk-usage gauge for the repository, not a query over the events inside it.
+
+This is a real architectural boundary, not a gap in the product. EFM manages agents — flow authoring,
+deployment, health, and metrics. Per-FlowFile lineage is NiFi's job, and **Data Provenance is a NiFi
+feature**. If you need to trace an individual FlowFile end to end, the trace has to happen in NiFi:
+route the leg through a NiFi instance over site-to-site and query provenance there. An EFM-managed
+MiNiFi agent working standalone gives you counters, queue depths, and repository metrics — which is
+what the per-leg screenshots above show, and it's the ceiling.
+
+What EFM *does* prove about this flow is already captured above: the topology, the per-processor task
+counters (46,225+ on `HandleHttpRequest-Inference` alone), and the field-measured latency and error
+paths from the agent side.
 
 ## Prometheus Observability for EFM and the Jetson Agent
 
