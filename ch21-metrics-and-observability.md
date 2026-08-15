@@ -153,6 +153,29 @@ up{container="efm",endpoint="efm-ui",instance="10.244.5.43:10090",job="efm",
 
 If you want to use `metrics/9092` (cleaner separation from the UI), set `management.server.port=9092` in the `efm-config` ConfigMap and redeploy — then `port: metrics` in the `ServiceMonitor` works. Until you do that, scrape `efm-ui`.
 
+### The Heartbeat Series — Fleet Liveness for Free
+
+The most useful thing in EFM's actuator output is the per-class heartbeat family — it gives fleet-wide liveness for every enrolled agent without touching a single device:
+
+- `efm_heartbeat_lastSeenTime_seconds{agentClass, agentId, agentManifestId}` — epoch of the last heartbeat. `time() - max by (agentClass)(...)` = seconds since last heartbeat, the core liveness expression.
+- `efm_heartbeat_count_total{...}` — `sum by (agentClass)(rate(...[5m]))*60` = heartbeats per minute.
+- `efm_heartbeat_contentLength_sum/_count` — `rate(sum)/rate(count)` = average heartbeat payload size.
+
+Three semantics that will bite if unlearned:
+
+- **Label churn creates duplicate series.** Every manifest change mints a new `agentManifestId` label value, so one physical device accumulates several series over its life. Always aggregate (`max by`, `sum by`) — never chart a raw series.
+- **Retired agents linger in the metric registry** until an EFM pod restart, even after their `agent` row is deleted — the micrometer counters are in-memory. Filter by `agentClass`/`agentId` rather than waiting for the registry to clean itself.
+- **The `last_seen` column in EFM's Postgres is not this metric.** The DB column updates only on material change; the actuator series updates on every heartbeat. For "is it alive right now," the metric wins.
+
+### The Fleet Dashboard
+
+Those series drive the **EFM Fleet - All Devices** Grafana dashboard ([`files/efm-fleet-dashboard.json`](files/efm-fleet-dashboard.json)): a seconds-since-heartbeat stat tile per device (green under 120s, yellow under 600s, red beyond), an all-device sawtooth graph (a healthy device saws between 0 and its heartbeat interval; a dying one just climbs), and a host row — scrape status, CPU, memory — for each device with a Layer-2 exporter (the Jetson, WindowsDesktop, and StarlinkAI legs below). Devices without an exporter get a Layer-1 row (sawtooth, heartbeats/min, average heartbeat size) instead.
+
+Two deployment conventions on this stack:
+
+- **Dashboards deploy as sidecar ConfigMaps, not manual imports.** Any ConfigMap labeled `grafana_dashboard=1` auto-loads and hot-reloads on `kubectl apply`; the JSON stays versioned in this repo's `files/` as the source of truth.
+- **⚠️ The datasource UID trap.** kube-prometheus-stack provisions its Prometheus datasource with the deterministic UID **`PBFA97CFB590B2093`** — *not* `prometheus`. A dashboard JSON hardcoding the wrong UID renders every panel "No data" while Prometheus itself is fine, and API-side sanity checks pass because they query Prometheus directly. Verify the way panels actually query: `GET /api/datasources` for the real UID, then run a panel expression through `/api/datasources/proxy/uid/<uid>/api/v1/query`.
+
 ## Layer 2 — MiNiFi C++ Agent Metrics
 
 MiNiFi C++ has a native Prometheus publisher — no `ExecuteScript`, no sidecar. It ships as a separate extension, `libminifi-prometheus.so`. Confirm it's present in the agent's `extensions/` directory before troubleshooting a "publisher never starts" symptom.
@@ -278,7 +301,7 @@ Applying a `minifi.properties.d/*.properties` change requires restarting the `mi
 The publisher binds `0.0.0.0`, but:
 
 - Confirm the host firewall allows the port (default `9936`) on the interface the scraper arrives on.
-- On StarlinkAI over Tailscale, Windows firewall rules for `9936` need attention — WindowsDesktop has `Allow EFM Port 10090` and generic Kafka `9092` rules, but no dedicated metrics `9936` rule, and Tailscale's adapter can land on a firewall profile the existing rules don't cover. Confirm metrics-over-tailnet is actually wanted before adding a rule.
+- On Windows targets a dedicated inbound allow rule for `9936` is mandatory — Defender defaults `BlockInbound` and drops silently. Both WindowsDesktop and the StarlinkAI Beelink needed `netsh advfirewall firewall add rule ... localport=9936` (elevated) before the in-cluster scrape connected; the StarlinkAI scrape additionally travels over Tailscale, not the LAN (the as-built details are in the Route 3 section below).
 
 ## Layer 2 — MiNiFi Java Agent Metrics (Prometheus endpoint blocked; unblocked via S2S relay)
 
@@ -336,6 +359,13 @@ Cluster side, the C++-era external-target wiring carries over unchanged: a selec
 - No `/proc` — the script runs via **`powershell.exe -NoProfile -EncodedCommand <base64-UTF-16LE>`** (the Windows equivalent of the `sh` base64 wrapper: the encoded form survives `ExecuteStreamCommand`'s `;` argument delimiter and quoting untouched). Metrics from `Get-CimInstance Win32_OperatingSystem` (memory, already KB) and `Win32_Processor` `LoadPercentage` (CPU %).
 - **PowerShell emits CRLF, and Prometheus rejects it** (`invalid metric type "gauge\r"`). Build the exposition text as one string and `[Console]::Out.Write(($lines -join "`n") + "`n")` — never let default `Write-Output` line endings reach the wire.
 - **Windows Defender Firewall silently drops the inbound scrape** on the LAN IP even from the same physical host — an elevated `netsh advfirewall firewall add rule ... localport=9936` allow rule is mandatory (the error signature before the rule is connection-failure; after the rule, any remaining error is the parser telling you about the payload). A WSL-side `curl` to the host's own LAN IP is *not* a valid reachability test in mirrored mode — it can keep failing after the in-cluster scrape works; test via loopback locally and via Prometheus's own target status for the real path.
+
+**The remote variant — StarlinkAI over Tailscale (field-validated 2026-08-15).** The third replay of the same fourth-leg shape, on the `StarlinkAI` class running on the Beelink — a Windows box that isn't on the cluster's LAN path. Same `-EncodedCommand` CIM script as WindowsDesktop; what's new is the network leg, and it produced the sharpest lesson of the set:
+
+- **The scrape target address is per-device, and only an in-cluster test decides it.** From an in-cluster pod, the Beelink's LAN IP (`192.168.1.245:9936`) times out — *even with the firewall rule verified on all three profiles* — while its Tailscale IP (`100.110.253.66:9936`) answers. That is the opposite of the Jetson and WindowsDesktop targets, which scrape over LAN. Run a `wget`-from-a-busybox-pod test against every candidate address *before* writing the `Endpoints`; a successful test from the target host itself proves nothing about the cluster's path. The selector-less `Service`/`Endpoints` therefore point at the Tailscale IP, with the same `fallbackScrapeProtocol: PrometheusText0.0.4` on the `ServiceMonitor`.
+- **The CRLF trap recurs — treat the LF-join as part of the pattern, not a one-off fix.** The first StarlinkAI flow version was published minutes before the WindowsDesktop CRLF lesson landed, and the first scrape failed with the identical `invalid metric type "gauge\r"`. Republishing with the `[Console]::Out.Write` LF-joined script fixed it immediately. Any PowerShell-emitting exporter leg should ship the LF-join from the first version.
+
+Verified live: `up{job="starlinkai-minifi-metrics"}=1` with real values, and the StarlinkAI host row (scrape status / CPU / memory) on the fleet dashboard. Flow export: [`files/efm/StarlinkAI.json`](files/efm/StarlinkAI.json).
 
 ## Layer 3 — Embedded Heartbeat Metrics (XIAO/microfi)
 
