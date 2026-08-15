@@ -388,7 +388,7 @@ The live flow isn't a single inference endpoint — it's **three independent `Ha
 Each leg has the identical four-processor shape, just pointed at a different `InvokeHTTP` target:
 
 ```
-HandleHttpRequest-Inference  (0,   0)    :8090, path /classify, HTTP Context Map
+HandleHttpRequest-Inference  (0,   0)    :8080, path /classify, HTTP Context Map
 InvokeHTTP-Classify          (0,   300)  POST → http://127.0.0.1:5910/classify
 HandleHttpResponse-OK        (0,   600)  200          ← success path
 HandleHttpResponse-Error     (600, 600)  502          ← error branch
@@ -418,7 +418,7 @@ Field-captured on the Jetson Orin Nano running the same MobileNetV2 FP16 inferen
 
 ```console
 $ curl --data-binary @dog-640.jpg -H "Content-Type: application/octet-stream" \
-       http://127.0.0.1:8090/classify
+       http://127.0.0.1:8080/classify
 {"ok": true, "model": "mobilenetv2-12 (ImageNet-1k, FP16)", "source": "body",
  "predictions": [{"label": "Samoyed", "class_id": 258, "confidence": 0.723496}, ...],
  "preprocess_ms": 6.53, "inference_ms": 4.12}
@@ -439,7 +439,7 @@ MiNiFi Java adds roughly 117 ms of overhead per request — FlowFile repository 
 When the inference daemon is unavailable or the input is malformed, the error path responds quickly without hanging:
 
 ```console
-$ curl --data-binary "definitely not an image" http://127.0.0.1:8090/classify
+$ curl --data-binary "definitely not an image" http://127.0.0.1:8080/classify
 --- HTTP 502 in 0.028073s ---
 ```
 
@@ -447,11 +447,26 @@ The HTTP 502 (Bad Gateway) is returned within 28 milliseconds, preventing the ca
 
 ### LAN Reachability
 
-The `HandleHttpRequest` processor binds to `*:8090` (all interfaces), not `127.0.0.1`, making it reachable from any device on the LAN. This allows microcontrollers and other edge devices to POST directly to `http://<jetson-ip>:8090/classify` without requiring them to reach a centralized message broker.
+The `HandleHttpRequest` processor binds to `*:8080` (all interfaces), not `127.0.0.1`, making it reachable from any device on the LAN. This allows microcontrollers and other edge devices to POST directly to `http://<jetson-ip>:8080/classify` without requiring them to reach a centralized message broker.
 
-A live request/response provenance trace for the Inference leg is still outstanding — the Designer canvas and per-leg screenshots above confirm the flow topology and its live per-processor task counters (46,225+ tasks on `HandleHttpRequest-Inference` alone), but a dedicated provenance-view capture of one round trip hasn't been taken yet:
+### Round-Trip Verification — EFM Has No Provenance Browser, But the Numbers Reconcile
 
-<!-- TODO: screenshot pending — NvidiaNano HandleHttp round-trip verification in EFM provenance view -->
+First, an expectation to set: **EFM has no NiFi-style provenance view.** There is no screen where I can open one FlowFile's lineage. "Provenance" appears in exactly one place in the whole 2.3.1.0-2 UI — Agent Manager → agent details → Repositories, a size gauge for the agent's provenance repository — and this Java agent reports that gauge as `Unknown`. I grepped the compiled UI bundle to make sure I wasn't missing a hidden screen; the only hits are that gauge and a `nifi-provenance-repository-nar` manifest entry.
+
+What EFM does give me is per-processor round-trip accounting from the agent's heartbeats. In Flow Design, flip **Monitoring Active** on and pick the agent under **Show Metrics for** — each processor card grows IN / READ/WRITE / OUT / TASKS rows over a rolling 5-minute window. One catch that cost me several passes: the metric rows are zoom-gated. At fit-to-view every card renders blank; zoom in far enough and the rows appear.
+
+Driving a 40-request batch through the Inference leg with the monitor live:
+
+![EFM Flow Designer monitoring — the Inference leg after a 40-request batch: InvokeHTTP-Classify IN 40 (2.95 MB) / OUT 40 (20.46 KB) / TASKS 40, HandleHttpResponse-OK 40 tasks, HandleHttpResponse-Error flat at 0, every queue drained](images/efm-NvidiaNano-Inference-RoundTrip-Monitoring.png)
+
+The same numbers come back without the UI — this is the endpoint the monitoring canvas polls:
+
+```bash
+curl -s "http://<efm-host>:10090/efm/api/designer/flows/<flowId>/process-group/status?agentId=<agentId>" \
+  | jq '.statusSnapshot.processorStatus[] | select(.taskCount > 0)'
+```
+
+The byte accounting reconciles a batch end to end. A 10-request run with the 77,423-byte test image shows `bytesWritten: 774230` (10 × 77,423) on `HandleHttpRequest-Inference`, `bytesIn: 774230` / `bytesOut: 5237` on `InvokeHTTP-Classify` (10 × ~524 bytes of prediction JSON), and `bytesIn: 5237` on `HandleHttpResponse-OK`, with the error branch flat at zero. That is request-level ingress/egress provenance for the whole leg, exact to the byte — aggregated per window, not per FlowFile.
 
 ## Prometheus Observability for EFM and the Jetson Agent
 
