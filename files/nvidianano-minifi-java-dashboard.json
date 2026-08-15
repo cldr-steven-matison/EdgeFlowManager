@@ -1,0 +1,57 @@
+{
+  "uid": "nvidianano-minifi-java",
+  "title": "MiNiFi Java - NvidiaNano",
+  "tags": ["minifi", "efm", "edge"],
+  "timezone": "browser",
+  "schemaVersion": 39,
+  "refresh": "30s",
+  "time": {"from": "now-3h", "to": "now"},
+  "panels": [
+    {
+      "id": 1,
+      "type": "stat",
+      "title": "Scrape Target Up",
+      "gridPos": {"h": 6, "w": 4, "x": 0, "y": 0},
+      "datasource": {"type": "prometheus", "uid": "prometheus"},
+      "targets": [
+        {"expr": "up{job=\"nvidianano-minifi-metrics\"}", "refId": "A"}
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [
+            {"type": "value", "options": {"0": {"text": "DOWN", "color": "red"}, "1": {"text": "UP", "color": "green"}}}
+          ],
+          "thresholds": {"mode": "absolute", "steps": [{"color": "red", "value": null}, {"color": "green", "value": 1}]}
+        },
+        "overrides": []
+      },
+      "options": {"colorMode": "background", "graphMode": "none", "reduceOptions": {"calcs": ["lastNotNull"]}}
+    },
+    {
+      "id": 2,
+      "type": "timeseries",
+      "title": "Host Load Average (flow-level exporter)",
+      "gridPos": {"h": 8, "w": 10, "x": 4, "y": 0},
+      "datasource": {"type": "prometheus", "uid": "prometheus"},
+      "targets": [
+        {"expr": "minifi_java_host_load1{job=\"nvidianano-minifi-metrics\"}", "legendFormat": "load1", "refId": "A"},
+        {"expr": "minifi_java_host_load5{job=\"nvidianano-minifi-metrics\"}", "legendFormat": "load5", "refId": "B"},
+        {"expr": "minifi_java_host_load15{job=\"nvidianano-minifi-metrics\"}", "legendFormat": "load15", "refId": "C"}
+      ],
+      "fieldConfig": {"defaults": {"unit": "short", "custom": {"fillOpacity": 8}}, "overrides": []}
+    },
+    {
+      "id": 3,
+      "type": "timeseries",
+      "title": "Host Memory (flow-level exporter)",
+      "gridPos": {"h": 8, "w": 10, "x": 14, "y": 0},
+      "datasource": {"type": "prometheus", "uid": "prometheus"},
+      "targets": [
+        {"expr": "minifi_java_host_mem_total_kb{job=\"nvidianano-minifi-metrics\"}", "legendFormat": "total", "refId": "A"},
+        {"expr": "minifi_java_host_mem_available_kb{job=\"nvidianano-minifi-metrics\"}", "legendFormat": "available", "refId": "B"},
+        {"expr": "minifi_java_host_mem_free_kb{job=\"nvidianano-minifi-metrics\"}", "legendFormat": "free", "refId": "C"}
+      ],
+      "fieldConfig": {"defaults": {"unit": "deckbytes", "custom": {"fillOpacity": 8}}, "overrides": []}
+    }
+  ]
+}

@@ -6,7 +6,7 @@ There are three metrics layers (Layer 2 covers both the C++ and Java agent varia
 
 1. **Layer 1 — EFM server metrics.** EFM is a Spring Boot app; it exposes an actuator Prometheus endpoint. ✅ Done.
 2. **Layer 2 — MiNiFi C++ agent metrics.** The C++ agent has a native Prometheus publisher (system + processor + repository metrics). ✅ Done.
-3. **Layer 2 (Java) — MiNiFi Java agent metrics.** The built-in Prometheus endpoint is blocked at the platform level, but the agent's metrics reach NiFi over a Site-to-Site relay instead. 🚫 Prometheus endpoint / ✅ S2S relay.
+3. **Layer 2 (Java) — MiNiFi Java agent metrics.** The built-in Prometheus endpoint is blocked at the platform level, but two working alternatives exist: a Site-to-Site metrics relay into NiFi, and — the production path on the Jetson — a flow-level `HandleHttpRequest`/`HandleHttpResponse` exporter that serves Prometheus exposition format directly. 🚫 built-in endpoint / ✅ S2S relay / ✅ flow-level exporter.
 4. **Layer 3 — embedded / heartbeat metrics.** The smallest agents (ESP32/XIAO class) fold storage and health counters into the C2 heartbeat instead. 🟡 Design confirmed; Grafana panel out of scope here.
 
 ## The CSO Prometheus/Grafana Stack
@@ -324,6 +324,12 @@ Two wiring notes that each cost a debug cycle:
 **Route 2 — unmanaged agent, the real `SiteToSiteMetricsReportingTask`.** An agent whose config is authored directly (not EFM/C2-managed) can run the actual reporting task, bypassing the C2 denylist. It delivers the *full* JVM/NiFi internal metric set — `jvm.heap_used`, `loadAverage1min`, `FlowFilesQueued`, GC counters, thread states — into the same input port, richer than the managed RecordSink can produce (a stock processor cannot read the agent's internal metric registry without the embedded web API).
 
 **Honest scope.** This is a metrics relay, not Prometheus parity: the managed route carries host/OS metrics, and neither route exposes a scrape endpoint on the agent. Both push records into NiFi — which is exactly where the CSO Prometheus stack already scrapes, so the edge metrics land on the same Grafana as everything else.
+
+### Route 3 — the flow itself as the Prometheus exporter (production path, field-validated 2026-08-14)
+
+The S2S relay assumes a Site-to-Site-enabled target NiFi — which the production instance deliberately does not have yet (S2S adoption is its own migration project). The route that actually shipped on the `NvidiaNano` Java agent needs no S2S, no new edge services, and no C2-blocked properties: **a fourth `HandleHttpRequest → ExecuteStreamCommand → HandleHttpResponse` leg on the agent's existing flow serves `/metrics` on port 9936** (the same port the C++ publisher used), emitting `# TYPE`-annotated gauges built from `/proc/loadavg` and `/proc/meminfo`. The agent *is* the scrape endpoint — exactly what the built-in-endpoint block was preventing — but implemented entirely as an EFM-designed, C2-pushed flow using the same synchronous HTTP pattern the agent's production inference legs already run.
+
+Cluster side, the C++-era external-target wiring carries over unchanged: a selector-less `Service` + manual `Endpoints` → `192.168.1.197:9936` + `ServiceMonitor` (`job="nvidianano-minifi-metrics"`, 15s interval). One Prometheus 3 requirement: the flow-level responder sends no `Content-Type` header and Prometheus 3 refuses a blank one (`non-compliant scrape target sending blank Content-Type`) — set `spec.fallbackScrapeProtocol: PrometheusText0.0.4` on the `ServiceMonitor`. Verified live: `up{job="nvidianano-minifi-metrics"}=1`, six `minifi_java_host_*` series in Prometheus, rendered on the sidecar-loaded **"MiNiFi Java - NvidiaNano"** Grafana dashboard. Full flow shape, series list, and files: [Chapter 19](ch19-efm-and-nvidia-jetson.md) "Java Agent Metrics Path (Confirmed)".
 
 ## Layer 3 — Embedded Heartbeat Metrics (XIAO/microfi)
 

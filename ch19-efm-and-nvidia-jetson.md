@@ -520,9 +520,25 @@ Binds `0.0.0.0` (confirmed via `ss`), so it is LAN-reachable in principle. Confi
 
 > **⚠️ Restarting to apply metrics config.** `sudo systemctl restart minifi` is the only reliable path — see the restart section above. The same caveat applies here: `minifi.sh restart` calls systemctl internally; a direct `kill` leaves the agent inactive with no automatic respawn.
 
-#### Java Agent Metrics Path (Pending)
+#### Java Agent Metrics Path (Confirmed — Flow-Level Prometheus Exporter)
 
-The above C++ path (`libminifi-prometheus.so`, `nifi.metrics.publisher.*`, port 9936) applies only to the MiNiFi C++ runtime. The current production agent on this class is MiNiFi Java. MiNiFi Java does not use `libminifi-prometheus.so` or the `nifi.metrics.publisher.*` property namespace. The metrics wiring for the Java agent — property configuration, scrape target, and Grafana panel — has not yet been documented or validated on this device and remains an open item. See [Chapter 21 (Metrics & Observability)](ch21-metrics-and-observability.md) for the in-progress work on that path.
+The above C++ path (`libminifi-prometheus.so`, `nifi.metrics.publisher.*`, port 9936) applies only to the MiNiFi C++ runtime. The current production agent on this class is MiNiFi Java, which has **no built-in metrics path at all on an EFM-managed headless agent** — [Chapter 21 (Metrics & Observability)](ch21-metrics-and-observability.md) documents the exhaustive proof (the embedded web API's Prometheus endpoint is blocked by the C2 protocol itself, and no Prometheus NAR ships in this build).
+
+**Field-validated on this device 2026-08-14 (#166): the flow itself becomes the exporter.** The same `HandleHttpRequest → … → HandleHttpResponse` synchronous pattern the class's three production legs already use gains a fourth leg that serves Prometheus exposition format on the same port the C++ publisher used:
+
+```
+HandleHttpRequest-Metrics      (port 9936, GET /metrics only, shared StandardHttpContextMap)
+  ─(success)─→ ExecuteStreamCommand-ProcMetrics   (/bin/sh -c "echo <b64> | base64 -d | sh" —
+                reads /proc/loadavg + /proc/meminfo, emits # TYPE-annotated gauges)
+  ─(output stream)─→ HandleHttpResponse-Metrics-OK    (200)
+  ─(nonzero status)─→ HandleHttpResponse-Metrics-Error (500)
+```
+
+Series exposed: `minifi_java_host_load1/5/15`, `minifi_java_host_mem_total_kb/mem_free_kb/mem_available_kb`. The base64 wrapper is the Chapter 21 `ExecuteStreamCommand` quoting workaround — inline quoted `sh -c` scripts get mangled by its argument tokenizer.
+
+The CSO-side wiring was already in place from the C++ era and carried over unchanged: the manual-`Endpoints` `Service` → `192.168.1.197:9936` + `ServiceMonitor` (`job="nvidianano-minifi-metrics"`, 15s). One Prometheus-3 addition was required: the flow-level responder sends no `Content-Type` header, and Prometheus 3 rejects a blank one — set `spec.fallbackScrapeProtocol: PrometheusText0.0.4` on the `ServiceMonitor`. Verified end to end: `up{job="nvidianano-minifi-metrics"}=1` and all six `minifi_java_host_*` series live in Prometheus, rendered on the **"MiNiFi Java - NvidiaNano"** Grafana dashboard (sidecar-loaded ConfigMap; JSON at [`files/nvidianano-minifi-java-dashboard.json`](../files/nvidianano-minifi-java-dashboard.json), flow export at [`files/efm/NvidiaNanoJava.json`](../files/efm/NvidiaNanoJava.json)).
+
+This closes the old firewall question too: the Jetson accepted the in-cluster scrape on `:9936` with no `ufw` change — the pre-flow "connection refused" (port closed, host reachable) flipped straight to a clean scrape once the leg bound the port.
 
 ## What NOT to Do
 
