@@ -12,7 +12,7 @@
       "type": "stat",
       "title": "Scrape Target Up",
       "gridPos": {"h": 6, "w": 4, "x": 0, "y": 0},
-      "datasource": {"type": "prometheus", "uid": "prometheus"},
+      "datasource": {"type": "prometheus", "uid": "PBFA97CFB590B2093"},
       "targets": [
         {"expr": "up{job=\"nvidianano-minifi-metrics\"}", "refId": "A"}
       ],
@@ -32,7 +32,7 @@
       "type": "timeseries",
       "title": "Host Load Average (flow-level exporter)",
       "gridPos": {"h": 8, "w": 10, "x": 4, "y": 0},
-      "datasource": {"type": "prometheus", "uid": "prometheus"},
+      "datasource": {"type": "prometheus", "uid": "PBFA97CFB590B2093"},
       "targets": [
         {"expr": "minifi_java_host_load1{job=\"nvidianano-minifi-metrics\"}", "legendFormat": "load1", "refId": "A"},
         {"expr": "minifi_java_host_load5{job=\"nvidianano-minifi-metrics\"}", "legendFormat": "load5", "refId": "B"},
@@ -45,7 +45,7 @@
       "type": "timeseries",
       "title": "Host Memory (flow-level exporter)",
       "gridPos": {"h": 8, "w": 10, "x": 14, "y": 0},
-      "datasource": {"type": "prometheus", "uid": "prometheus"},
+      "datasource": {"type": "prometheus", "uid": "PBFA97CFB590B2093"},
       "targets": [
         {"expr": "minifi_java_host_mem_total_kb{job=\"nvidianano-minifi-metrics\"}", "legendFormat": "total", "refId": "A"},
         {"expr": "minifi_java_host_mem_available_kb{job=\"nvidianano-minifi-metrics\"}", "legendFormat": "available", "refId": "B"},
