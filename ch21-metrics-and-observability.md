@@ -7,7 +7,7 @@ There are three metrics layers (Layer 2 covers both the C++ and Java agent varia
 1. **Layer 1 — EFM server metrics.** EFM is a Spring Boot app; it exposes an actuator Prometheus endpoint. ✅ Done.
 2. **Layer 2 — MiNiFi C++ agent metrics.** The C++ agent has a native Prometheus publisher (system + processor + repository metrics). ✅ Done.
 3. **Layer 2 (Java) — MiNiFi Java agent metrics.** The built-in Prometheus endpoint is blocked at the platform level, but two working alternatives exist: a Site-to-Site metrics relay into NiFi, and — the production path on the Jetson — a flow-level `HandleHttpRequest`/`HandleHttpResponse` exporter that serves Prometheus exposition format directly. 🚫 built-in endpoint / ✅ S2S relay / ✅ flow-level exporter.
-4. **Layer 3 — embedded / heartbeat metrics.** The smallest agents (ESP32/XIAO class) fold storage and health counters into the C2 heartbeat instead. 🟡 Design confirmed; Grafana panel out of scope here.
+4. **Layer 3 — embedded / heartbeat metrics.** The smallest agents (ESP32/XIAO class) fold storage and health counters into the C2 heartbeat instead. Field-verified 2026-08-15: EFM drops the custom payload fields and re-exports nothing from the heartbeat body, so the panelable slice is the heartbeat-transport series (already on the fleet dashboard); the storage counters need a device-egress path.
 
 ## The CSO Prometheus/Grafana Stack
 
@@ -369,9 +369,16 @@ Verified live: `up{job="starlinkai-minifi-metrics"}=1` with real values, and the
 
 ## Layer 3 — Embedded Heartbeat Metrics (XIAO/microfi)
 
-The ESP32-class agent is too small to run a Prometheus server. Instead it puts its own health into the **C2 heartbeat**: LittleFS durable-storage counters with watermark-based eviction, reported as storage metrics in the heartbeat payload EFM already receives.
+The ESP32-class agent is too small to run a Prometheus server. Instead it puts its own health into the **C2 heartbeat**: LittleFS durable-storage counters with watermark-based eviction — `littleFsUsedBytes`, `littleFsCapacityBytes`, `littleFsFillPercent`, `evictionCount`, `failedWrites`, `storedRecords` — emitted under `status.microfi` in every heartbeat (`CONFIG_MICROFI_STORAGE_METRICS=y` is the firmware default), alongside `queueDepth` / `produced` / `consumed` engine counters.
 
-Getting those heartbeat metrics onto a Grafana panel means going through EFM (Layer 1) rather than scraping the device directly — EFM holds the agent state, Prometheus scrapes EFM. Design confirmed for the ESP32 class; a Grafana panel is out of scope here.
+The plan was "EFM holds the agent state, Prometheus scrapes EFM." Field-checking that on EFM 2.3.1.0-2 killed it, at two independent points:
+
+- **EFM drops the payload.** `GET /efm/api/agents/{agentId}` for a live MicroFi agent returns the parsed heartbeat status — `uptime`, `repositories.flowFile`, `resourceConsumption` — and no `microfi` block at all. EFM deserializes the heartbeat into its own DTO and unknown fields vanish. "EFM tolerates unknown fields" means exactly that: tolerated, not stored.
+- **The actuator never re-exports payload fields anyway.** The full family list on `/efm/actuator/prometheus` carries per-agent `agentClass`/`agentId` labels only on the heartbeat-transport series — `efm_heartbeat_count_total`, `efm_heartbeat_lastSeenTime_seconds`, `efm_heartbeat_content_*` (payload size), `efm_heartbeat_time_seconds*` (processing latency). Nothing from inside the heartbeat body comes back out, for any agent class.
+
+So the storage counters exist in exactly one place: on the wire between the device and EFM. No intermediary that polls EFM can recover them, and Prometheus has nothing to scrape. What Layer 3 gets on this stack is the heartbeat-transport series — and those are real: the fleet dashboard's MicroFi-1/2/3 rows (seconds-since-heartbeat, heartbeats/min, average heartbeat size) are built entirely from them, and average heartbeat size doubles as a coarse payload signal — a heartbeat carrying the storage block is measurably bigger than one without it.
+
+Putting the storage counters themselves on a panel needs one of two real changes, both outside this chapter's scope: EFM re-exporting heartbeat payload fields (a vendor gap), or the device publishing metrics through its own egress path — MicroFi-3 already publishes Sparkplug B to Mosquitto, and the MQTT → NiFi → Prometheus road is already paved. That work belongs to the MicroFi R&D stream, not the observability wiring.
 
 ## What NOT to Do
 
@@ -382,6 +389,8 @@ Getting those heartbeat metrics onto a Grafana panel means going through EFM (La
 **Don't `kubectl exec ... -- curl` into the EFM pod.** The image ships no `curl`. Port-forward `10090` to the host and curl locally to check health or the Prometheus endpoint.
 
 **Don't apply the `ServiceMonitor` and call it done.** Confirm the target shows green and a value lands in Prometheus (`up{job="efm"}=1`) before trusting it. The port trap above silently yields an empty scrape if the wrong port is used.
+
+**Don't design a metric to ride custom fields in the C2 heartbeat and expect it downstream.** EFM 2.3.1.0-2 deserializes heartbeats into a fixed DTO — unknown payload fields are dropped, not stored, and the actuator re-exports nothing from the heartbeat body. A custom heartbeat metric is visible to nobody. If a device metric must reach Prometheus, give it a real egress (a scrape endpoint or an MQTT/Kafka publish), not a heartbeat side-channel.
 
 **Don't configure the MiNiFi C++ publisher with `nifi.c2.*` property names.** That namespace does not exist in MiNiFi C++ 1.26.02. The real keys are `nifi.metrics.publisher.*`.
 
