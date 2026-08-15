@@ -113,7 +113,7 @@ Conflating these two is the most common mistake. They are different processors w
 
 Everything above gets published to agents the same way, and the method is worth stating once because it's what makes AI-assisted edge work fast instead of frustrating.
 
-**Use the `nifi-and-ai` skill, not raw recall.** [Chapter 14](ch14-nifi-and-ai-skill-efm-portion.md) is the skill's EFM machinery. It carries the flow-build API shapes, the manifest-mapping rules, and the silent-drop failure catalog so an AI building these flows works from the proven contract instead of hallucinating one.
+**Use the `nifi-and-ai` skill, not raw recall.** [Chapter 14](ch14-nifi-and-ai-skill-efm-portion.md) is the skill's EFM machinery, and the skill itself is public — `git clone https://github.com/cldr-steven-matison/NiFiandAi ~/.claude/skills/nifi-and-ai` installs it. It carries the flow-build API shapes, the manifest-mapping rules, and the silent-drop failure catalog so an AI building these flows works from the proven contract instead of hallucinating one.
 
 **Build flows component by component — there is no whole-flow PUT.** `PUT /efm/api/designer/flows/{flowId}` returns `405`. The loop is always the same:
 

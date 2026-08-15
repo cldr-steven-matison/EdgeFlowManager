@@ -37,7 +37,7 @@ calls for one:
 | `references/custom-processors.md` | Writing custom Python/Java processors, the mixed-template EL trap, and rebuild→redeploy discipline. |
 | `references/patterns.md` | Flow patterns that ship: NiFi-as-HTTP-API, the MiNiFi fire-and-forget router, ingest→Kafka→transform→sink (RAG), and the GUI-less edge→host bridge. |
 | `references/debugging.md` | Cross-cutting wire-up gotchas and a 10-step debugging checklist. |
-| `references/layout.md` | Canvas layout: the coordinate model, spacing constants, per-shape placement rules, and a worked example. |
+| `references/layout.md` | Canvas layout: the coordinate model, spacing constants, direction & sprawl rules (route/add down never up, new work right of existing canvas, one test funnel, per-branch terminal logs), per-shape placement rules, a worked example — and the running list of what a programmatic build still needs a human pass on. |
 
 ### The 9 Rules
 
@@ -427,4 +427,11 @@ or the old identifier is liable to reproduce the exact failure it was meant to f
 - Ch16 — [How to AI with MiNiFi](ch16-how-to-ai-with-minifi.md): what you make agents *do* once this
   machinery is in place; builds against the same Designer contract.
 
-The `nifi-and-ai` skill (`skills/nifi-and-ai/`) is the working toolkit this chapter documents.
+The `nifi-and-ai` skill is published at
+[cldr-steven-matison/NiFiandAi](https://github.com/cldr-steven-matison/NiFiandAi) — install it with
+
+```bash
+git clone https://github.com/cldr-steven-matison/NiFiandAi ~/.claude/skills/nifi-and-ai
+```
+
+and the next Claude Code session that touches NiFi, MiNiFi, or EFM loads it automatically. That repo is the working toolkit this chapter documents.
