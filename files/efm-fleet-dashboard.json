@@ -1015,7 +1015,7 @@
     {
       "id": 29,
       "type": "row",
-      "title": "WindowsDesktop (gaming PC agent) \u2014 heartbeat health (Layer 1)",
+      "title": "WindowsDesktop (gaming PC agent) \u2014 host via flow-level exporter (Layer 2) + heartbeat",
       "gridPos": {
         "h": 1,
         "w": 24,
@@ -1026,6 +1026,139 @@
       "panels": []
     },
     {
+      "id": 33,
+      "type": "stat",
+      "title": "WD Scrape",
+      "gridPos": {
+        "h": 7,
+        "w": 4,
+        "x": 0,
+        "y": 57
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
+      },
+      "targets": [
+        {
+          "expr": "up{job=\"windowsdesktopcpp-minifi-metrics\"}",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "0": {
+                  "text": "DOWN",
+                  "color": "red"
+                },
+                "1": {
+                  "text": "UP",
+                  "color": "green"
+                }
+              }
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "green",
+                "value": 1
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        }
+      }
+    },
+    {
+      "id": 34,
+      "type": "timeseries",
+      "title": "WindowsDesktop CPU %",
+      "gridPos": {
+        "h": 7,
+        "w": 10,
+        "x": 4,
+        "y": 57
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
+      },
+      "targets": [
+        {
+          "expr": "minifi_java_host_cpu_percent{job=\"windowsdesktopcpp-minifi-metrics\"}",
+          "legendFormat": "cpu %",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "min": 0,
+          "max": 100,
+          "custom": {
+            "fillOpacity": 10
+          }
+        },
+        "overrides": []
+      }
+    },
+    {
+      "id": 35,
+      "type": "timeseries",
+      "title": "WindowsDesktop memory",
+      "gridPos": {
+        "h": 7,
+        "w": 10,
+        "x": 14,
+        "y": 57
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
+      },
+      "targets": [
+        {
+          "expr": "minifi_java_host_mem_total_kb{job=\"windowsdesktopcpp-minifi-metrics\"}",
+          "legendFormat": "total",
+          "refId": "A"
+        },
+        {
+          "expr": "minifi_java_host_mem_free_kb{job=\"windowsdesktopcpp-minifi-metrics\"}",
+          "legendFormat": "free",
+          "refId": "B"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "deckbytes",
+          "min": 0,
+          "custom": {
+            "fillOpacity": 10
+          }
+        },
+        "overrides": []
+      }
+    },
+    {
       "id": 30,
       "type": "timeseries",
       "title": "WindowsDesktop \u2014 seconds since heartbeat",
@@ -1033,7 +1166,7 @@
         "h": 7,
         "w": 8,
         "x": 0,
-        "y": 57
+        "y": 64
       },
       "datasource": {
         "type": "prometheus",
@@ -1065,7 +1198,7 @@
         "h": 7,
         "w": 8,
         "x": 8,
-        "y": 57
+        "y": 64
       },
       "datasource": {
         "type": "prometheus",
@@ -1097,7 +1230,7 @@
         "h": 7,
         "w": 8,
         "x": 16,
-        "y": 57
+        "y": 64
       },
       "datasource": {
         "type": "prometheus",

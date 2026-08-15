@@ -331,6 +331,12 @@ The S2S relay assumes a Site-to-Site-enabled target NiFi — which the productio
 
 Cluster side, the C++-era external-target wiring carries over unchanged: a selector-less `Service` + manual `Endpoints` → `192.168.1.197:9936` + `ServiceMonitor` (`job="nvidianano-minifi-metrics"`, 15s interval). One Prometheus 3 requirement: the flow-level responder sends no `Content-Type` header and Prometheus 3 refuses a blank one (`non-compliant scrape target sending blank Content-Type`) — set `spec.fallbackScrapeProtocol: PrometheusText0.0.4` on the `ServiceMonitor`. Verified live: `up{job="nvidianano-minifi-metrics"}=1`, six `minifi_java_host_*` series in Prometheus, rendered on the sidecar-loaded **"MiNiFi Java - NvidiaNano"** Grafana dashboard. Full flow shape, series list, and files: [Chapter 19](ch19-efm-and-nvidia-jetson.md) "Java Agent Metrics Path (Confirmed)".
 
+**The Windows variant (field-validated on the `WindowsDesktop` Java agent, 2026-08-15).** Same fourth-leg shape; three Windows-specific substitutions:
+
+- No `/proc` — the script runs via **`powershell.exe -NoProfile -EncodedCommand <base64-UTF-16LE>`** (the Windows equivalent of the `sh` base64 wrapper: the encoded form survives `ExecuteStreamCommand`'s `;` argument delimiter and quoting untouched). Metrics from `Get-CimInstance Win32_OperatingSystem` (memory, already KB) and `Win32_Processor` `LoadPercentage` (CPU %).
+- **PowerShell emits CRLF, and Prometheus rejects it** (`invalid metric type "gauge\r"`). Build the exposition text as one string and `[Console]::Out.Write(($lines -join "`n") + "`n")` — never let default `Write-Output` line endings reach the wire.
+- **Windows Defender Firewall silently drops the inbound scrape** on the LAN IP even from the same physical host — an elevated `netsh advfirewall firewall add rule ... localport=9936` allow rule is mandatory (the error signature before the rule is connection-failure; after the rule, any remaining error is the parser telling you about the payload). A WSL-side `curl` to the host's own LAN IP is *not* a valid reachability test in mirrored mode — it can keep failing after the in-cluster scrape works; test via loopback locally and via Prometheus's own target status for the real path.
+
 ## Layer 3 — Embedded Heartbeat Metrics (XIAO/microfi)
 
 The ESP32-class agent is too small to run a Prometheus server. Instead it puts its own health into the **C2 heartbeat**: LittleFS durable-storage counters with watermark-based eviction, reported as storage metrics in the heartbeat payload EFM already receives.
