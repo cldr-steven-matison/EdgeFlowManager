@@ -19,6 +19,15 @@ For contrast on the NiFi side: the old `PrometheusReportingTask` is gone in NiFi
 
 ## Layer 0 — Prerequisites and Deploy
 
+> **The stack is rebuildable in two moves — proven by losing it.** A 2026-08-26 cluster cutover
+> left this lab with no Prometheus/Grafana at all, while every agent-side exporter kept serving.
+> Because the monitoring CRDs and the ServiceMonitor/Service/Endpoints objects survived the
+> stack's removal, the 2026-09-01 re-stand was exactly: (1) the same `kube-prometheus-stack`
+> helm install, (2) `kubectl apply` of the committed scrape wiring + the two dashboard
+> ConfigMaps. All five fleet targets were `up=1` again within minutes, with zero agent-side
+> work — the payoff of keeping every monitor and dashboard as versioned YAML/JSON rather than
+> UI state.
+
 Every layer below assumes EFM is actually deployed. On a CSO host that runs NiFi/Kafka/Flink but has never run EFM, stand it up from the `ClouderaStreamingOperators` repo. EFM is a Spring Boot app backed by Postgres; skipping a prerequisite is how you get a pod in `CrashLoopBackOff` instead of a clean metrics endpoint.
 
 ### Verify Prerequisites Before Applying Anything
@@ -170,6 +179,14 @@ Three semantics that will bite if unlearned:
 ### The Fleet Dashboard
 
 Those series drive the **EFM Fleet - All Devices** Grafana dashboard ([`files/efm-fleet-dashboard.json`](files/efm-fleet-dashboard.json)): a seconds-since-heartbeat stat tile per device (green under 120s, yellow under 600s, red beyond), an all-device sawtooth graph (a healthy device saws between 0 and its heartbeat interval; a dying one just climbs), and a host row — scrape status, CPU, memory — for each device with a Layer-2 exporter (the Jetson, WindowsDesktop, and StarlinkAI legs below). Devices without an exporter get a Layer-1 row (sawtooth, heartbeats/min, average heartbeat size) instead.
+
+Live, all six device tiles green and all three Layer-2 host rows UP (captured 2026-09-01, right after the post-cutover re-stand described under Layer 0):
+
+![EFM Fleet - All Devices: six green seconds-since-heartbeat tiles, the all-device sawtooth, and Layer-2 host rows for the Jetson, StarlinkAI, and WindowsDesktop](images/ch21-efm-fleet-dashboard.png)
+
+The per-agent board from the same capture — the Jetson's flow-level exporter feeding scrape status, host load, and memory:
+
+![MiNiFi Java - NvidiaNano: scrape target UP, host load average and memory from the flow-level exporter](images/ch21-nvidianano-minifi-java-dashboard.png)
 
 Two deployment conventions on this stack:
 
