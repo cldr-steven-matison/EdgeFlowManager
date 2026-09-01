@@ -2,7 +2,7 @@
 
 MicroFi is a clean-room, from-scratch reimplementation of the MiNiFi C2 protocol contracts — FlowFile semantics, C2 heartbeat/ack, flow-definition apply — written in C++ against ESP-IDF for the Seeed XIAO ESP32-S3. It is **not** a fork of `nifi-minifi-cpp`, and it does not behave like one once you're inside it. This chapter is the field record of turning MicroFi into a real EFM agent class running real processors on real hardware: chip identification, the hardware/flash-size trap that ate most of a session, EFM enrollment and the implicit-ack question, building new processors into a compile-time registry, and three real engine bugs found by running actual flows against actual hardware.
 
-Everything in this chapter ran on real hardware — a single physical XIAO ESP32-S3 **Sense** unit, MAC `e0:72:a1:fb:fd:04` — moved between `StarlinkAI` and `WindowsDesktop` over the course of the work. Where SparkPlug B payload decoding and the JSON-telemetry-to-Kafka pipeline are concerned, that content lives in [Chapter 13 — EFM and SparkPlug MQTT](ch13-efm-and-sparkplug-mqtt.md) and [Chapter 20 — SparkPlug Demo](ch20-sparkplug-demo.md). This chapter owns the EFM/MicroFi-agent side only: getting a device to enroll, verifying the manifest, pushing flows, and extending the firmware itself.
+Everything in the field-record half of this chapter ran on real hardware — a single physical XIAO ESP32-S3 **Sense** unit, MAC `e0:72:a1:fb:fd:04` — moved between `StarlinkAI` and `WindowsDesktop` over the course of the work. That one unit later became a **fleet**: three Sharpie-numbered XIAOs running one flow type each, plus a fourth MicroFi host of a very different kind — a Waveshare AMOLED touchscreen whose display, touch, IMU, and microphone became EFM processors. The capstone sections at the end of this chapter collect that final state: the fleet, the full processor registry, and the AMOLED's senses. Where SparkPlug B payload decoding and the JSON-telemetry-to-Kafka pipeline are concerned, that content lives in [Chapter 13 — EFM and SparkPlug MQTT](ch13-efm-and-sparkplug-mqtt.md) and [Chapter 20 — SparkPlug Demo](ch20-sparkplug-demo.md). This chapter owns the EFM/MicroFi-agent side only: getting a device to enroll, verifying the manifest, pushing flows, and extending the firmware itself.
 
 ## Scope — Read This First
 
@@ -15,7 +15,7 @@ Everything in this chapter ran on real hardware — a single physical XIAO ESP32
 | Storage | Heap-centric, RocksDB repositories | LittleFS with watermark eviction |
 | Python | Full CPython via `libminifi-python-script-extension.so` | None — no embedded interpreter; processors are C++, compiled into the static registry |
 | Target | Linux/ARM64, Jetson-class, k8s pods | Seeed XIAO ESP32-S3 (and C3), microcontroller-class |
-| Processors available (this work) | Dozens, catalog in [Chapter 3](ch03-cpp-processor-catalog.md) | 5, built by hand in this chapter |
+| Processors available (this work) | Dozens, catalog in [Chapter 3](ch03-cpp-processor-catalog.md) | 5 during this build log; **9 in the final XIAO registry, 11 on the AMOLED** (capstone sections below) |
 
 The rationale for building something new rather than porting MiNiFi C++ down is in the repo's own `docs/MICROFI_ASSESSMENT.md`: MiNiFi C++'s design — heap-centric, RocksDB repositories, `dlopen` plugin loading — doesn't shrink to a microcontroller. So MicroFi resolves processors by name against a **compile-time static registry** instead. The property names are deliberately kept MiNiFi-C++-compatible (`generate_flowfile.cpp` declares `File Size` / `Batch Size` / `Data Format`; `log_attribute.cpp` declares `Log Level` / `Log Payload` / `Log prefix` / `Attributes to Log`) so an EFM flow definition written against MiNiFi C++ resolves against MicroFi's registry unchanged. That compatibility bet is the thing every processor built in this chapter had to respect.
 
@@ -248,7 +248,7 @@ Built `GenerateFlowFile → PublishMQTT` in the Designer (`Broker URI: mqtt://19
 
 **A real engine bug turned up here.** `Session::transfer()` (`src/session.cpp`) matches a relationship name against `bindings_` and returns on the *first* match. A one-relationship, multi-connection fan-out — the pre-existing `GenerateFlowFile → LogAttribute` connection plus the new `→ PublishMQTT` one, both bound to `success` — silently starved every connection registered after the first. `PublishMQTT` never received a single FlowFile as long as `LogAttribute` stayed bound to the same relationship. Confirmed by reading the source directly, not inferred from logs.
 
-**Workaround applied (not a real fix)**: deleted the `GenerateFlowFile → LogAttribute` connection and the now-orphaned `LogAttribute` node, leaving `GenerateFlowFile → PublishMQTT` as the flow's only connection. Republished; `PublishMQTT` then received every FlowFile. The real fix — patching `transfer()` to keep scanning `bindings_` instead of returning on the first match, followed by a rebuild and reflash — is still open. Any flow needing two consumers on one relationship (bringing `LogAttribute` back alongside `PublishMQTT` for debugging, for instance) will hit this again until it's patched.
+**Workaround applied (not a real fix)**: deleted the `GenerateFlowFile → LogAttribute` connection and the now-orphaned `LogAttribute` node, leaving `GenerateFlowFile → PublishMQTT` as the flow's only connection. Republished; `PublishMQTT` then received every FlowFile. The real fix — patching `transfer()` to keep scanning `bindings_` instead of returning on the first match — was ultimately **not** made: the constraint was accepted as platform behavior, and every fleet flow since keeps one consumer per relationship (see the capstone's bug disposition). Any flow needing two consumers on one relationship will hit this.
 
 The first retest after the workaround still failed at the transport layer:
 
@@ -301,18 +301,134 @@ Flash on this unit's 2 MB layout reached **96.8% (1,141,317 / 1,179,648 bytes)**
 
 Of the original build list (`PublishMQTT` → real ingress source → `UpdateAttribute`), **2 of 3 shipped and verified on hardware** (`PublishMQTT`, `UpdateAttribute`). The real-ingress-source slot ended up filled by `GetGPIO` after the memory-corruption detour, plus `ListenHTTP` as a bonus ingress path beyond the original three. `RouteOnAttribute` remains deferred, per the original design spec, pending a scoped Expression-Language evaluator this runtime doesn't have.
 
-**Three real engine/infra bugs found and documented, all still open, low urgency** (worked around, not blocking anything currently running):
+**Four real engine/infra findings came out of running actual flows on actual hardware** — three tracked to a close as issues, one still genuinely open:
 
-- `Session::transfer()` only delivers to the first relationship binding that matches by name — a fan-out to two connections on the same relationship silently starves every connection after the first.
-- EFM's manifest store doesn't refresh a processor's property descriptors when its name is already known to the agent class, even on a genuine new manifest hash — only a fresh processor *name* reliably gets a new manifest record. This bit the `UpdateAttribute` property redesign; the workaround (temporarily rename, verify, rename back) is in the fork's commit history.
-- `kMaxFlowNodes=4` silently drops processors beyond the fourth in a flow, with no user-visible error.
+- `Session::transfer()` only delivers to the first relationship binding that matches by name — a fan-out to two connections on the same relationship silently starves every connection after the first. **Closed as accepted platform behavior**: every fleet flow keeps one consumer per relationship, and the constraint is designed around rather than patched.
+- EFM's manifest store doesn't refresh a processor's property descriptors when its name is already known to the agent class, even on a genuine new manifest hash — only a fresh processor *name* reliably gets a new manifest record. This bit the `UpdateAttribute` property redesign; the workaround (temporarily rename, verify, rename back) is in the fork's commit history. **Closed with the workaround as the documented procedure.**
+- The GetGPIO memory-corruption suspicion cleared after instrumented soak testing (stack canaries + strong stack checks, no regression) — closed with a reopen-if-it-resurfaces note.
+- `kMaxFlowNodes=4` silently drops processors beyond the fourth in a flow, with no user-visible error. **Still open** — and it actively shaped the AMOLED work below (only two sense pairs fit one class flow). The proposed fix on record: a `MICROFI_MAX_FLOW_NODES`/`MICROFI_MAX_FLOW_CONNECTIONS` override to 8 for the AMOLED (whose queues ride PSRAM; XIAO DRAM is why the cap is 4), and making the over-cap case a hard error instead of a silent drop.
+
+## The Capstone — From One Test Unit to a Fleet
+
+Everything above is the build story on a single XIAO. What follows is where MicroFi actually landed: three XIAO units running one flow type each, a unified firmware image, and the retirement of two early findings by real fixes.
+
+### MicroFi-1/2/3 — one flow type per unit
+
+Three physical Seeed XIAO ESP32-S3 **Sense** units (identical hardware: 8 MB flash — GigaDevice GD25Q64, JEDEC-verified per unit — 8 MB PSRAM, OV2640 camera + mic on all three), each its own EFM agent class. MicroFi's compile-time, processor-count-limited architecture makes each device realistically its own small research track rather than one flow reused three ways:
+
+| Unit | Class | Track | Live flow | Export |
+|---|---|---|---|---|
+| #1 | `MicroFi-1` | JSON telemetry emit | `GenerateFlowFile({"device_id":"MicroFi-1"}) → PublishMQTT(test/sensor/data)` (+ a parked `ListenHTTP :8095/test`) | [`files/microfi/microfi-1-telemetry.json`](../files/microfi/microfi-1-telemetry.json) |
+| #2 | `MicroFi-2` | Camera | `CaptureImage(VGA JPEG, broker-direct microfi2/camera/jpg) → PublishMQTT(microfi2/camera/meta)` | [`files/microfi/microfi-2-camera.json`](../files/microfi/microfi-2-camera.json) |
+| #3 | `MicroFi-3` | Sparkplug B emit | `GenerateFlowFile-SpbTick → PublishSparkplug` (real NBIRTH/NDATA on `spBv1.0/MicroFi/…/MicroFi-3`) | [`files/microfi/microfi-3-sparkplug.json`](../files/microfi/microfi-3-sparkplug.json) |
+
+![EFM Flow Design listing showing the whole MicroFi fleet published — AMOLED v8, MicroFi-1/2/3, and the Sparkplug lab classes](images/ch12-efm-flow-design-fleet.png)
+
+MicroFi-3's earlier LED-actuation flow (`ListenHTTP /led → SetGPIO pin 21`) is preserved at [`files/microfi/microfi-3-led-flow-backup.json`](../files/microfi/microfi-3-led-flow-backup.json) — it was re-fielded on MicroFi-1 for Chapter 20's 2026-09-01 round-trip re-validation and is Chapter 18's Entry 12. The NiFi-side bridges for the fleet are committed alongside: [`files/microfi/MicroFi2CameraBridge.json`](../files/microfi/MicroFi2CameraBridge.json) (camera topics → Kafka `microfi2.camera.*`), and the AMOLED pair below.
+
+**The flash-size trap resolved fleet-wide:** all three units run an OTA-preserving 8 MB partition layout (`partitions_8mb.csv`: nvs/otadata/phy_init + 2×2 MB app slots + ~3.9 MB LittleFS). The 2 MB near-wall capacity numbers earlier in this chapter are that first unit's history; the fleet image sits at ~52–59% of an app slot with the full registry compiled in.
+
+**One unified image, per-device overlays.** A single firmware build serves every unit; only a per-device `sdkconfig.defaults.microfiN` overlay differs, setting `CONFIG_MICROFI_AGENT_CLASS` (agent ids are MAC-derived, unique by construction). Overlays must live in the `sdkconfig.defaults.*` namespace — PlatformIO writes each env's *generated* config to `sdkconfig.<env-name>` and will clobber (then ignore) an overlay named that way. WiFi credentials and C2 URLs stay in the untracked `sdkconfig.defaults.local`.
+
+### Fleet-class EFM mechanics (apply to every MicroFi class)
+
+- **No deployer command.** Class and identity are compile-time; EFM auto-creates the class on first heartbeat. The `generateCommand` rule is for real MiNiFi C++/Java installs, not MicroFi.
+- **Every new/changed manifest needs the Designer palette pin**: `POST /efm/api/agent-class-manifest-config` with `{"agentClassName": …, "agentManifestId": …}` (for the AMOLED it took `DELETE` + `POST` — POST alone won't overwrite an existing mapping, and PUT 500s). EFM content-hashes manifests and dedupes identical builds across classes.
+- **The implicit-ack question (Task 7 above) was eventually answered by replacing it.** The early "implicit ack via heartbeat flowId match" reading is disproven — EFM 2.3.1 times unacknowledged operations out to FAILED. MicroFi now POSTs an explicit `/acknowledge` (`{"operationId": …, "operationState": {"state": "FULLY_APPLIED"|"NOT_APPLIED"}}`) after every configuration apply, and EFM maps it to DONE — verified live down to the `operation`/`bulk_operation` rows. The ack body deliberately omits `agentInfo`/`deviceInfo`/`flowInfo`: including any of them makes EFM also process the ack as a heartbeat.
+- **Flow re-apply teardown is fixed.** `ProcessorDescriptor` grew an `on_stop` hook the engine calls on the outgoing graph before every rebuild — ListenHTTP releases its httpd port, MQTT-owning processors stop and destroy their esp-mqtt clients. Back-to-back republishes no longer need a power-cycle; the reset-after-publish rule is retired for post-fix builds. (The one exception found later: a *hot* flow-swap on a **pre-fix** build can strand a bound socket — Chapter 20's `httpd_start failed` incident.)
+- **Every MQTT-owning processor on one device needs a distinct Client ID.** esp-mqtt's default id is MAC-derived, so two clients on one unit collide and the broker kicks the older session on every connect (`microfi2-cam` / `microfi2-meta` on the camera unit is the pattern).
+- **Serial without rebooting:** a plain `serial.Serial('COMx')` open asserts DTR/RTS and trips the ESP32 auto-reset — it silently reboots the unit under test. Construct unopened, clear both lines, then open.
+
+### The full processor registry — what got built
+
+The chapter's build log stops at five processors; the fleet's final registry is **nine**, all C++, all compile-time:
+
+| Processor | Kind | The one thing to know |
+|---|---|---|
+| `GenerateFlowFile` | source | MiNiFi-C++-compatible property names — the compatibility bet held throughout |
+| `LogAttribute` | sink | first-light proof for every new source |
+| `PublishMQTT` | sink | minimal props, no TLS; lazy-connects on its first FlowFile |
+| `UpdateAttribute` | mid | four literal slots (`Attribute N Name/Value`) — no EL, no dynamic properties |
+| `GetGPIO` | source | read-only, BOOT/GPIO0 |
+| `SetGPIO` | sink | write; `Pin Level=from-content` parses `1/0/on/off/high/low/toggle`; `Invert` for active-low LEDs |
+| `ListenHTTP` | ingress | fire-and-forget only (no request/response pair — Chapter 16's trap list) |
+| `CaptureImage` | source | OV2640 JPEG published **broker-direct**, metadata JSON as the FlowFile |
+| `PublishSparkplug` | sink | real NBIRTH/NDATA via the vendored `EmbeddedSparkplugNode`/nanopb stack — Chapter 13/20's edge publisher |
+
+`RouteOnAttribute` stays deferred forever on this runtime — there is no Expression-Language engine, so branching is separate flows or a property on the source (the AMOLED's shake threshold below is exactly that pattern).
+
+Two architectural ceilings shape every flow above and below: **FlowFile content is a 256-byte inline buffer** (binary payloads never ride the chain — a media processor publishes bytes broker-direct and emits a metadata FlowFile instead; `CaptureImage` set the pattern, `CaptureAudio` followed it), and **`kMaxFlowNodes=4`** (count nodes before publishing).
+
+### Can the XIAO run custom Python processors? No — and it's worth knowing why
+
+Three layers, evaluated against the real MiNiFi C++ Python machinery:
+
+1. **The MiNiFi C++ Python extension can't run on an ESP32.** It embeds a full CPython interpreter — dynamic `libpython` linking, a system Python install, `.so` extension loading. None of that exists on ESP-IDF: no libpython build, no dlopen loader, no room (CPython + stdlib is many MB).
+2. **MicroFi's architecture rules out the delivery model, not just the size.** The entire point of a NiFi/MiNiFi Python processor is *ship a script in the flow definition, no rebuild*. MicroFi is the opposite by design — adding a processor is a firmware rebuild + reflash. Even if CPython fit, the property you'd reach for isn't there.
+3. **What is possible:** custom processors in C++ against the static registry (this whole chapter), and — in principle — an `ExecuteMicroPython` processor embedding a MicroPython VM. That would restore push-logic-without-reflash, but it's a from-scratch MicroFi feature with a reduced stdlib and a property contract that would break the MiNiFi-C++ compatibility bet. Scoped as its own idea, never built.
+
+Same shape as the `RouteOnAttribute` deferral: the tiny runtime has no embedded interpreter, and every "just run a script/predicate" feature hits that wall until one is deliberately embedded.
+
+## The AMOLED — a MicroFi Host With Senses
+
+The fourth MicroFi host breaks the mold: a **Waveshare ESP32-S3 AMOLED 1.8" V2** touchscreen running the Brookesia launcher — a device with a display, capacitive touch, an IMU, a power-management IC, and an ES8311 mic/speaker codec. The MicroFi agent runs *inside* that firmware as a guest, and the board's senses became EFM processors: an EFM flow can read the panel's motion and touch, put text on its screen, play a clip through its speaker, and record its microphone. This is the capstone demo of what the MicroFi architecture is for.
+
+**The framework fact that made it tractable:** Brookesia doesn't hand-roll drivers — every peripheral is declared in the board port and realized by `esp_board_manager`, which exposes public by-name accessors (`esp_board_periph_get_handle("i2c_master", …)`, `esp_board_device_get_handle(…)`). "Adopt existing" is the framework's normal access path, not a per-peripheral hack: the agent shares the I2C bus the way the board's own drivers do, and subscribes to Brookesia services (display gestures, audio) rather than re-owning hardware. Per-board processor sets stay a source-list choice — each sense `.cpp` is wrapped whole in a `MICROFI_BOARD_*` compile define, so the XIAO builds compile them to empty translation units (`pio run -e esp32s3-8mb` stays the regression gate).
+
+### The five senses, as built (manifest: 11 processors — the 6-set above plus these)
+
+- **`GetIMU`** (QMI8658, source) — the cleanest first build: nothing in Brookesia touches the IMU, so the processor owns it outright via the shared bus. Polled source shaped like `GetGPIO`; props `Read Interval` / `Output Format` (JSON or attributes) / full-scale ranges / **`Motion Threshold (g)`** — shake-as-trigger is a property on the source, not a router, because there is no EL. Field notes that survived the build: the driver's "g" mode is really **milli-g** (first flash read `az=-1009`; now scaled in-processor), the gyro range set is 32–4096 dps, and `ts` is µs-since-boot (the RTC is an un-adopted sense).
+- **`GetTouch`** (CST820, source) — does *not* read the touch controller; it subscribes to the Display service's gesture signal (the shell already runs gesture detection) and emits one FlowFile per completed gesture: `tap`/`hold`/`swipe_up|down|left|right` with coordinates, duration, distance, speed. First Brookesia *service* dependency in the agent.
+- **`PlayAudio`** (ES8311, sink) — plays a **URL** (`http(s)://` or `file://littlefs/…`), never audio bytes: a FlowFile carries 256 B, so the board pulls the clip through the `AudioPlayback` service (Brookesia's mixer arbitrates with the live wake-word pipeline). Field finding: the V2 amplifier path is quiet — `Volume: 100` on the node is what made it audible.
+- **`CaptureAudio`** (ES8311 mic, source) — the hard one, landed last: taps Brookesia `AudioEncoder0`'s raw recorder-data signal (16 kHz `MR` stereo; channel 0 is the mic), records N-second clips into heap PSRAM (never the agent's ISR/DMA-excluded static mapping), publishes a complete WAV **broker-direct** on its own MQTT client, and emits the capture event as a JSON FlowFile — the `CaptureImage` pattern exactly. Verified ears-on through the cluster's Whisper service: real transcripts from taps on the glass ("Oh, my God." — RMS 9,977, clipped). Whisper hallucinates on silent clips, so an RMS gate belongs before any transcription step.
+- **`DisplayMessage`** (CO5300 display, sink) — no public notification API exists in Brookesia, so the processor writes a spinlock-guarded single-slot mailbox that the native agent status tile renders. `INPUT_REQUIRED`, one property (`Message`, blank = FlowFile content is the text).
+
+`GetPower` (AXP2101) stays deliberately unbuilt: this board is USB-tethered with no battery, so power telemetry would be rails and temperature — not demo-worthy yet.
+
+### The round-trip — shake the panel, the glass answers
+
+The capstone flow closes a full loop with no Sparkplug framing (that story stays in Chapters 13/20):
+
+```
+AMOLED GetIMU (Motion Threshold 0.3 g — silent at rest)
+  → PublishMQTT (microfi/amoled/imu)
+    → NiFi AmoledImuBridge PG:   ConsumeMQTT → PublishKafka (amoled.imu)
+      → NiFi AmoledShakeToDisplay PG:  ConsumeKafka → EvaluateJsonPath → ReplaceText
+        → InvokeHTTP POST http://<board>:8095/message
+          → AMOLED ListenHTTP → DisplayMessage (mailbox → status tile)
+```
+
+![AmoledImuBridge PG live on the NiFi canvas — ConsumeMQTT to PublishKafka with the failure log leg](images/ch12-nifi-amoled-imu-bridge.png)
+
+![AmoledShakeToDisplay PG live — ConsumeKafka, ExtractAccel, BuildShakeMessage, PostToGlass with retry/failure legs](images/ch12-nifi-amoled-shake-to-display.png)
+
+Field-verified end to end: a resting panel produces zero messages (|accel| ≈ 1.014 g, 0.014 off 1 g); real bumps produced threshold-crossing events on `amoled.imu` (1–3 samples per shake — the 1 s sample clock), every event came back to the board as an `InvokeHTTP` 200, and the board's serial shows `DisplayMessage` writing the mailbox. Exports: [`files/microfi/AmoledImuBridge.json`](../files/microfi/AmoledImuBridge.json), [`files/microfi/AmoledShakeToDisplay.json`](../files/microfi/AmoledShakeToDisplay.json), class flow [`files/microfi/amoled-class-flow-imu-shake-displaymessage.json`](../files/microfi/amoled-class-flow-imu-shake-displaymessage.json).
+
+**`kMaxFlowNodes=4` bit hard here**: four senses cannot share one class flow, so the published flow rotates between 4-node shapes — the IMU/DisplayMessage pair, touch/audio (`GetTouch → PublishMQTT` + `ListenHTTP /play → PlayAudio`), and the record shape (`GetTouch → CaptureAudio ← ListenHTTP /record`, `CaptureAudio → PublishMQTT` for the capture events). All exports live in [`files/microfi/`](../files/microfi/), and [`files/microfi/amoled-class-flow.py`](../files/microfi/amoled-class-flow.py) rebuilds any of them through the EFM Designer API (`clear` / `build <spec>` / `publish`) — itself a worked example of driving the Designer programmatically.
+
+### AMOLED engine/lifecycle facts worth stealing
+
+- **A MicroFi sink has no idle tick** — the engine calls a node with an incoming connection only when a FlowFile is queued for it. A processor that defers work to "the next tick" silently never runs; `CaptureAudio` does connect→record→publish→emit inside one `on_trigger` (taps queue and drain sequentially).
+- **Create Designer nodes only after the class-manifest re-pin lands.** A node created before the pin stays "not an available Processor type" even after the palette lists it — delete and recreate.
+- MicroFi manifests give **every** processor a `success` relationship, sinks included — auto-terminate it on sinks or validation fails.
+- `AudioEncoder0` is initialized but not *started* at boot; only an AI-agent session normally binds it. `CaptureAudio` holds its own service binding and starts the encoder if idle (and leaves it alone if someone else runs it).
+
+### Still open, recorded honestly
+
+1. **`kMaxFlowNodes=4`** — the override-to-8-for-the-AMOLED fix (XIAOs keep 4) is designed, not built; the silent drop should become an error at the same time.
+2. **`DisplayMessage` has no visible surface today** — the native status tile that renders the mailbox has been hidden since the launcher cleanup; a flow-sent string reaches the board but not a screen you can open. Two routes on record: flip the tile visible, or route the text through the board's app backend into the runtime agent app.
+3. **LAN-HTTP audio clips stop at the Windows host firewall** — `file://littlefs/sounds/…` is the proven playback path; an `http://` clip served off the array needs its own per-port firewall rule (and `:8095` has a port-collision risk with a separately proposed app-store server).
 
 ## What NOT to Do
 
 - **Don't push to `Christopheraburns/MicroFi`.** The fork token allows it; the work doesn't. Every dev branch lives on `steven-matison/MicroFi`.
 - **Don't register MicroFi under an agent class an existing live agent already uses** (e.g. `StarlinkAI`). A shared class means an EFM flow push aimed at one device reaches both. Use a distinct class (`MicroFi`) and verify the existing agent afterward, every time.
 - **Don't try to flash from WSL2.** No native USB passthrough; the board enumerates on the Windows side as a `COM` port. Run PlatformIO natively on Windows. `usbipd-win` is a workaround, not the path of least resistance.
-- **Don't treat the 48-processor roadmap as available.** At most 5 processors are built at any point in this chapter (`GenerateFlowFile`, `LogAttribute`, `PublishMQTT`, `UpdateAttribute`, plus whichever of `GetGPIO`/`ListenHTTP` is currently flashed). Every capability beyond what's actually in the static registry is a plan, not a feature.
+- **Don't treat the 48-processor roadmap as available.** The final registry is 9 processors on the XIAO builds and 11 on the AMOLED (capstone above) — every capability beyond what's actually in the static registry is a plan, not a feature.
+- **Don't give two MQTT-owning processors on one device the same (or default) Client ID.** esp-mqtt's default is MAC-derived; two clients on one unit fight, and the broker kicks the older session on every connect.
+- **Don't open a serial port with default DTR/RTS to "just watch" a unit.** It trips the auto-reset circuit and silently reboots the device under test. Construct unopened, clear `dtr`/`rts`, then open.
+- **Don't create a Designer node for a brand-new processor before the class-manifest re-pin has landed.** It sticks as "not an available Processor type" even once the palette shows it — delete and recreate after the pin.
+- **Don't build a MicroFi sink that defers work to "the next tick."** Sinks get no idle tick — the engine only calls a node with an incoming connection when a FlowFile is queued for it. Do the whole job inside one `on_trigger`.
 - **Don't flash the default `esp32s3` env onto a XIAO S3 unit sight-unseen.** Its `partitions.csv` assumes 16 MB. Confirm the *actual physical flash size* via the upload-step warning or a direct read, separately from confirming the silicon family via `chip-id` — they are not the same fact.
 - **Don't commit `sdkconfig.defaults.local`.** It holds the WiFi passphrase. Gitignored upstream; keep it that way in any clone.
 - **Don't trust EFM's `GET /efm/api/agents/{id}` REST view as proof a flow push landed.** It has frozen on stale snapshots across real heartbeats and a real reboot during this work. Live serial output (or Postgres directly) is the reliable source.

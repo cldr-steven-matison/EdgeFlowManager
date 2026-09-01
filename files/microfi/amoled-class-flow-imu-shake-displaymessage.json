@@ -1,0 +1,409 @@
+{
+  "flowMetadata": {
+    "identifier": "edef12d8-aea5-4973-8739-e760cab29ff5",
+    "agentClass": "AMOLED",
+    "rootProcessGroupIdentifier": "4aae5d77-bbb2-474b-9c93-cc41488320ea",
+    "created": 1787083579726,
+    "updated": 1787598799455,
+    "undoEnabled": false,
+    "redoEnabled": false
+  },
+  "flowContent": {
+    "identifier": "4aae5d77-bbb2-474b-9c93-cc41488320ea",
+    "instanceIdentifier": "4c40e01b-cc95-45a2-8c97-d540911a94ad",
+    "name": "root",
+    "comments": null,
+    "position": {
+      "x": 0.0,
+      "y": 0.0
+    },
+    "processGroups": [],
+    "remoteProcessGroups": [],
+    "processors": [
+      {
+        "identifier": "efde2795-6403-4721-bd62-13d8c3b7cd15",
+        "instanceIdentifier": "6d809d34-e076-423c-888b-0e163c8447ab",
+        "name": "DisplayMessage",
+        "comments": "",
+        "position": {
+          "x": 800.0,
+          "y": 400.0
+        },
+        "type": "DisplayMessage",
+        "bundle": {
+          "group": "org.apache.nifi",
+          "artifact": "microfi-system",
+          "version": "0.1.0"
+        },
+        "properties": {
+          "Message": null
+        },
+        "propertyDescriptors": {
+          "Message": {
+            "name": "Message",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          }
+        },
+        "style": {},
+        "annotationData": null,
+        "schedulingPeriod": "1000 ms",
+        "schedulingStrategy": "TIMER_DRIVEN",
+        "executionNode": "ALL",
+        "penaltyDuration": "30000 ms",
+        "yieldDuration": "1000 ms",
+        "bulletinLevel": "WARN",
+        "runDurationMillis": 0,
+        "concurrentlySchedulableTaskCount": 1,
+        "autoTerminatedRelationships": [
+          "success"
+        ],
+        "scheduledState": null,
+        "retryCount": null,
+        "retriedRelationships": null,
+        "backoffMechanism": null,
+        "maxBackoffPeriod": null,
+        "componentType": "PROCESSOR",
+        "groupIdentifier": "4aae5d77-bbb2-474b-9c93-cc41488320ea"
+      },
+      {
+        "identifier": "1ea22ce4-9897-426b-aaba-81ddf4c983dd",
+        "instanceIdentifier": "a5fdad12-d215-40e0-88a5-898475c8a506",
+        "name": "GetIMU",
+        "comments": "",
+        "position": {
+          "x": 100.0,
+          "y": 100.0
+        },
+        "type": "GetIMU",
+        "bundle": {
+          "group": "org.apache.nifi",
+          "artifact": "microfi-system",
+          "version": "0.1.0"
+        },
+        "properties": {
+          "Read Interval": "1 s",
+          "Gyro Full Scale": "512dps",
+          "Accel Full Scale": "4g",
+          "Output Format": "JSON",
+          "Motion Threshold (g)": "0.3"
+        },
+        "propertyDescriptors": {
+          "Read Interval": {
+            "name": "Read Interval",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Gyro Full Scale": {
+            "name": "Gyro Full Scale",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Accel Full Scale": {
+            "name": "Accel Full Scale",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Output Format": {
+            "name": "Output Format",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Motion Threshold (g)": {
+            "name": "Motion Threshold (g)",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          }
+        },
+        "style": {},
+        "annotationData": null,
+        "schedulingPeriod": "1000 ms",
+        "schedulingStrategy": "TIMER_DRIVEN",
+        "executionNode": "ALL",
+        "penaltyDuration": "30000 ms",
+        "yieldDuration": "1000 ms",
+        "bulletinLevel": "WARN",
+        "runDurationMillis": 0,
+        "concurrentlySchedulableTaskCount": 1,
+        "autoTerminatedRelationships": [],
+        "scheduledState": null,
+        "retryCount": null,
+        "retriedRelationships": null,
+        "backoffMechanism": null,
+        "maxBackoffPeriod": null,
+        "componentType": "PROCESSOR",
+        "groupIdentifier": "4aae5d77-bbb2-474b-9c93-cc41488320ea"
+      },
+      {
+        "identifier": "4f722b51-b03e-4ecc-9da5-f904616a2ca0",
+        "instanceIdentifier": "a2553209-c38b-4f62-98d6-067809751417",
+        "name": "ListenHTTP",
+        "comments": "",
+        "position": {
+          "x": 800.0,
+          "y": 100.0
+        },
+        "type": "ListenHTTP",
+        "bundle": {
+          "group": "org.apache.nifi",
+          "artifact": "microfi-system",
+          "version": "0.1.0"
+        },
+        "properties": {
+          "Base Path": "/message",
+          "Listening Port": "8095"
+        },
+        "propertyDescriptors": {
+          "Base Path": {
+            "name": "Base Path",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Listening Port": {
+            "name": "Listening Port",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          }
+        },
+        "style": {},
+        "annotationData": null,
+        "schedulingPeriod": "1000 ms",
+        "schedulingStrategy": "TIMER_DRIVEN",
+        "executionNode": "ALL",
+        "penaltyDuration": "30000 ms",
+        "yieldDuration": "1000 ms",
+        "bulletinLevel": "WARN",
+        "runDurationMillis": 0,
+        "concurrentlySchedulableTaskCount": 1,
+        "autoTerminatedRelationships": [],
+        "scheduledState": null,
+        "retryCount": null,
+        "retriedRelationships": null,
+        "backoffMechanism": null,
+        "maxBackoffPeriod": null,
+        "componentType": "PROCESSOR",
+        "groupIdentifier": "4aae5d77-bbb2-474b-9c93-cc41488320ea"
+      },
+      {
+        "identifier": "022c3a7c-04b5-491e-8dc3-6933f27194a5",
+        "instanceIdentifier": "fa99e425-8b25-47da-b472-4376ffe2ffad",
+        "name": "PublishMQTT",
+        "comments": "",
+        "position": {
+          "x": 100.0,
+          "y": 400.0
+        },
+        "type": "PublishMQTT",
+        "bundle": {
+          "group": "org.apache.nifi",
+          "artifact": "microfi-system",
+          "version": "0.1.0"
+        },
+        "properties": {
+          "Broker URI": "mqtt://192.168.1.121:1883",
+          "Client ID": "amoled-imu",
+          "Username": null,
+          "Topic": "microfi/amoled/imu",
+          "Quality of Service": "0",
+          "Password": null
+        },
+        "propertyDescriptors": {
+          "Broker URI": {
+            "name": "Broker URI",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Client ID": {
+            "name": "Client ID",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Username": {
+            "name": "Username",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Topic": {
+            "name": "Topic",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Quality of Service": {
+            "name": "Quality of Service",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          },
+          "Password": {
+            "name": "Password",
+            "displayName": null,
+            "identifiesControllerService": false,
+            "sensitive": false,
+            "resourceDefinition": null
+          }
+        },
+        "style": {},
+        "annotationData": null,
+        "schedulingPeriod": "1000 ms",
+        "schedulingStrategy": "TIMER_DRIVEN",
+        "executionNode": "ALL",
+        "penaltyDuration": "30000 ms",
+        "yieldDuration": "1000 ms",
+        "bulletinLevel": "WARN",
+        "runDurationMillis": 0,
+        "concurrentlySchedulableTaskCount": 1,
+        "autoTerminatedRelationships": [
+          "success"
+        ],
+        "scheduledState": null,
+        "retryCount": null,
+        "retriedRelationships": null,
+        "backoffMechanism": null,
+        "maxBackoffPeriod": null,
+        "componentType": "PROCESSOR",
+        "groupIdentifier": "4aae5d77-bbb2-474b-9c93-cc41488320ea"
+      }
+    ],
+    "inputPorts": [],
+    "outputPorts": [],
+    "connections": [
+      {
+        "identifier": "1e0bdf60-0e9e-4932-974c-514cc8301a52",
+        "instanceIdentifier": "bbfa090d-a3f7-4197-b560-bef8e1ad1b38",
+        "name": "GetIMU/success/PublishMQTT",
+        "comments": null,
+        "position": {
+          "x": 0.0,
+          "y": 0.0
+        },
+        "source": {
+          "id": "1ea22ce4-9897-426b-aaba-81ddf4c983dd",
+          "type": "PROCESSOR",
+          "groupId": "4aae5d77-bbb2-474b-9c93-cc41488320ea",
+          "name": "GetIMU",
+          "comments": null,
+          "instanceIdentifier": "a5fdad12-d215-40e0-88a5-898475c8a506"
+        },
+        "destination": {
+          "id": "022c3a7c-04b5-491e-8dc3-6933f27194a5",
+          "type": "PROCESSOR",
+          "groupId": "4aae5d77-bbb2-474b-9c93-cc41488320ea",
+          "name": "PublishMQTT",
+          "comments": null,
+          "instanceIdentifier": "fa99e425-8b25-47da-b472-4376ffe2ffad"
+        },
+        "labelIndex": 1,
+        "zIndex": 0,
+        "selectedRelationships": [
+          "success"
+        ],
+        "backPressureObjectThreshold": 2000,
+        "backPressureDataSizeThreshold": "100 MB",
+        "flowFileExpiration": "0 seconds",
+        "prioritizers": [],
+        "bends": [],
+        "loadBalanceStrategy": null,
+        "partitioningAttribute": null,
+        "loadBalanceCompression": null,
+        "componentType": "CONNECTION",
+        "groupIdentifier": "4aae5d77-bbb2-474b-9c93-cc41488320ea"
+      },
+      {
+        "identifier": "d43bbc61-b051-4536-ac8c-5441bdbabde0",
+        "instanceIdentifier": "db1b31d3-7ee3-466c-9d2a-72bda001aa5b",
+        "name": "ListenHTTP/success/DisplayMessage",
+        "comments": null,
+        "position": {
+          "x": 0.0,
+          "y": 0.0
+        },
+        "source": {
+          "id": "4f722b51-b03e-4ecc-9da5-f904616a2ca0",
+          "type": "PROCESSOR",
+          "groupId": "4aae5d77-bbb2-474b-9c93-cc41488320ea",
+          "name": "ListenHTTP",
+          "comments": null,
+          "instanceIdentifier": "a2553209-c38b-4f62-98d6-067809751417"
+        },
+        "destination": {
+          "id": "efde2795-6403-4721-bd62-13d8c3b7cd15",
+          "type": "PROCESSOR",
+          "groupId": "4aae5d77-bbb2-474b-9c93-cc41488320ea",
+          "name": "DisplayMessage",
+          "comments": null,
+          "instanceIdentifier": "6d809d34-e076-423c-888b-0e163c8447ab"
+        },
+        "labelIndex": 1,
+        "zIndex": 0,
+        "selectedRelationships": [
+          "success"
+        ],
+        "backPressureObjectThreshold": 2000,
+        "backPressureDataSizeThreshold": "100 MB",
+        "flowFileExpiration": "0 seconds",
+        "prioritizers": [],
+        "bends": [],
+        "loadBalanceStrategy": null,
+        "partitioningAttribute": null,
+        "loadBalanceCompression": null,
+        "componentType": "CONNECTION",
+        "groupIdentifier": "4aae5d77-bbb2-474b-9c93-cc41488320ea"
+      }
+    ],
+    "labels": [],
+    "funnels": [],
+    "controllerServices": [],
+    "versionedFlowCoordinates": null,
+    "variables": {},
+    "parameterContextName": "399599af-5cc2-4f2b-8cc6-545949a388ff",
+    "defaultFlowFileExpiration": null,
+    "defaultBackPressureObjectThreshold": null,
+    "defaultBackPressureDataSizeThreshold": null,
+    "logFileSuffix": null,
+    "flowFileConcurrency": null,
+    "flowFileOutboundPolicy": null,
+    "componentType": "PROCESS_GROUP",
+    "groupIdentifier": null
+  },
+  "parameterContexts": [
+    {
+      "id": "399599af-5cc2-4f2b-8cc6-545949a388ff",
+      "name": "399599af-5cc2-4f2b-8cc6-545949a388ff",
+      "parameters": [],
+      "usage": null
+    }
+  ],
+  "versionInfo": {
+    "flowVersion": 4,
+    "lastPublished": 1787598797613,
+    "lastPublishedBy": "anonymous",
+    "dirty": false,
+    "localChanges": false
+  },
+  "localFlowRevision": 28
+}

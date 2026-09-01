@@ -1,0 +1,409 @@
+{
+    "flowMetadata": {
+        "identifier": "edef12d8-aea5-4973-8739-e760cab29ff5",
+        "agentClass": "AMOLED",
+        "rootProcessGroupIdentifier": "4aae5d77-bbb2-474b-9c93-cc41488320ea",
+        "created": 1787083579726,
+        "updated": 1787591333204,
+        "undoEnabled": false,
+        "redoEnabled": false
+    },
+    "flowContent": {
+        "identifier": "4aae5d77-bbb2-474b-9c93-cc41488320ea",
+        "instanceIdentifier": "4c40e01b-cc95-45a2-8c97-d540911a94ad",
+        "name": "root",
+        "comments": null,
+        "position": {
+            "x": 0.0,
+            "y": 0.0
+        },
+        "processGroups": [],
+        "remoteProcessGroups": [],
+        "processors": [
+            {
+                "identifier": "1ea22ce4-9897-426b-aaba-81ddf4c983dd",
+                "instanceIdentifier": "a5fdad12-d215-40e0-88a5-898475c8a506",
+                "name": "GetIMU",
+                "comments": "",
+                "position": {
+                    "x": 100.0,
+                    "y": 100.0
+                },
+                "type": "GetIMU",
+                "bundle": {
+                    "group": "org.apache.nifi",
+                    "artifact": "microfi-system",
+                    "version": "0.1.0"
+                },
+                "properties": {
+                    "Read Interval": "1 s",
+                    "Gyro Full Scale": "512dps",
+                    "Accel Full Scale": "4g",
+                    "Output Format": "JSON",
+                    "Motion Threshold (g)": "0"
+                },
+                "propertyDescriptors": {
+                    "Read Interval": {
+                        "name": "Read Interval",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Gyro Full Scale": {
+                        "name": "Gyro Full Scale",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Accel Full Scale": {
+                        "name": "Accel Full Scale",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Output Format": {
+                        "name": "Output Format",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Motion Threshold (g)": {
+                        "name": "Motion Threshold (g)",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    }
+                },
+                "style": {},
+                "annotationData": null,
+                "schedulingPeriod": "1000 ms",
+                "schedulingStrategy": "TIMER_DRIVEN",
+                "executionNode": "ALL",
+                "penaltyDuration": "30000 ms",
+                "yieldDuration": "1000 ms",
+                "bulletinLevel": "WARN",
+                "runDurationMillis": 0,
+                "concurrentlySchedulableTaskCount": 1,
+                "autoTerminatedRelationships": [],
+                "scheduledState": null,
+                "retryCount": null,
+                "retriedRelationships": null,
+                "backoffMechanism": null,
+                "maxBackoffPeriod": null,
+                "componentType": "PROCESSOR",
+                "groupIdentifier": "4aae5d77-bbb2-474b-9c93-cc41488320ea"
+            },
+            {
+                "identifier": "49c2596b-7d5a-4786-8144-91b6b1844588",
+                "instanceIdentifier": "680221ad-39df-41da-ba79-b98213d613c0",
+                "name": "UpdateAttribute",
+                "comments": "",
+                "position": {
+                    "x": 100.0,
+                    "y": 400.0
+                },
+                "type": "UpdateAttribute",
+                "bundle": {
+                    "group": "org.apache.nifi",
+                    "artifact": "microfi-system",
+                    "version": "0.1.0"
+                },
+                "properties": {
+                    "Attribute 4 Name": null,
+                    "Attribute 4 Value": null,
+                    "Attribute 1 Name": "device",
+                    "Attribute 2 Value": "imu",
+                    "Attribute 3 Name": null,
+                    "Attribute 3 Value": null,
+                    "Attribute 1 Value": "amoled",
+                    "Attribute 2 Name": "sensor"
+                },
+                "propertyDescriptors": {
+                    "Attribute 4 Name": {
+                        "name": "Attribute 4 Name",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Attribute 4 Value": {
+                        "name": "Attribute 4 Value",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Attribute 1 Name": {
+                        "name": "Attribute 1 Name",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Attribute 2 Value": {
+                        "name": "Attribute 2 Value",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Attribute 3 Name": {
+                        "name": "Attribute 3 Name",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Attribute 3 Value": {
+                        "name": "Attribute 3 Value",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Attribute 1 Value": {
+                        "name": "Attribute 1 Value",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Attribute 2 Name": {
+                        "name": "Attribute 2 Name",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    }
+                },
+                "style": {},
+                "annotationData": null,
+                "schedulingPeriod": "1000 ms",
+                "schedulingStrategy": "TIMER_DRIVEN",
+                "executionNode": "ALL",
+                "penaltyDuration": "30000 ms",
+                "yieldDuration": "1000 ms",
+                "bulletinLevel": "WARN",
+                "runDurationMillis": 0,
+                "concurrentlySchedulableTaskCount": 1,
+                "autoTerminatedRelationships": [],
+                "scheduledState": null,
+                "retryCount": null,
+                "retriedRelationships": null,
+                "backoffMechanism": null,
+                "maxBackoffPeriod": null,
+                "componentType": "PROCESSOR",
+                "groupIdentifier": "4aae5d77-bbb2-474b-9c93-cc41488320ea"
+            },
+            {
+                "identifier": "022c3a7c-04b5-491e-8dc3-6933f27194a5",
+                "instanceIdentifier": "fa99e425-8b25-47da-b472-4376ffe2ffad",
+                "name": "PublishMQTT",
+                "comments": "",
+                "position": {
+                    "x": 100.0,
+                    "y": 700.0
+                },
+                "type": "PublishMQTT",
+                "bundle": {
+                    "group": "org.apache.nifi",
+                    "artifact": "microfi-system",
+                    "version": "0.1.0"
+                },
+                "properties": {
+                    "Broker URI": "mqtt://192.168.1.121:1883",
+                    "Client ID": "amoled-imu",
+                    "Username": null,
+                    "Topic": "microfi/amoled/imu",
+                    "Quality of Service": "0",
+                    "Password": null
+                },
+                "propertyDescriptors": {
+                    "Broker URI": {
+                        "name": "Broker URI",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Client ID": {
+                        "name": "Client ID",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Username": {
+                        "name": "Username",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Topic": {
+                        "name": "Topic",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Quality of Service": {
+                        "name": "Quality of Service",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    },
+                    "Password": {
+                        "name": "Password",
+                        "displayName": null,
+                        "identifiesControllerService": false,
+                        "sensitive": false,
+                        "resourceDefinition": null
+                    }
+                },
+                "style": {},
+                "annotationData": null,
+                "schedulingPeriod": "1000 ms",
+                "schedulingStrategy": "TIMER_DRIVEN",
+                "executionNode": "ALL",
+                "penaltyDuration": "30000 ms",
+                "yieldDuration": "1000 ms",
+                "bulletinLevel": "WARN",
+                "runDurationMillis": 0,
+                "concurrentlySchedulableTaskCount": 1,
+                "autoTerminatedRelationships": [
+                    "success"
+                ],
+                "scheduledState": null,
+                "retryCount": null,
+                "retriedRelationships": null,
+                "backoffMechanism": null,
+                "maxBackoffPeriod": null,
+                "componentType": "PROCESSOR",
+                "groupIdentifier": "4aae5d77-bbb2-474b-9c93-cc41488320ea"
+            }
+        ],
+        "inputPorts": [],
+        "outputPorts": [],
+        "connections": [
+            {
+                "identifier": "64d64c71-1832-432f-b2cd-cfc8ba6aaeb1",
+                "instanceIdentifier": "ced88bf7-860f-4b68-9a3b-ab589411d2b3",
+                "name": "GetIMU/success/UpdateAttribute",
+                "comments": null,
+                "position": {
+                    "x": 0.0,
+                    "y": 0.0
+                },
+                "source": {
+                    "id": "1ea22ce4-9897-426b-aaba-81ddf4c983dd",
+                    "type": "PROCESSOR",
+                    "groupId": "4aae5d77-bbb2-474b-9c93-cc41488320ea",
+                    "name": "GetIMU",
+                    "comments": null,
+                    "instanceIdentifier": "a5fdad12-d215-40e0-88a5-898475c8a506"
+                },
+                "destination": {
+                    "id": "49c2596b-7d5a-4786-8144-91b6b1844588",
+                    "type": "PROCESSOR",
+                    "groupId": "4aae5d77-bbb2-474b-9c93-cc41488320ea",
+                    "name": "UpdateAttribute",
+                    "comments": null,
+                    "instanceIdentifier": "680221ad-39df-41da-ba79-b98213d613c0"
+                },
+                "labelIndex": 1,
+                "zIndex": 0,
+                "selectedRelationships": [
+                    "success"
+                ],
+                "backPressureObjectThreshold": 2000,
+                "backPressureDataSizeThreshold": "100 MB",
+                "flowFileExpiration": "0 seconds",
+                "prioritizers": [],
+                "bends": [],
+                "loadBalanceStrategy": null,
+                "partitioningAttribute": null,
+                "loadBalanceCompression": null,
+                "componentType": "CONNECTION",
+                "groupIdentifier": "4aae5d77-bbb2-474b-9c93-cc41488320ea"
+            },
+            {
+                "identifier": "a3e2c542-55d2-4f30-bffd-2a88c5a8c610",
+                "instanceIdentifier": "e9913338-97cd-45d5-842e-6225e5beecaa",
+                "name": "UpdateAttribute/success/PublishMQTT",
+                "comments": null,
+                "position": {
+                    "x": 0.0,
+                    "y": 0.0
+                },
+                "source": {
+                    "id": "49c2596b-7d5a-4786-8144-91b6b1844588",
+                    "type": "PROCESSOR",
+                    "groupId": "4aae5d77-bbb2-474b-9c93-cc41488320ea",
+                    "name": "UpdateAttribute",
+                    "comments": null,
+                    "instanceIdentifier": "680221ad-39df-41da-ba79-b98213d613c0"
+                },
+                "destination": {
+                    "id": "022c3a7c-04b5-491e-8dc3-6933f27194a5",
+                    "type": "PROCESSOR",
+                    "groupId": "4aae5d77-bbb2-474b-9c93-cc41488320ea",
+                    "name": "PublishMQTT",
+                    "comments": null,
+                    "instanceIdentifier": "fa99e425-8b25-47da-b472-4376ffe2ffad"
+                },
+                "labelIndex": 1,
+                "zIndex": 0,
+                "selectedRelationships": [
+                    "success"
+                ],
+                "backPressureObjectThreshold": 2000,
+                "backPressureDataSizeThreshold": "100 MB",
+                "flowFileExpiration": "0 seconds",
+                "prioritizers": [],
+                "bends": [],
+                "loadBalanceStrategy": null,
+                "partitioningAttribute": null,
+                "loadBalanceCompression": null,
+                "componentType": "CONNECTION",
+                "groupIdentifier": "4aae5d77-bbb2-474b-9c93-cc41488320ea"
+            }
+        ],
+        "labels": [],
+        "funnels": [],
+        "controllerServices": [],
+        "versionedFlowCoordinates": null,
+        "variables": {},
+        "parameterContextName": "399599af-5cc2-4f2b-8cc6-545949a388ff",
+        "defaultFlowFileExpiration": null,
+        "defaultBackPressureObjectThreshold": null,
+        "defaultBackPressureDataSizeThreshold": null,
+        "logFileSuffix": null,
+        "flowFileConcurrency": null,
+        "flowFileOutboundPolicy": null,
+        "componentType": "PROCESS_GROUP",
+        "groupIdentifier": null
+    },
+    "parameterContexts": [
+        {
+            "id": "399599af-5cc2-4f2b-8cc6-545949a388ff",
+            "name": "399599af-5cc2-4f2b-8cc6-545949a388ff",
+            "parameters": [],
+            "usage": null
+        }
+    ],
+    "versionInfo": {
+        "flowVersion": 2,
+        "lastPublished": 1787591333056,
+        "lastPublishedBy": "anonymous",
+        "dirty": false,
+        "localChanges": false
+    },
+    "localFlowRevision": 12
+}
