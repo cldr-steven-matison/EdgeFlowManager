@@ -236,6 +236,47 @@ forwards raw bytes to Kafka or NiFi for downstream decode. But native edge decod
 `ConsumeMQTTIIoT` is a real, confirmed capability on MiNiFi Java — the design target of putting the
 decode on a Java edge agent (rather than only in NiFi) is achievable today.
 
+## Publishing Sparkplug B from MiNiFi — the Missing Half, Now Built
+
+Everything above is the **consume/decode** side. The publish side has no stock answer on either
+MiNiFi flavor: the CDF `nifi-cdf-iiot-mqtt-nar` ships exactly one component (`ConsumeMQTTIIoT`,
+consume-only), and stock `PublishMQTT` moves raw bytes with no idea what a birth certificate or a
+`seq` counter is. An edge agent that needs to *originate* Sparkplug B has to encode the protobuf
+and run the session state machine itself.
+
+The worked comparison of every route — MiNiFi Java via Eclipse Tahu (`ExecuteScript` prototype or
+a custom NAR) versus MiNiFi C++ (embedded-CPython `pysparkplug` or a custom `.so` vendoring
+Tahu-C/nanopb, the direct analog of MicroFi's own C++ `PublishSparkplug`) — lives in the how-to
+[`minifi-sparkplug-publish.md`](https://github.com/cldr-steven-matison/DesktopShare/blob/main/minifi-sparkplug-publish.md),
+with code skeletons, side-load mechanics, and a verify checklist.
+
+**The recommended route is built and field-verified: a native Java `PublishSparkplug` processor**
+([`nifi-sparkplug-bundle`](https://github.com/cldr-steven-matison/NiFi2-Processor-Playground/tree/main/nifi-sparkplug-bundle),
+one-pager: [`sparkplug-publish-processor.md`](https://github.com/cldr-steven-matison/DesktopShare/blob/main/sparkplug-publish-processor.md)).
+One FlowFile of flat JSON metrics in → spec-compliant Sparkplug B out: NBIRTH-first (declaring
+`bdSeq` and `Node Control/Rebirth`), NDATA per FlowFile, NDEATH registered as the MQTT will,
+`bdSeq`/`seq` (0–255 wrap) managed internally (Eclipse Tahu encode, Paho transport, self-contained
+NAR — no parent NAR to line up).
+
+**Field-verified end-to-end 2026-09-01** (evidence:
+[`files/issue-138/`](https://github.com/cldr-steven-matison/DesktopShare/tree/main/files/issue-138)):
+the NAR side-loaded onto a fresh EFM-managed MiNiFi Java agent (class `SparkplugJavaLab`, enrolled
+via EFM `generateCommand`), a two-node Designer flow
+(`GenerateFlowFile({"Sensors/Temperature": 22.5, …}) → PublishSparkplug`) published, and the wire
+showed a correct NBIRTH (seq=0) then NDATA with advancing `seq` — which the live NiFi
+`ConsumeMQTTIIoT` accepted via its `Message` relationship (zero `parse.failure`, the real
+verification standard) all the way into Kafka.
+
+Two side-load mechanics discovered in that run, worth knowing before repeating it:
+
+- **A hot-loaded NAR does not refresh the agent's C2 manifest.** The Java agent's `NarAutoLoader`
+  picks the NAR up from `extensions/` within seconds (`Loaded extensions for
+  com.example:nifi-sparkplug-nar`), but the manifest it heartbeats to EFM is built at startup —
+  the new processor won't appear in the Designer palette until the agent restarts.
+- **Pinning the refreshed manifest to the class** uses
+  `POST /efm/api/agent-class-manifest-config` with field name `agentClassName` (not `agentClass`),
+  after which the Designer resolves the new type.
+
 ## The NiFi Side — `ConsumeMQTTIIoT`
 
 NiFi ships a processor purpose-built for this: **`ConsumeMQTTIIoT`**. Unlike generic `ConsumeMQTT`,
@@ -505,12 +546,29 @@ convention of not blurring designed-but-untested with field-proven:
   float32 values (`NBIRTH` `Temperature=22.0`/`Humidity=50.0` matching the publisher exactly, `NDATA`
   values in the publisher's ranges). The CDF IIoT NAR ships no separate `MQTTIIoTReader` controller
   service — the decode is built into `ConsumeMQTTIIoT`, with `Record Reader`/`Record Writer` optional.
-- The Primary Host Application / Rebirth-request behavior of `ConsumeMQTTIIoT` — the processor
-  supports it, but no field run in this lab has exercised a live rebirth request against a
-  connected edge node.
-- Edge-side decode of Sparkplug B on a MiNiFi C++ agent via custom Python (rather than relay-only) —
-  not attempted; see the MiNiFi C++ section above for why this would require custom code no stock
-  extension currently provides.
+- **Sparkplug B publish from a MiNiFi Java agent via the native `PublishSparkplug` NAR** — the
+  full origination chain (FlowFile JSON → NBIRTH/NDATA on the wire → decoded by the live
+  `ConsumeMQTTIIoT`, `Message`-not-`parse.failure` → Kafka) ran end-to-end 2026-09-01 on a fresh
+  EFM-managed Java agent. See "Publishing Sparkplug B from MiNiFi" above; wire capture, agent log,
+  and Kafka sample in
+  [`files/issue-138/`](https://github.com/cldr-steven-matison/DesktopShare/tree/main/files/issue-138).
+- **The Primary Host Application / Rebirth-request behavior of `ConsumeMQTTIIoT` — fielded live
+  2026-09-01, with a split verdict.** With `Primary Host Application=true` and
+  `Send Rebirth Requests=true` (validation then requires a *literal* group in the topic filter —
+  `spBv1.0/MicroFi/#`, a wildcard group is rejected — plus explicit `Node IDs`), the processor
+  published its own `STATE` birth (`{"online": true, …}`) on schedule-start and a real **NCMD**
+  carrying `Node Control/Rebirth = true` to `spBv1.0/MicroFi/NCMD/MicroFi-3`. The consumer side of
+  the mechanism is field-verified. The *device* side is not honored by the current MicroFi firmware:
+  it declares `Node Control/Rebirth` in its NBIRTH but never subscribes to its NCMD topic, so the
+  node kept publishing NDATA and never re-birthed (wire capture:
+  [`files/issue-138/rebirth-field-run-capture.txt`](https://github.com/cldr-steven-matison/DesktopShare/blob/main/files/issue-138/rebirth-field-run-capture.txt)).
+
+**Explicitly not pursued, with reason:**
+- Edge-side decode of Sparkplug B on a MiNiFi **C++** agent via custom Python (rather than
+  relay-only) — not attempted, and effectively **moot** since native decode was field-confirmed on
+  MiNiFi **Java** (above): Java is the production decode runtime everywhere this lab decodes at the
+  edge, and the C++ agents' relay-only role stands. The custom-code path remains documented in the
+  MiNiFi C++ section if a C++-only deployment ever needs it.
 
 ## All the Ways to Learn About EFM and Sparkplug
 
@@ -537,6 +595,13 @@ material, gathered in one place:
 - **`pysparkplug`'s own source/docs** — the library used for every binary-payload field test in
   this lab; its `Metric`/`DataType`/`NBirth`/`NData` API surface is the practical on-ramp for
   writing another Sparkplug B publisher without hand-rolling protobuf encoding.
+- **[`minifi-sparkplug-publish.md`](https://github.com/cldr-steven-matison/DesktopShare/blob/main/minifi-sparkplug-publish.md)**
+  — the publish-side how-to: every route to originating Sparkplug B from a MiNiFi agent (Java/Tahu
+  vs C++/pysparkplug/`.so`), compared, with skeletons and the end-to-end verify checklist.
+- **[`nifi-sparkplug-bundle`](https://github.com/cldr-steven-matison/NiFi2-Processor-Playground/tree/main/nifi-sparkplug-bundle)**
+  — the field-verified native Java `PublishSparkplug` processor itself: readable, unit-tested
+  reference code for the NBIRTH/NDATA/NDEATH session state machine
+  (one-pager: [`sparkplug-publish-processor.md`](https://github.com/cldr-steven-matison/DesktopShare/blob/main/sparkplug-publish-processor.md)).
 
 ## What NOT to Do
 
@@ -562,6 +627,13 @@ state model depends on the birth certificate establishing the full metric set fi
 `NBIRTH` (or after a missed sequence number) means a subscriber's view of that node's state may
 already be wrong. This is what the Primary Host / Rebirth-request mechanism exists to correct —
 don't build downstream logic that ignores `seq` gaps.
+
+**Declare `Node Control/Rebirth` in an NBIRTH without subscribing to your own NCMD topic.** The
+birth certificate advertises the rebirth control metric to every Primary Host on the broker; a
+publisher that declares it but never listens for the NCMD (the current MicroFi firmware, per the
+2026-09-01 field run) silently breaks the spec's recovery mechanism — the host's rebirth request
+goes nowhere and its view of the node stays stale. Either subscribe and honor the request, or
+don't declare the metric.
 
 **Treat embedded Sparkplug B publish as unverified when the field record says otherwise.** The
 Seeed XIAO ESP32-S3 has been verified publishing genuine Sparkplug B (`NBIRTH`/`NDATA`), decoded

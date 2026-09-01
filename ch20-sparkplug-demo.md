@@ -140,7 +140,27 @@ Verified two ways:
 - `xiao_telemetry`, 20s live consume at the tip after the fix: 0 messages, versus a steady ~1/sec before.
 - Raw MQTT `test/sensor/data` via `mosquitto_sub`, 20s: also silent.
 
-That silence cuts both ways — as of this chapter, it also means the real XIAO device isn't currently powered on and publishing (confirmed the same way: a live `mosquitto_sub -t test/sensor/data` and a live consume of `xiao_telemetry` both come back empty). The wiring and the fix are real and field-verified against real XIAO messages captured earlier; the device itself just isn't live at the moment this chapter was folded. Re-flashing or re-powering the XIAO is the only remaining step to see fresh messages land.
+That silence cuts both ways — at the time this chapter was first folded, it also meant the real
+XIAO device wasn't powered on and publishing. That gap has since closed: see the 2026-09-01
+re-validation below.
+
+### Re-Validation After the Prod Cutover — 2026-09-01
+
+The 2026-08-26 cluster cutover (the prod stack moving to a new minikube profile) left this demo's
+substrate partially gone: the `mqtt` namespace was **empty** — no Mosquitto pod, no service — and
+every processor in the `SparkPlug` PG (and its sibling bridge PGs) was stopped. A committed
+manifest set (`files/mosquitto.yaml` + `files/mosquitto-configmap.yaml`) made the broker a
+one-command redeploy into the new cluster; the PGs restarted clean (17 processors across four PGs,
+zero bulletins), and the re-powered devices reconnected on their own — the XIAO firmware targets
+the stable LAN address `192.168.1.121:1883`, which the host-side port-forward re-bound as soon as
+the service existed again.
+
+Fresh end-to-end proof, all three units at once (evidence:
+[`files/issue-138/`](https://github.com/cldr-steven-matison/DesktopShare/tree/main/files/issue-138)):
+`{"device_id":"MicroFi-1"}` records landing in `xiao_telemetry` keyed `MicroFi-1`; MicroFi-3's
+`PublishSparkplug` NDATA (seq advancing) landing in `sparkplug_telemetry` with `parse.failure = 0`;
+MicroFi-2's camera JPEGs landing in `microfi2.camera.jpg`. The live `ConsumeMQTTIIoT` configuration
+diffed clean against the committed `files/SparkPlug.json` — the export held.
 
 > **⚠️ A shared MQTT topic has no per-publisher isolation.** Anything else that publishes to the same topic a `ConsumeMQTT` filters on ends up indistinguishable downstream unless the payload shape itself carries something to key on (`device_id`, in this case — the noise publisher had none, which is what made it possible to tell the two apart at all). Don't assume a topic is single-producer just because one flow was built assuming that.
 
@@ -150,9 +170,9 @@ The original plan for this chapter included a further phase: a MiNiFi flow runni
 
 What was built and field-verified instead is the conceptual equivalent for the XIAO platform: `NvidiaNanoSparkPlug` consuming MQTT data, `ExecuteScript` running a threshold condition on each reading, and on a match, `InvokeHTTP` posting back into the XIAO's `ListenHTTP` endpoint to trigger an actuation — a real sensor-to-edge-decision-to-actuation round-trip, confirmed live via `ESTABLISHED` connection on the Jetson. That architecture (`ConsumeMQTT → ExecuteScript → InvokeHTTP actuation`, forwarding unconditionally to central Kafka) is documented in the live-assembly section below; the GPIO buzzer and TensorRT/ONNX layers remain future work once a real sensor value is on the wire to threshold against.
 
-## Live Assembly Toward the Full Architecture (#109) — In Progress, Not Complete
+## Live Assembly Toward the Full Architecture (#109) — How It Landed
 
-#106 asked for the real end-to-end chain: **XIAO publishes to Mosquitto → NvidiaNano runs inference on the reading → NvidiaNano Site-to-Site to NiFi K8s.** As of this pass, two of the three legs are built and one is confirmed live; the third is blocked on a live production change that needs a human decision, not a doc fix.
+#106 asked for the real end-to-end chain: **XIAO publishes to Mosquitto → NvidiaNano runs inference on the reading → NvidiaNano Site-to-Site to NiFi K8s.** Two of the three legs were built and confirmed live; the Site-to-Site leg was **descoped by direction change rather than finished** — the 2026-08-05 pivot (detailed below) replaced it with the actuation round-trip, and that descope stands as the final shape for this guide: the edge concepts the S2S leg existed to prove (edge decision → central delivery) are proven by the Kafka legs and the round-trip instead. The step-by-step S2S enablement recipe below is kept as the documented path for whenever a production reason to turn it on actually arrives.
 
 **Context that changed the plan.** The same day this work started, the live `NvidiaNano` EFM class was cut over (#28) from the Ch19 TensorRT/`PublishKafka` pipeline to an unrelated Java relay (`classify`/`streamChat`/`matrix` — screen and matrix-screensaver control, ports 8080/8081/8082). That flow is live production and was left untouched. The XIAO-sensor-inference leg needed a **new, separate EFM agent class** instead of reusing `NvidiaNano`.
 
@@ -183,6 +203,26 @@ Step 1 is what's actually blocking this — a production NiFi config change with
 
 - **MicroFi (XIAO) — back to 3 nodes**, after a false start at 4. `GenerateFlowFile → PublishMQTT` (unchanged) plus a re-added `ListenHTTP-Trigger` (port `8095`, base path `/test`, `success` auto-terminated — no downstream `LogAttribute` this time, see the node-count note below). Published flowVersion 19.
 - **NvidiaNanoSparkPlug — the full round trip.** `ExecuteScript` now fans out two ways: `PublishKafka-NvidiaNanoInference` (unconditional, every reading) and a new `RouteOnAttribute-Trigger → InvokeHTTP-TriggerXiao` leg that only fires when `ExecuteScript` sets `trigger.actuation=true` (a placeholder condition — deterministic on even UTC seconds, since there's no real sensor value on the wire yet to threshold on; swap for a real signal once one exists). `InvokeHTTP-TriggerXiao` POSTs to `http://192.168.1.198:8095/test`. Published flowVersion 4. Verified live via `ss -tn` on the Jetson: a real `ESTABLISHED` connection to `192.168.1.198:8095`, confirming the trigger genuinely fires and reaches the XIAO — not just validated-and-published.
+
+**How the device roles settled — one flow type per unit.** The single `MicroFi` class this
+section's history describes was later split into per-device classes, exactly along Steven's
+"one flow type per device" line: **`MicroFi-1`** carries the plain-JSON telemetry emit
+(`GenerateFlowFile → PublishMQTT`, the `ConsumeMQTT` leg's producer), **`MicroFi-2`** the camera
+(`CaptureImage` broker-direct, bridged by the `MicroFi2CameraBridge` NiFi PG), and **`MicroFi-3`**
+the real Sparkplug B emit via the unified firmware's native `PublishSparkplug` — the producer
+behind Chapter 18's Entry 10. Anywhere this chapter or that card says "MicroFi-3" or "MicroFi",
+they are the same physical XIAO family; the class names encode the per-unit flow role.
+
+**Actuation re-fielded 2026-09-01 — a visible LED, driven from central NiFi.** With the flows kept
+separate per that split, the actuation leg was re-proven on **MicroFi-1**: its class flow swapped
+(via the EFM Designer API, original flow backed up) to `ListenHTTP(/led :8095) → SetGPIO(pin 21,
+level from-content)`, and a new central-NiFi process group **`MicroFiLedActuation`**
+(`GenerateFlowFile → InvokeHTTP POST http://192.168.1.198:8095/led`, failure/retry legs to a log
+processor per this guide's Retry-is-not-Failure rule) drove the board's user LED off and on from
+the canvas — two FlowFiles through, zero failures. That is the round-trip in its simplest
+teachable form: a flow decision anywhere in the array becomes a physical state change on the
+glass-less-est device in the fleet. Evidence and the Designer-API swap script:
+[`files/issue-138/`](https://github.com/cldr-steven-matison/DesktopShare/tree/main/files/issue-138).
 
 **Three real bugs found and fixed getting here, worth recording:**
 

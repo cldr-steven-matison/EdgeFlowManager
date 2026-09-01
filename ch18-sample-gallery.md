@@ -334,6 +334,57 @@ Every entry uses the same card so the gallery reads consistently:
 
 ---
 
+## Entry 11 — Sparkplug B Publish from MiNiFi Java (`PublishSparkplug` NAR)
+
+- **Name:** `minifi-java-publish-sparkplug`
+- **Purpose:** Originate spec-compliant Sparkplug B from a MiNiFi **Java** edge agent — the publish side the CDF IIoT NAR doesn't ship. One FlowFile of flat JSON metrics becomes NBIRTH-then-NDATA with `bdSeq`/`seq` and an NDEATH will, all managed by the processor.
+- **Agent:** MiNiFi Java `2.24.08.0-19`, EFM-managed (class `SparkplugJavaLab`), the custom [`nifi-sparkplug-nar`](https://github.com/cldr-steven-matison/NiFi2-Processor-Playground/tree/main/nifi-sparkplug-bundle) (Eclipse Tahu + Paho, self-contained) side-loaded into `extensions/`. Consumer/validator is the live `SparkPlug` PG's `ConsumeMQTTIIoT`.
+- **Shape:**
+  ```
+  # device side (EFM Designer, class SparkplugJavaLab)
+  GenerateFlowFile ({"Sensors/Temperature": 22.5, "Sensors/Count": 1013, "Sensors/Online": true})
+    ─(success)─→ PublishSparkplug (tcp://mosquitto.mqtt.svc:1883, group SparkplugLab, node MiNiFi-Java-1)
+
+  # wire: spBv1.0/SparkplugLab/NBIRTH/MiNiFi-Java-1 (seq=0), then NDATA seq 1,2,3…
+  # NiFi side: the existing ConsumeMQTTIIoT (spBv1.0/#) decodes it into sparkplug_telemetry
+  ```
+- **Files:** flow export + agent pod spec + Designer-API build script + wire/log/Kafka evidence in [DesktopShare `files/issue-138/`](https://github.com/cldr-steven-matison/DesktopShare/tree/main/files/issue-138) · processor source: [`nifi-sparkplug-bundle`](https://github.com/cldr-steven-matison/NiFi2-Processor-Playground/tree/main/nifi-sparkplug-bundle)
+- **Verification:**
+  ```bash
+  # wire: birth-first then advancing seq
+  mosquitto_sub -h <broker-lan-ip> -v -t 'spBv1.0/SparkplugLab/#'
+
+  # decode validates: Message-not-parse.failure into Kafka, metric names present
+  kubectl exec -n cld-streaming my-cluster-combined-0 -c kafka -- \
+    /opt/kafka/bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 \
+    --topic sparkplug_telemetry --timeout-ms 15000
+  ```
+- **Status:** ✅ field-validated live 2026-09-01 ([#138](https://github.com/cldr-steven-matison/DesktopShare/issues/138)/[#248](https://github.com/cldr-steven-matison/DesktopShare/issues/248)). Publish-side how-to: [`minifi-sparkplug-publish.md`](https://github.com/cldr-steven-matison/DesktopShare/blob/main/minifi-sparkplug-publish.md); mechanics + gotchas: [Chapter 13](ch13-efm-and-sparkplug-mqtt.md).
+
+> **⚠️ A hot-loaded NAR doesn't refresh the agent's C2 manifest.** The extension loads in seconds, but the Designer palette only sees the new processor after an agent restart re-heartbeats the manifest (then pin it: `POST /efm/api/agent-class-manifest-config`, field `agentClassName`).
+
+---
+
+## Entry 12 — LED Actuation Round-Trip (NiFi → MicroFi `ListenHTTP` → `SetGPIO`)
+
+- **Name:** `microfi-led-actuation`
+- **Purpose:** The minimal flow-to-physical-world round trip: a FlowFile on the central NiFi canvas turns a physical LED on or off on an ESP32 across the room. The teachable core of every actuation leg in this guide.
+- **Agent:** **MicroFi** (ESP32-S3 XIAO, class `MicroFi-1`), plus the `MicroFiLedActuation` PG on central NiFi.
+- **Shape:**
+  ```
+  # device side (EFM-pushed class flow, 2 nodes)
+  ListenHTTP (:8095, base path /led) ─(success)─→ SetGPIO (pin 21, level from-content, Invert)
+
+  # NiFi side (MicroFiLedActuation PG)
+  GenerateFlowFile (content "1" or "0") ─(success)─→ InvokeHTTP (POST http://<device-ip>:8095/led)
+                                                      └─(Failure/Retry/No Retry)─→ LogAttribute
+  ```
+- **Files:** device flow shape: [DesktopShare `files/issue-164/microfi3-led-flow-backup.json`](https://github.com/cldr-steven-matison/DesktopShare/blob/main/files/issue-164/microfi3-led-flow-backup.json) · Designer-API swap script + run evidence: [`files/issue-138/`](https://github.com/cldr-steven-matison/DesktopShare/tree/main/files/issue-138)
+- **Verification:** POST content `1`/`0` (directly or via the PG) → HTTP 200, the user LED visibly toggles, and the InvokeHTTP failure legs stay empty. FlowFile content *is* the pin level — no attributes survive the HTTP hop (MiNiFi `ListenHTTP` is fire-and-forget, Ch16's trap list).
+- **Status:** ✅ field-validated 2026-08 on MicroFi-3 ([#164](https://github.com/cldr-steven-matison/DesktopShare/issues/164)), re-fielded live 2026-09-01 on MicroFi-1 driven from central NiFi ([#138](https://github.com/cldr-steven-matison/DesktopShare/issues/138)). Demo narrative: [Chapter 20](ch20-sparkplug-demo.md).
+
+---
+
 ## Pending Entries
 
 These flows are planned but don't yet have a folded, field-validated chapter behind them. Each becomes a full card above once its chapter lands.
