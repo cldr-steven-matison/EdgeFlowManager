@@ -91,7 +91,7 @@ Every entry uses the same card so the gallery reads consistently:
   GenerateFlowFile (10 sec, Custom Text: "PlaygroundCpp Level 2 heartbeat")
     ─(success)─→ LogAttribute
   ```
-- **Files:** [`minifi-test-efm-cpp.yaml`](https://github.com/cldr-steven-matison/MiNiFi-Kubernetes-Playground/blob/main/minifi-test-efm-cpp.yaml) · [`files/efm/PlaygroundCpp.json`](../files/efm/PlaygroundCpp.json) (exported flow)
+- **Files:** [`minifi-test-efm-cpp.yaml`](https://github.com/cldr-steven-matison/MiNiFi-Kubernetes-Playground/blob/main/minifi-test-efm-cpp.yaml) · [`files/efm/PlaygroundCpp.json`](files/efm/PlaygroundCpp.json) (exported flow)
 - **Verification:**
   ```bash
   # confirm the agent reached ONLINE in EFM Monitor → Agents
@@ -117,7 +117,7 @@ Every entry uses the same card so the gallery reads consistently:
   GenerateFlowFile (10 sec, Custom Text: "PlaygroundJava Level 2 heartbeat")
     ─(success)─→ LogAttribute
   ```
-- **Files:** [`minifi-test-efm-java.yaml`](https://github.com/cldr-steven-matison/MiNiFi-Kubernetes-Playground/blob/main/minifi-test-efm-java.yaml) · [`files/efm/PlaygroundJava.json`](../files/efm/PlaygroundJava.json) (exported flow)
+- **Files:** [`minifi-test-efm-java.yaml`](https://github.com/cldr-steven-matison/MiNiFi-Kubernetes-Playground/blob/main/minifi-test-efm-java.yaml) · [`files/efm/PlaygroundJava.json`](files/efm/PlaygroundJava.json) (exported flow)
 - **Verification:**
   ```bash
   kubectl logs minifi-test-efm-java -n default | grep LogAttribute
@@ -208,9 +208,9 @@ Every entry uses the same card so the gallery reads consistently:
     ─(success)─→ PublishKafka  (topic agent-nvidia-tensorRT, bootstrap gaming-pc-lan-ip:31623)
   ```
 - **Files:**
-  - EFM flow export: [`files/efm/NvidiaNano-TensorRT.json`](../files/efm/NvidiaNano-TensorRT.json)
-  - TensorRT script: [`files/gpu_nifi_tensorRT-3.py`](../files/gpu_nifi_tensorRT-3.py)
-  - Companion flows: [`WindowsDesktop-TensorRT.json`](../files/efm/WindowsDesktop-TensorRT.json), [`KubernetesPod-TensorRT.json`](../files/efm/KubernetesPod-TensorRT.json)
+  - EFM flow export: [`files/efm/NvidiaNano-TensorRT.json`](files/efm/NvidiaNano-TensorRT.json)
+  - TensorRT script: [`files/gpu_nifi_tensorRT-3.py`](files/gpu_nifi_tensorRT-3.py)
+  - Companion flows: [`WindowsDesktop-TensorRT.json`](files/efm/WindowsDesktop-TensorRT.json), [`KubernetesPod-TensorRT.json`](files/efm/KubernetesPod-TensorRT.json)
 - **Verification:**
   ```bash
   # POST to the Jetson's ListenHTTP
@@ -311,7 +311,7 @@ Every entry uses the same card so the gallery reads consistently:
                                      ─(matched…)─→ PublishKafka-XiaoTelemetry      (topic xiao_telemetry, key ${device_id})
   ConsumeMQTTIIoT (spBv1.0/#)        ─(Message)─→ PublishKafka-SparkplugTelemetry  (topic sparkplug_telemetry)
   ```
-- **Files:** [`files/SparkPlug.json`](../files/SparkPlug.json) (NiFi PG export, current with live) · device flow exports and proof log in [DesktopShare `files/issue-164/`](https://github.com/cldr-steven-matison/DesktopShare/tree/issue-164-sparkplug-kafka/files/issue-164)
+- **Files:** [`files/SparkPlug.json`](files/SparkPlug.json) (NiFi PG export, current with live) · device flow exports and proof log in [DesktopShare `files/issue-164/`](https://github.com/cldr-steven-matison/DesktopShare/tree/issue-164-sparkplug-kafka/files/issue-164)
 - **Verification:**
   ```bash
   # broker: both payload kinds arriving

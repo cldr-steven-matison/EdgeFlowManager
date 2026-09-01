@@ -309,15 +309,15 @@ Import and publish the flow to the `NvidiaNano` class via EFM's flow designer. T
 
 **TensorRT flow — `ListenHTTP → ExecuteScript → PublishKafka`:**
 
-- [NvidiaNano-TensorRT.json](../files/efm/NvidiaNano-TensorRT.json) — Operational
-- [WindowsDesktop-TensorRT.json](../files/efm/WindowsDesktop-TensorRT.json) — Operational
-- [KubernetesPod-TensorRT.json](../files/efm/KubernetesPod-TensorRT.json) — Operational
+- [NvidiaNano-TensorRT.json](files/efm/NvidiaNano-TensorRT.json) — Operational
+- [WindowsDesktop-TensorRT.json](files/efm/WindowsDesktop-TensorRT.json) — Operational
+- [KubernetesPod-TensorRT.json](files/efm/KubernetesPod-TensorRT.json) — Operational
 
 **TailLog flow — `TailFile → PublishKafka` (ships `minifi-app.log` entries to Kafka):**
 
-- [NvidiaNano.json](../files/efm/NvidiaNano.json) — Operational
-- [WindowsDesktop.json](../files/efm/WindowsDesktop.json) — Operational
-- [KubernetesPod.json](../files/efm/KubernetesPod.json) — Operational
+- [NvidiaNano.json](files/efm/NvidiaNano.json) — Operational
+- [WindowsDesktop.json](files/efm/WindowsDesktop.json) — Operational
+- [KubernetesPod.json](files/efm/KubernetesPod.json) — Operational
 
 ## Delivering Resources to the Agent
 
@@ -377,7 +377,7 @@ cd ~/minifi-java-nano/minifi-2.24.08.0-19 && ./bin/minifi.sh start
 
 With OpenJDK 21.0.11 installed, the agent starts in under 5 seconds and auto-registers with EFM as a `NvidiaNano` class agent within the standard heartbeat cycle.
 
-![NvidiaNano agent class in EFM → Monitor → Agents — Good Health with the Java agent enrolled](images/efm-NvidiaNano-Class.jpg)
+![EFM Monitor dashboard, captured 2026-09-01: the NvidiaNano class at Good Health 1 (1) with the Java agent enrolled, alongside the rest of the fleet](images/ch19-efm-monitor-nvidianano-java-good-health.png)
 
 ### Three Parallel HandleHttp Legs, Not One
 
@@ -551,7 +551,7 @@ HandleHttpRequest-Metrics      (port 9936, GET /metrics only, shared StandardHtt
 
 Series exposed: `minifi_java_host_load1/5/15`, `minifi_java_host_mem_total_kb/mem_free_kb/mem_available_kb`. The base64 wrapper is the Chapter 21 `ExecuteStreamCommand` quoting workaround — inline quoted `sh -c` scripts get mangled by its argument tokenizer.
 
-The CSO-side wiring was already in place from the C++ era and carried over unchanged: the manual-`Endpoints` `Service` → `192.168.1.197:9936` + `ServiceMonitor` (`job="nvidianano-minifi-metrics"`, 15s). One Prometheus-3 addition was required: the flow-level responder sends no `Content-Type` header, and Prometheus 3 rejects a blank one — set `spec.fallbackScrapeProtocol: PrometheusText0.0.4` on the `ServiceMonitor`. Verified end to end: `up{job="nvidianano-minifi-metrics"}=1` and all six `minifi_java_host_*` series live in Prometheus, rendered on the **"MiNiFi Java - NvidiaNano"** Grafana dashboard (sidecar-loaded ConfigMap; JSON at [`files/nvidianano-minifi-java-dashboard.json`](../files/nvidianano-minifi-java-dashboard.json), flow export at [`files/efm/NvidiaNanoJava.json`](../files/efm/NvidiaNanoJava.json)).
+The CSO-side wiring was already in place from the C++ era and carried over unchanged: the manual-`Endpoints` `Service` → `192.168.1.197:9936` + `ServiceMonitor` (`job="nvidianano-minifi-metrics"`, 15s). One Prometheus-3 addition was required: the flow-level responder sends no `Content-Type` header, and Prometheus 3 rejects a blank one — set `spec.fallbackScrapeProtocol: PrometheusText0.0.4` on the `ServiceMonitor`. Verified end to end: `up{job="nvidianano-minifi-metrics"}=1` and all six `minifi_java_host_*` series live in Prometheus, rendered on the **"MiNiFi Java - NvidiaNano"** Grafana dashboard (sidecar-loaded ConfigMap; JSON at [`files/nvidianano-minifi-java-dashboard.json`](files/nvidianano-minifi-java-dashboard.json), flow export at [`files/efm/NvidiaNanoJava.json`](files/efm/NvidiaNanoJava.json)).
 
 This closes the old firewall question too: the Jetson accepted the in-cluster scrape on `:9936` with no `ufw` change — the pre-flow "connection refused" (port closed, host reachable) flipped straight to a clean scrape once the leg bound the port.
 
@@ -616,6 +616,6 @@ sudo systemctl status minifi
 - Ch2 — [EFM Binaries](ch02-efm-binaries.md): installing the MiNiFi Java & C++ binaries into EFM.
 - Ch21 — [Metrics & Observability](ch21-metrics-and-observability.md): the full three-layer EFM/agent Prometheus story; this chapter carries the Jetson slice.
 - [MiNiFi Kubernetes Playground](https://github.com/cldr-steven-matison/MiNiFi-Kubernetes-Playground) — the MiNiFi test harness.
-- EFM agent flows: [NvidiaNano-TensorRT.json](../files/efm/NvidiaNano-TensorRT.json), [WindowsDesktop-TensorRT.json](../files/efm/WindowsDesktop-TensorRT.json), [KubernetesPod-TensorRT.json](../files/efm/KubernetesPod-TensorRT.json)
-- TailLog variants: [NvidiaNano.json](../files/efm/NvidiaNano.json), [WindowsDesktop.json](../files/efm/WindowsDesktop.json), [KubernetesPod.json](../files/efm/KubernetesPod.json)
-- Edge inference script: [gpu_nifi_tensorRT-3.py](../files/gpu_nifi_tensorRT-3.py)
+- EFM agent flows: [NvidiaNano-TensorRT.json](files/efm/NvidiaNano-TensorRT.json), [WindowsDesktop-TensorRT.json](files/efm/WindowsDesktop-TensorRT.json), [KubernetesPod-TensorRT.json](files/efm/KubernetesPod-TensorRT.json)
+- TailLog variants: [NvidiaNano.json](files/efm/NvidiaNano.json), [WindowsDesktop.json](files/efm/WindowsDesktop.json), [KubernetesPod.json](files/efm/KubernetesPod.json)
+- Edge inference script: [gpu_nifi_tensorRT-3.py](files/gpu_nifi_tensorRT-3.py)

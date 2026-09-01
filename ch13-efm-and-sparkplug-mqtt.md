@@ -298,7 +298,7 @@ Two behaviors worth knowing before wiring it into a flow:
 ### Two-Leg Process-Group Pattern
 
 The field-validated NiFi process group for this chapter's material (exported at
-[`files/SparkPlug.json`](../files/SparkPlug.json)) runs **two independent consumer legs off the
+[`files/SparkPlug.json`](files/SparkPlug.json)) runs **two independent consumer legs off the
 same broker**, because two different kinds of publishers exist in this lab at once — a plain-JSON
 test/demo publisher and a real Sparkplug B binary publisher:
 
@@ -344,7 +344,7 @@ key between "spec-compliant Sparkplug" and "anything simpler that just wants a b
 
 ### Sample Flow — `files/SparkPlug.json`
 
-The committed export, [`files/SparkPlug.json`](../files/SparkPlug.json), is the field-run version
+The committed export, [`files/SparkPlug.json`](files/SparkPlug.json), is the field-run version
 of the process group above. Import it directly rather than rebuilding the two legs from scratch:
 
 ```bash

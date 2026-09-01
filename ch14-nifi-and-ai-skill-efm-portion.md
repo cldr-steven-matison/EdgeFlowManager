@@ -20,7 +20,7 @@ Java `2.24.08.0-19`.
 
 ## What the Skill Actually Is
 
-`nifi-and-ai` is a Claude Code skill — a `SKILL.md` and six reference files that install into
+`nifi-and-ai` is a Claude Code skill — a `SKILL.md` and eight reference files that install into
 `~/.claude/skills/` and load on demand when a session touches NiFi, MiNiFi, or EFM. It is not
 documentation *about* NiFi; the Apache docs already exist. It is the distilled residue of building
 this array: each rule is one bug that cost real time, written down so the next session doesn't pay
@@ -31,17 +31,19 @@ calls for one:
 
 | File | What it covers |
 |---|---|
-| `SKILL.md` | The 9 rules, the three deployment shapes, and the map to everything else. Always loaded. |
+| `SKILL.md` | The 10 rules, the three deployment shapes, and the map to everything else. Always loaded. |
 | `references/flow-api.md` | Deploying and editing flows via the **NiFi** REST API — auth, uploading a Process Group JSON, re-exporting to keep a checked-in copy current, safe live edits. |
 | `references/minifi-efm.md` | **The edge side.** Staging agent binaries, EFM persistence, the deployer curl, Windows+Python, the undocumented EFM Designer API, and recovering an agent whose heartbeat has gone dark. This is the EFM portion. |
 | `references/custom-processors.md` | Writing custom Python/Java processors, the mixed-template EL trap, and rebuild→redeploy discipline. |
 | `references/patterns.md` | Flow patterns that ship: NiFi-as-HTTP-API, the MiNiFi fire-and-forget router, ingest→Kafka→transform→sink (RAG), and the GUI-less edge→host bridge. |
 | `references/debugging.md` | Cross-cutting wire-up gotchas and a 10-step debugging checklist. |
 | `references/layout.md` | Canvas layout: the coordinate model, spacing constants, direction & sprawl rules (route/add down never up, new work right of existing canvas, one test funnel, per-branch terminal logs), per-shape placement rules, a worked example — and the running list of what a programmatic build still needs a human pass on. |
+| `references/flow-registry.md` | Add/update a Process Group **without ever reading the root `flow.json`** — the committed export is the registry: PG upload/upsert via the API, Parameter Context pre-create from k8s Secrets, a complete k8s Job template, and the secret-manager options. |
+| `references/site-to-site.md` | Site-to-Site and secure-cluster rollout on the CFM operator: `userCertAuth` at CR creation, identity = cert SAN, the one-CA issuer chain, peers as `User` CRs, transport keys, and the symptom→cause→fix traps table. |
 
-### The 9 Rules
+### The 10 Rules
 
-The core of the skill is nine rules you read before touching any live flow. They aren't NiFi
+The core of the skill is ten rules you read before touching any live flow. They aren't NiFi
 trivia — they're the ones that, ignored, cost an afternoon each:
 
 1. **Live UI / `flow.json` is truth. Docs and memory lag.** Dump the running flow before editing;
@@ -66,6 +68,10 @@ trivia — they're the ones that, ignored, cost an afternoon each:
    branching inside one custom Python processor.** A leaked internal-timer thread once kept
    re-logging stale state after a restart; a stock-processor chain can't, because NiFi owns all
    scheduling.
+10. **Never read `flow.json.gz` to add a component.** The committed JSON export in git is the
+   source of truth — POST it to the parent PG's `upload` endpoint and only the new PG is touched;
+   the rest of the canvas is never read or modified. The full registry pattern lives in
+   `references/flow-registry.md`.
 
 Rules 1, 2, 5, and 6 are the ones that bite hardest at the edge, and they carry through the whole
 of Part VI.
