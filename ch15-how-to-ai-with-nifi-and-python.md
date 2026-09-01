@@ -197,6 +197,10 @@ If the processor does not appear or the version tag does not update, check the N
 
 > **⚠️ The ghost-processor trap.** If you skip Rule 2 and deploy AI-generated code without proving the skeleton first, you will see dashed-line processors with no relationships on the canvas. The fix is always the same: strip back to `GenericTransform`, confirm it loads, then re-add logic incrementally.
 
+## From Iteration to Deployment
+
+The hot-reload loop above is for developing the processor. Once it loads clean and routes, promote it deliberately rather than leaving it wired into whatever you were testing against. Build the finished logic inside its own new, finite Process Group — never inline inside a live flow — then export that PG to a versioned `files/*.json` and commit it. That committed JSON, not the running canvas, is the source of truth. Deploy or redeploy it by importing the file through the process-group upload API, so any environment gets the same flow from the same artifact instead of a hand-rebuild. Sensitive values (API keys, model endpoints, credentials) belong in a Parameter Context backed by a secret store and referenced as `#{…}` — never baked into the processor properties or the exported JSON.
+
 ## Source
 
 Published in full as [How to AI with NiFi and Python](https://cldr-steven-matison.github.io/blog/How-to-AI-with-NiFi-and-Python/) on the blog, with the complete worked examples.

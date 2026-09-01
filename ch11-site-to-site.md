@@ -36,6 +36,8 @@ The operator rolls the pod to apply.
 
 **2. An input port exists and is RUNNING.** On the root canvas, add an input port `from-minifi`, wire it to a downstream funnel (an input port with no outgoing connection is invalid and won't start), and start it. Note its UUID — the RPG addresses the port by ID.
 
+> Keep the receiving side inside its own named Process Group rather than wiring the port straight onto the root canvas, then export that PG to `files/` and commit it. The committed JSON is the source of truth: to stand the receiver up in a fresh environment you re-import it through the process-group upload API rather than hand-rebuilding the port and its downstream wiring. Only the port UUID is environment-specific — regenerate the RPG's port binding after import.
+
 **3. The agent's identity is authorized — declaratively.** This is the one idea that shapes everything on a CFM-operator NiFi: **you don't POST authorization policies, you declare them.** The operator owns the authorizer; hand-POSTing a policy as the seeded admin returns `500 Unable to save Authorizations` because you're writing to a store the operator manages. Declare the peer with a `User` CR whose identity matches the agent's client-cert SAN:
 
 ```yaml

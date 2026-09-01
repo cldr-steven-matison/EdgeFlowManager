@@ -210,7 +210,10 @@ Two gotchas, each cost a rebuild:
 
 Both the reporting task and the SSL CS are baked into `flow.json.raw` **and** `flow.json.gz` (consistent,
 per the authoritative-`.raw` rule above); `nifi.minifi.sensitive.props.key=` is empty, so the keystore
-passwords go in as plaintext. The JSON added to the flow:
+passwords go in as plaintext. This is acceptable only because these are lab certs carrying the default
+`changeit` password on a throwaway agent. A production agent should set `nifi.minifi.sensitive.props.key`
+and reference the keystore passwords through a Parameter Context (`#{…}`) backed by a k8s Secret — never
+a literal baked into the flow. The JSON added to the flow:
 
 ```json
 "controllerServices": [{
