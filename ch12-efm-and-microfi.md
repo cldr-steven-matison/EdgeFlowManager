@@ -1,5 +1,7 @@
 # Chapter 12: EFM and MicroFi
 
+> **MicroFi** is Chris Burns's open-source project — [`github.com/Christopheraburns/MicroFi`](https://github.com/Christopheraburns/MicroFi) (public). The firmware, the C2 implementation, and the `docs/MICROFI_ASSESSMENT.md` design rationale referenced throughout this chapter are all his. This chapter documents fielding it as an EFM agent class; credit for the agent itself goes upstream.
+
 MicroFi is a clean-room implementation of the MiNiFi C2 contracts, written in C++ against ESP-IDF for the Seeed XIAO ESP32-S3: FlowFile semantics, C2 heartbeat and acknowledge, flow-definition apply. It is not a fork of `nifi-minifi-cpp` and it does not behave like one once you are inside it. This chapter is how a microcontroller becomes a first-class EFM agent class: identify the board, enroll it, verify its manifest, push a flow, build processors into its compile-time registry, and run a fleet of them. It ends with the fleet as it stands: three XIAO units running one flow type each, and a Waveshare AMOLED touchscreen whose display, touch, IMU, and microphone are EFM processors.
 
 The Sparkplug B payload side and the JSON-telemetry-to-Kafka pipeline live in [Chapter 13](ch13-efm-and-sparkplug-mqtt.md) and [Chapter 20](ch20-sparkplug-demo.md). This chapter owns the agent side only: enrollment, manifest, flow push, and extending the firmware itself.

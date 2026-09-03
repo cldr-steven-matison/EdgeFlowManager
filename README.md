@@ -49,7 +49,7 @@ Running both MiNiFi runtimes as EFM-managed Kubernetes pods, then moving their F
 ### Part V — EFM at the Edge
 Two real-hardware edge legs: a from-scratch ESP32 C2 agent enrolled directly in EFM, and Sparkplug B over MQTT.
 
-- **Ch12** — [EFM and MicroFi](ch12-efm-and-microfi.md)
+- **Ch12** — [EFM and MicroFi](ch12-efm-and-microfi.md) — the ESP32 C2 agent is Chris Burns's open-source [MicroFi](https://github.com/Christopheraburns/MicroFi)
 - **Ch13** — [EFM and SparkPlug MQTT](ch13-efm-and-sparkplug-mqtt.md)
 
 ### Part VI — AI at the Edge
@@ -89,3 +89,12 @@ demos, and the observability layer that watches all of it.
 
 **This is the published guide** — the chapter files in this directory, read through this index on
 GitHub. There is no separate document to assemble and no other site to go to.
+
+---
+
+## Acknowledgements
+
+The ESP32 edge agent in [Chapter 12](ch12-efm-and-microfi.md) is **MicroFi**, Chris Burns's
+open-source clean-room MiNiFi C2 implementation for microcontrollers:
+[**github.com/Christopheraburns/MicroFi**](https://github.com/Christopheraburns/MicroFi). The
+firmware and its design are his; this guide only documents fielding it as an EFM agent.
