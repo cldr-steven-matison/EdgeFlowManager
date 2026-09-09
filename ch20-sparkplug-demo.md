@@ -45,9 +45,9 @@ The NiFi side is three process groups on the central canvas: [`files/SparkPlug.j
 - The three MicroFi units enrolled in EFM with their class flows published ([Chapter 12](ch12-efm-and-microfi.md)). Each unit's firmware carries the broker address as a literal LAN dotted-quad; the boards have no Tailscale client and join the same WiFi AP as the host.
 - No hardware yet? Chapter 13's two Python publishers exercise both legs of the `SparkPlug` PG from a laptop against a port-forwarded broker.
 
-## NiFi Ingestion — the `SparkPlug` Process Group
+## NiFi Ingestion, the `SparkPlug` Process Group
 
-Import the committed export rather than rebuilding the two legs by hand:
+Import the committed export. There is no need to rebuild the two legs by hand.
 
 ```bash
 curl -k -u "$NIFI_USER:$NIFI_PASS" \
@@ -59,13 +59,13 @@ Two independent consumer legs share the broker, because two kinds of publisher e
 
 - **JSON leg.** `ConsumeMQTT` (topic filter `test/sensor/data`) → `ExtractDeviceId` (`EvaluateJsonPath`, `device_id` from `$.device_id`) → `PublishKafka-XiaoTelemetry` (topic `xiao_telemetry`, key `${device_id}`). The payload carries the publisher's own agent-class name, so every Kafka record is keyed by the device's class identity: `MicroFi-1`.
 - **Sparkplug leg.** `ConsumeMQTTIIoT` (topic filter `spBv1.0/#`) → `PublishKafka-SparkplugTelemetry` (topic `sparkplug_telemetry`). `ConsumeMQTTIIoT` decodes the protobuf itself and routes every well-formed message to `Message`; anything it cannot parse goes to `parse.failure`. On this leg the device identity travels in the topic segments (`spBv1.0/<group>/<type>/<edge-node>`), not in a `device_id` attribute, so the records carry a null key.
-- `parse.failure` on both legs routes to an `EOL` output port. Nothing is auto-terminated, so a bad payload is visible in a queue instead of vanishing.
+- `parse.failure` on both legs routes to an `EOL` output port. Nothing is auto-terminated, so a bad payload is visible in a queue, never vanishing.
 
-Both `PublishKafka` processors use the in-cluster bootstrap address, `PLAINTEXT`, no SASL, copied from the other live processors on the same cluster.
+Both `PublishKafka` processors use the in-cluster bootstrap address, `PLAINTEXT`, no SASL, copied from the other processors on the same cluster.
 
-> **⚠️ Never GET-then-PUT `ConsumeMQTT` or `ConsumeMQTTIIoT`.** Both carry a sensitive `Password` property. On this pair it reads back as a literal `null` rather than the usual `********`, and the rule is the same: check `descriptors[...].sensitive` before any full-entity PUT, or bind the broker password to a Parameter Context and never touch the entity at all.
+> **⚠️ Never GET-then-PUT `ConsumeMQTT` or `ConsumeMQTTIIoT`.** Both carry a sensitive `Password` property. On this pair it reads back as a literal `null` and not the usual `********`, and the rule is the same: check `descriptors[...].sensitive` before any full-entity PUT, or bind the broker password to a Parameter Context and never touch the entity at all.
 
-## The Publishers — One Flow Type per Unit
+## The Publishers, One Flow Type per Unit
 
 **MicroFi-1, plain JSON.** `GenerateFlowFile → PublishMQTT` (`Broker URI: mqtt://192.168.1.121:1883`, `Topic: test/sensor/data`, QoS 0). The generated content is the class name as JSON:
 
@@ -117,7 +117,7 @@ kubectl exec -n cld-streaming my-cluster-combined-0 -- \
 
 The Sparkplug records are not human-readable, but the metric names are literal strings inside the protobuf, so `Sensors/Temperature` is visible in the raw bytes. That, plus `Message`-not-`parse.failure` in NiFi, is the verification standard for "this device speaks Sparkplug B."
 
-## Round Trip — a FlowFile Becomes an LED
+## Round Trip, a FlowFile Becomes an LED
 
 Ingest proves the edge can talk to the center. The round trip proves the center can act on the edge, and it is the simplest teachable form of every actuation leg in this guide: a FlowFile on the central canvas becomes a physical state change on the smallest device in the fleet.
 
@@ -146,11 +146,11 @@ curl -X POST http://192.168.1.198:8095/led -d 1     # LED on, HTTP 200
 curl -X POST http://192.168.1.198:8095/led -d 0     # LED off
 ```
 
-**Swapping a unit's role.** MicroFi-1 normally runs the JSON publisher. To run the LED flow on it, publish the LED class flow through the EFM Designer API (delete the current components, create the two processors and one connection, validate, publish) and publish the telemetry export back afterwards. [`files/microfi/amoled-class-flow.py`](files/microfi/amoled-class-flow.py) is the worked builder for exactly that swap on the AMOLED class; the same three calls apply to any MicroFi class. Publishing a new class flow re-applies the graph in place. On current firmware the old `ListenHTTP` releases its port before the new graph starts; on a firmware build without the teardown hook, power-cycle the unit if a port-binding processor does not come up.
+**Swapping a unit's role.** MicroFi-1 normally runs the JSON publisher. To run the LED flow on it, publish the LED class flow through the EFM Designer API (delete the current components, create the two processors and one connection, validate, publish) and publish the telemetry export back afterwards. [`files/microfi/amoled-class-flow.py`](files/microfi/amoled-class-flow.py) is the builder for exactly that swap on the AMOLED class; the same three calls apply to any MicroFi class. Publishing a new class flow re-applies the graph in place. On current firmware the old `ListenHTTP` releases its port before the new graph starts; on a firmware build without the teardown hook, power-cycle the unit if a port-binding processor does not come up.
 
-## Edge Decision on the Jetson — Designed and Exported
+## Edge Decision on the Jetson, Designed and Exported
 
-The same threshold-to-actuation idea runs on a MiNiFi C++ agent when the decision should be made at the edge rather than on the central canvas. The `NvidiaNanoSparkPlug` class flow ([`files/efm/NvidiaNanoSparkPlug.json`](files/efm/NvidiaNanoSparkPlug.json)):
+The same threshold-to-actuation idea runs on a MiNiFi C++ agent when the decision should be made at the edge and not on the central canvas. The `NvidiaNanoSparkPlug` class flow ([`files/efm/NvidiaNanoSparkPlug.json`](files/efm/NvidiaNanoSparkPlug.json)):
 
 ```
 ConsumeMQTT-XiaoSensor (tcp://192.168.1.121:1883, test/sensor/data)
@@ -173,7 +173,7 @@ Site-to-Site is not part of this demo. Every hop here goes through the broker or
 
 **GET-then-PUT a processor whose sensitive property reads back `null`.** The masked form varies; the destruction on PUT does not.
 
-**Point a device's `PublishKafka` at the in-cluster bootstrap DNS name.** A physical agent outside the cluster needs the external listener on the host's LAN address, and a MiNiFi C++ agent needs a full restart, not just a property push, before a changed broker address takes effect.
+**Point a device's `PublishKafka` at the in-cluster bootstrap DNS name.** A physical agent outside the cluster needs the external listener on the host's LAN address, and a MiNiFi C++ agent needs a full restart, and not only a property push, before a changed broker address takes effect.
 
 **Push an Expression Language predicate with nested single quotes through EFM's C2 path to a MiNiFi C++ agent.** `${trigger.actuation:equals('true')}` arrives on the device as the literal `false`. Use a bare attribute reference (`${trigger.actuation}`) and read the agent's regenerated `config.yml` to see what it received; the Designer's echo of the property is not that.
 
@@ -183,8 +183,8 @@ Site-to-Site is not part of this demo. Every hop here goes through the broker or
 
 ## Related Chapters
 
-- [Chapter 12 — EFM and MicroFi](ch12-efm-and-microfi.md): the fleet, the processor registry (`PublishMQTT`, `PublishSparkplug`, `ListenHTTP`, `SetGPIO`, `CaptureImage`), and how a class flow gets onto a unit.
-- [Chapter 13 — EFM and SparkPlug MQTT](ch13-efm-and-sparkplug-mqtt.md): the protocol, the broker manifests, `ConsumeMQTTIIoT`, the test publishers, and publishing Sparkplug B from MiNiFi Java.
-- [Chapter 18 — Sample Gallery](ch18-sample-gallery.md): Entries 10 (two-leg ingest), 11 (`PublishSparkplug` on MiNiFi Java), and 12 (LED actuation round trip) are this chapter's flows as runnable cards.
-- [Chapter 19 — EFM + NVIDIA Jetson](ch19-efm-and-nvidia-jetson.md): the `ExecuteScript`/TensorRT pattern the Jetson leg reuses, and the Java agent that runs on the board today.
-- [Chapter 21 — Metrics & Observability](ch21-metrics-and-observability.md): the Prometheus/Grafana layer watching this NiFi/Kafka stack and the fleet's heartbeats.
+- [EFM and MicroFi](ch12-efm-and-microfi.md) (Ch12). The fleet, the processor registry (`PublishMQTT`, `PublishSparkplug`, `ListenHTTP`, `SetGPIO`, `CaptureImage`), and how a class flow gets onto a unit.
+- [EFM and SparkPlug MQTT](ch13-efm-and-sparkplug-mqtt.md) (Ch13). The protocol, the broker manifests, `ConsumeMQTTIIoT`, the test publishers, and publishing Sparkplug B from MiNiFi Java.
+- [Sample Gallery](ch18-sample-gallery.md) (Ch18). Entries 10 (two-leg ingest), 11 (`PublishSparkplug` on MiNiFi Java), and 12 (LED actuation round trip) are this chapter's flows as runnable cards.
+- [EFM + NVIDIA Jetson](ch19-efm-and-nvidia-jetson.md) (Ch19). The `ExecuteScript`/TensorRT pattern the Jetson leg reuses, and the Java agent that runs on the board today.
+- [Metrics & Observability](ch21-metrics-and-observability.md) (Ch21). The Prometheus/Grafana layer watching this NiFi/Kafka stack and the fleet's heartbeats.
