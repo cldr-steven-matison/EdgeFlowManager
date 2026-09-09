@@ -1,400 +1,476 @@
 # Chapter 18: Sample Gallery of MiNiFi Flows
 
-A curated, runnable set of MiNiFi flows accumulated as the guide is built. Each entry is a flow that has been **field-validated** somewhere in this guide — this chapter collects and polishes them behind one consistent card, it doesn't invent new ones. A flow only earns a full card here after its own chapter is field-validated; slots whose chapters are not yet closed are listed as labeled pending entries at the bottom.
+A runnable set of MiNiFi flows collected as the guide was built. Each entry is a flow that runs somewhere in this guide. This chapter gathers them behind one consistent card and does not invent new ones. A flow gets a card here once its own chapter is complete.
 
-The runnable home for these flows is the [`sample-gallery/`](https://github.com/cldr-steven-matison/MiNiFi-Kubernetes-Playground/tree/main/sample-gallery) directory in the MiNiFi Kubernetes Playground repo. This chapter is the plan and narrative; the Playground's `sample-gallery/README.md` is the runnable index that links the configs. Configs live once at the repo root — each card here links to them, not duplicates them.
+The runnable home for these flows is the [`sample-gallery/`](https://github.com/cldr-steven-matison/MiNiFi-Kubernetes-Playground/tree/main/sample-gallery) directory in the MiNiFi Kubernetes Playground repo. This chapter is the narrative. The Playground's `sample-gallery/README.md` is the runnable index that links the configs. Configs live once, at the repo root, and each card here links to them.
 
 ## Card Format
 
-Every entry uses the same card so the gallery reads consistently:
+Every entry uses the same card so the gallery reads consistently.
 
-- **Name** — short, googlable
-- **Purpose** — one line, what it's for
-- **Agent** — C++ / Java, version, class (standalone vs EFM-managed)
-- **Shape** — the processor chain
-- **Files** — `config.yml` and/or exported `flow.json`
-- **Verification** — the exact command(s) to prove it runs
-- **Status** — field-validation date and where to find the full walkthrough
-
----
-
-## Entry 1 — HTTP → Kafka + File (MiNiFi C++, Standalone)
-
-- **Name:** `http-to-kafka-cpp`
-- **Purpose:** Accept an HTTP POST at the edge and fan it out to a Kafka topic *and* a local file in one flow.
-- **Agent:** MiNiFi **C++** `1.26.02` (`container.repo.cloudera.com/cloudera/apacheminificpp:latest`), standalone `config.yml` baked at image build time, no EFM.
-- **Shape:** fan-out from a single listener — both connections carry `ListenHTTP`'s `success` relationship; the flow is a fork, not a chain:
-  ```
-  ListenHTTP ─┬─(success)─→ PublishKafka   (topic test-minifi, broker my-cluster-kafka-bootstrap.cld-streaming.svc:9092)
-              └─(success)─→ PutFile         (/tmp/minifi-test-output)
-  ```
-- **Files:** [`config.yml`](https://github.com/cldr-steven-matison/MiNiFi-Kubernetes-Playground/blob/main/config.yml) · [`Dockerfile`](https://github.com/cldr-steven-matison/MiNiFi-Kubernetes-Playground/blob/main/Dockerfile) · [`minifi-test.yaml`](https://github.com/cldr-steven-matison/MiNiFi-Kubernetes-Playground/blob/main/minifi-test.yaml) (NodePort 30080)
-- **Verification:**
-  ```bash
-  # 1. open the network tunnel (required on macOS — NodePort not directly reachable)
-  minikube service minifi-test-service --url
-
-  # 2. POST a payload (use the tunnel port from step 1)
-  curl -i -X POST http://127.0.0.1:<TUNNEL_PORT>/contentListener \
-       -H "Content-Type: application/json" \
-       -d '{"test_id": "integration-success", "message": "Flow is functional"}'
-
-  # 3. confirm delivery to Kafka
-  kubectl run kafka-viewer -it --rm \
-    --image=quay.io/strimzi/kafka:latest-kafka-3.7.0 --restart=Never \
-    -- bin/kafka-console-consumer.sh \
-    --bootstrap-server my-cluster-kafka-bootstrap.cld-streaming.svc:9092 \
-    --topic test-minifi --from-beginning --timeout-ms 10000
-
-  # 4. confirm PutFile also wrote the payload
-  kubectl exec -it deployment/minifi-test -- /bin/sh -c "cat /tmp/minifi-test-output/*"
-  ```
-- **Status:** ✅ field-validated, playground Minikube (context `minikube`). Full walkthrough: [Chapter 7](ch07-standalone-minifi-cpp-on-k8s.md).
-
-> **⚠️ C++ config requirements.** Every processor and connection needs an explicit `id` UUID. Class names are C++ short names (`ListenHTTP`, `PublishKafka`, `PutFile`) — Java FQCNs do not work. `PublishKafka` requires a non-empty `Client Name`. The readiness probe path is `/contentListener`, not `/` or `/health`.
+| Field | What goes in it |
+|---|---|
+| Name | Short and googlable |
+| Purpose | One line, what it is for |
+| Agent | C++ or Java, version, class, standalone or EFM-managed |
+| Shape | The processor chain |
+| Files | `config.yml` or the exported flow JSON |
+| Verify | The exact commands that show it runs |
+| Chapter | Where the full walkthrough lives |
 
 ---
 
-## Entry 2 — HTTP → File (MiNiFi Java, Standalone)
+## 1. HTTP to Kafka and File (MiNiFi C++, Standalone)
 
-- **Name:** `http-to-file-java`
-- **Purpose:** Accept an HTTP POST at the edge and persist it to a local file. No Kafka — the stock Java image ships no Kafka NAR.
-- **Agent:** MiNiFi **Java** `1.23.04-b15` (`container.repo.cloudera.com/cloudera/nifi-minifi-java:latest`), standalone `config-java.yml` (`MiNiFi Config Version: 3`), no EFM.
-- **Shape:**
-  ```
-  ListenHTTP ─(success)─→ PutFile   (/tmp/minifi-test-output)
-  ```
-- **Files:** [`config-java.yml`](https://github.com/cldr-steven-matison/MiNiFi-Kubernetes-Playground/blob/main/config-java.yml) · [`Dockerfile.java`](https://github.com/cldr-steven-matison/MiNiFi-Kubernetes-Playground/blob/main/Dockerfile.java) · [`minifi-test-java.yaml`](https://github.com/cldr-steven-matison/MiNiFi-Kubernetes-Playground/blob/main/minifi-test-java.yaml) (NodePort 30081)
-- **Verification:**
-  ```bash
-  minikube service minifi-test-java-service --url
+| Field | Value |
+|---|---|
+| Name | `http-to-kafka-cpp` |
+| Purpose | Accept an HTTP POST at the edge and fan it out to a Kafka topic and a local file in one flow. |
+| Agent | MiNiFi C++ `1.26.02` (`container.repo.cloudera.com/cloudera/apacheminificpp:latest`), standalone `config.yml` baked at image build time, no EFM. |
+| Files | [`config.yml`](https://github.com/cldr-steven-matison/MiNiFi-Kubernetes-Playground/blob/main/config.yml) · [`Dockerfile`](https://github.com/cldr-steven-matison/MiNiFi-Kubernetes-Playground/blob/main/Dockerfile) · [`minifi-test.yaml`](https://github.com/cldr-steven-matison/MiNiFi-Kubernetes-Playground/blob/main/minifi-test.yaml) (NodePort 30080) |
+| Chapter | [Chapter 7](ch07-standalone-minifi-cpp-on-k8s.md) |
 
-  curl -i -X POST http://127.0.0.1:<TUNNEL_PORT>/contentListener \
-       -H "Content-Type: application/json" \
-       -d '{"test_id": "integration-success", "message": "Flow is functional"}'
+#### Shape
 
-  kubectl exec -it deployment/minifi-test-java -- /bin/sh -c "cat /tmp/minifi-test-output/*"
-  ```
-- **Status:** ✅ field-verified end-to-end on playground Minikube. Full walkthrough: [Chapter 8](ch08-minifi-java-setup.md).
+The flow is a fork, not a chain. Both connections carry `ListenHTTP`'s `success` relationship.
 
-> **⚠️ Java config gotchas.** Connections wire by `source id`/`destination id` UUID, not by name. Processor `class` is fully-qualified. The readiness/liveness probes must be `tcpSocket`, not `httpGet` — Java's `ListenHTTP` returns `405` to a bare `GET` and an `httpGet` probe crash-loops the pod.
+```
+ListenHTTP ─┬─(success)─→ PublishKafka   (topic test-minifi, broker my-cluster-kafka-bootstrap.cld-streaming.svc:9092)
+            └─(success)─→ PutFile         (/tmp/minifi-test-output)
+```
 
----
+#### Verify
 
-## Entry 3 — EFM-Managed Smoke Flow (MiNiFi C++, Level 2)
+```bash
+# 1. open the network tunnel (required on macOS — NodePort not directly reachable)
+minikube service minifi-test-service --url
 
-- **Name:** `efm-level2-playground-cpp`
-- **Purpose:** Prove EFM C2 wiring end to end in the `default` namespace using a bare Ubuntu pod. `GenerateFlowFile` emits a heartbeat every 10 seconds; `LogAttribute` confirms the agent is receiving and executing EFM-published flows.
-- **Agent:** MiNiFi **C++** `1.26.02`, EFM-managed agent class `PlaygroundCpp`, installed from bare `ubuntu:22.04` via the EFM agent-deployer script (no custom image). EFM `2.3.1.0-2` in `cld-streaming` namespace.
-- **Shape:**
-  ```
-  GenerateFlowFile (10 sec, Custom Text: "PlaygroundCpp Level 2 heartbeat")
-    ─(success)─→ LogAttribute
-  ```
-- **Files:** [`minifi-test-efm-cpp.yaml`](https://github.com/cldr-steven-matison/MiNiFi-Kubernetes-Playground/blob/main/minifi-test-efm-cpp.yaml) · [`files/efm/PlaygroundCpp.json`](files/efm/PlaygroundCpp.json) (exported flow)
-- **Verification:**
-  ```bash
-  # confirm the agent reached ONLINE in EFM Monitor → Agents
-  # (check EFM UI at http://127.0.0.1:10090/efm/ui)
+# 2. POST a payload (use the tunnel port from step 1)
+curl -i -X POST http://127.0.0.1:<TUNNEL_PORT>/contentListener \
+     -H "Content-Type: application/json" \
+     -d '{"test_id": "integration-success", "message": "Flow is functional"}'
 
-  # confirm LogAttribute output in pod logs
-  kubectl logs minifi-test-efm-cpp -n default | grep LogAttribute
-  # expected: LogAttribute -- filename: <uuid>, content: PlaygroundCpp Level 2 heartbeat
-  ```
-- **Status:** ✅ field-validated on playground Minikube, `default` namespace. Full walkthrough: [Chapter 9](ch09-efm-in-the-playground.md).
+# 3. confirm delivery to Kafka
+kubectl run kafka-viewer -it --rm \
+  --image=quay.io/strimzi/kafka:latest-kafka-3.7.0 --restart=Never \
+  -- bin/kafka-console-consumer.sh \
+  --bootstrap-server my-cluster-kafka-bootstrap.cld-streaming.svc:9092 \
+  --topic test-minifi --from-beginning --timeout-ms 10000
 
-> **⚠️ EFM health-poll required.** On cold-start EFM takes up to two minutes to bind its Jetty listener. Both manifests poll `/efm/actuator/health` in a loop before running the deployer curl — skip the poll and the agent never enrolls. Both `flowId` and `pgId` are required in the processor-create API path; using only `pgId` returns a misleading Spring 404.
+# 4. confirm PutFile also wrote the payload
+kubectl exec -it deployment/minifi-test -- /bin/sh -c "cat /tmp/minifi-test-output/*"
+```
+
+> **⚠️ C++ config requirements.** Every processor and connection needs an explicit `id` UUID. Class names are C++ short names (`ListenHTTP`, `PublishKafka`, `PutFile`). Java FQCNs do not work. `PublishKafka` requires a non-empty `Client Name`. The readiness probe path is `/contentListener`, not `/` or `/health`.
 
 ---
 
-## Entry 4 — EFM-Managed Smoke Flow (MiNiFi Java, Level 2)
+## 2. HTTP to File (MiNiFi Java, Standalone)
 
-- **Name:** `efm-level2-playground-java`
-- **Purpose:** The Java-flavor counterpart to Entry 3. Proves EFM C2 enrollment and flow delivery to a MiNiFi Java agent, same bare-pod bootstrap pattern.
-- **Agent:** MiNiFi **Java** `2.24.08.0-19`, EFM-managed agent class `PlaygroundJava`, installed from bare `ubuntu:22.04` via the EFM agent-deployer script (requires `openjdk-11-jre-headless`). EFM `2.3.1.0-2` in `cld-streaming` namespace.
-- **Shape:**
-  ```
-  GenerateFlowFile (10 sec, Custom Text: "PlaygroundJava Level 2 heartbeat")
-    ─(success)─→ LogAttribute
-  ```
-- **Files:** [`minifi-test-efm-java.yaml`](https://github.com/cldr-steven-matison/MiNiFi-Kubernetes-Playground/blob/main/minifi-test-efm-java.yaml) · [`files/efm/PlaygroundJava.json`](files/efm/PlaygroundJava.json) (exported flow)
-- **Verification:**
-  ```bash
-  kubectl logs minifi-test-efm-java -n default | grep LogAttribute
-  # expected: LogAttribute -- filename: <uuid>, content: PlaygroundJava Level 2 heartbeat
-  ```
-- **Status:** ✅ field-validated on playground Minikube, `default` namespace. Full walkthrough: [Chapter 9](ch09-efm-in-the-playground.md).
+| Field | Value |
+|---|---|
+| Name | `http-to-file-java` |
+| Purpose | Accept an HTTP POST at the edge and persist it to a local file. No Kafka, because the stock Java image ships no Kafka NAR. |
+| Agent | MiNiFi Java `1.23.04-b15` (`container.repo.cloudera.com/cloudera/nifi-minifi-java:latest`), standalone `config-java.yml` (`MiNiFi Config Version: 3`), no EFM. |
+| Files | [`config-java.yml`](https://github.com/cldr-steven-matison/MiNiFi-Kubernetes-Playground/blob/main/config-java.yml) · [`Dockerfile.java`](https://github.com/cldr-steven-matison/MiNiFi-Kubernetes-Playground/blob/main/Dockerfile.java) · [`minifi-test-java.yaml`](https://github.com/cldr-steven-matison/MiNiFi-Kubernetes-Playground/blob/main/minifi-test-java.yaml) (NodePort 30081) |
+| Chapter | [Chapter 8](ch08-minifi-java-setup.md) |
 
----
+#### Shape
 
-## Entry 5 — S2S Source (MiNiFi C++, EFM-Managed, K8s → NiFi)
+```
+ListenHTTP ─(success)─→ PutFile   (/tmp/minifi-test-output)
+```
 
-- **Name:** `s2s-cpp-to-nifi-k8s`
-- **Purpose:** Transmit FlowFiles from a MiNiFi C++ agent running in Kubernetes to a CFM-operator-managed NiFi in the same cluster over secure HTTP Site-to-Site. Proves the full C++ S2S path: EFM-authored flow, cert-mounted client identity, and `User` CR authorization on NiFi.
-- **Agent:** MiNiFi **C++** `1.26.02`, EFM-managed (any C++ agent class with the S2S props in `minifi.properties`). Client SSL is global — `nifi.security.client.certificate/private.key/ca.certificate` in `minifi.properties`; there is no per-RPG SSL context service field in C++.
-- **Shape:**
-  ```
-  GenerateFlowFile
-    ─(success)─→ RemoteProcessGroup  (targetUris: https://nifi-web.<ns>.svc.cluster.local:8443,
-                                      transportProtocol: HTTP,
-                                      destination: from-minifi input port UUID)
-  ```
-- **Files:** No committed C++-specific flow file — the EFM-authored flow is built in the Designer and published per agent class. See [`files/site-to-site/`](files/site-to-site/) for the shared S2S reference assets and [`files/site-to-site/SITE_TO_SITE.md`](files/site-to-site/SITE_TO_SITE.md) for the directory guide. NiFi-side manifests (cert, user CR, web service) live in [`files/site-to-site/ch11-java/`](files/site-to-site/ch11-java/) and apply unchanged to the C++ leg.
-- **Verification:**
-  ```bash
-  # agent log confirms each transaction
-  grep "Site to Site transaction" /path/to/minifi-app.log
-  # expected: "sent flow 1 flow records, with total size <N>"
-  # expected: "peer finished transaction"
+#### Verify
 
-  # NiFi side: queued count climbs on the from-minifi input port
-  curl -s --cert /certs/tls.crt --key /certs/tls.key --cacert /certs/ca.crt \
-    "https://nifi-web.<ns>.svc.cluster.local:8443/nifi-api/flow/process-groups/root/status?recursive=true" \
-    | grep -oE '"(flowFilesReceived|queued)":("[^"]*"|[0-9]+)'
-  ```
-- **Status:** ✅ field-validated on playground Minikube. Full walkthrough: [Chapter 11](ch11-site-to-site.md).
+```bash
+minikube service minifi-test-java-service --url
 
-> **⚠️ C++ S2S client SSL is global, not per-processor.** Set `nifi.security.client.certificate`, `nifi.security.client.private.key`, and `nifi.security.client.ca.certificate` in `minifi.properties`. The EFM deployer may overwrite `minifi.properties` on pod restart — bake the keys into your boot script. The `from-minifi` input port must be RUNNING and the `User` CR must reference the cert's **SAN** (not subject DN) and the exact port UUID before the agent can complete its first transaction.
+curl -i -X POST http://127.0.0.1:<TUNNEL_PORT>/contentListener \
+     -H "Content-Type: application/json" \
+     -d '{"test_id": "integration-success", "message": "Flow is functional"}'
+
+kubectl exec -it deployment/minifi-test-java -- /bin/sh -c "cat /tmp/minifi-test-output/*"
+```
+
+> **⚠️ Java config gotchas.** Connections wire by `source id`/`destination id` UUID, not by name. Processor `class` is fully qualified. The readiness and liveness probes must be `tcpSocket`, not `httpGet`. Java's `ListenHTTP` returns `405` to a bare `GET`, and an `httpGet` probe crash-loops the pod.
 
 ---
 
-## Entry 6 — S2S Source (MiNiFi Java, Standalone K8s → NiFi)
+## 3. EFM-Managed Smoke Flow (MiNiFi C++, Level 2)
 
-- **Name:** `s2s-java-to-nifi-k8s`
-- **Purpose:** Transmit FlowFiles from a MiNiFi Java agent running as a standalone Kubernetes pod to a CFM-operator-managed NiFi in the same cluster over secure HTTP Site-to-Site. The agent runs without EFM — flow and config are baked into a custom image. Proves the Java S2S path: `bootstrap.conf` SSL wiring, `flow.json.raw` bake-in, and `User` CR authorization on NiFi.
-- **Agent:** MiNiFi **Java** `2.24.08.0-19`, standalone (no EFM). Client SSL is set in `bootstrap.conf` with `nifi.minifi.flow.use.parent.ssl=true` — MiNiFi Java regenerates `minifi.properties` from `bootstrap.conf` on every start; direct edits to `minifi.properties` are wiped.
-- **Shape:**
-  ```
-  GenerateFlowFile
-    ─(success)─→ RemoteProcessGroup  (targetUris: https://nifi-web.<ns>.svc.cluster.local:8443,
-                                      transportProtocol: HTTP,
-                                      destination: from-minifi input port UUID)
-  ```
-- **Files:**
-  - [`files/site-to-site/ch11-java/bootstrap.conf`](files/site-to-site/ch11-java/bootstrap.conf) — SSL config with `use.parent.ssl=true`
-  - [`files/site-to-site/ch11-java/Dockerfile`](files/site-to-site/ch11-java/Dockerfile) — bakes `flow.json.raw`, `flow.json.gz`, `flow-identifier`, `bootstrap.conf`, and the truststore
-  - [`files/site-to-site/ch11-java/minifi-java-unmanaged.yaml`](files/site-to-site/ch11-java/minifi-java-unmanaged.yaml) — pod manifest, mounts the client keystore from a Secret
-  - [`files/site-to-site/ch11-java/minifi-s2s-cert.yaml`](files/site-to-site/ch11-java/minifi-s2s-cert.yaml) — cert-manager Certificate for the agent client identity (SAN `minifi-s2s`)
-  - [`files/site-to-site/ch11-java/minifi-s2s-user.yaml`](files/site-to-site/ch11-java/minifi-s2s-user.yaml) — `User` CR granting write on the `from-minifi` input port and read on `/site-to-site`
-  - [`files/site-to-site/ch11-java/nifi-web-svc.yaml`](files/site-to-site/ch11-java/nifi-web-svc.yaml) — the `nifi-web` ClusterIP service (the operator does not create this)
-  - [`files/site-to-site/ch11-java/README.md`](files/site-to-site/ch11-java/README.md) — build and apply sequence
-- **Verification:**
-  ```bash
-  # Java agent log — peer refresh and each send
-  kubectl logs <minifi-java-pod> | grep -E "Successfully refreshed|Successfully sent"
-  # expected: "Successfully refreshed Flow Contents for RemoteProcessGroup[https://nifi-web…]"
-  # expected: "Successfully sent [...] (32 bytes) to …/nifi-api in <N> milliseconds"
+| Field | Value |
+|---|---|
+| Name | `efm-level2-playground-cpp` |
+| Purpose | Exercise EFM C2 wiring end to end in the `default` namespace using a bare Ubuntu pod. `GenerateFlowFile` emits a heartbeat every 10 seconds and `LogAttribute` shows the agent is receiving and executing EFM-published flows. |
+| Agent | MiNiFi C++ `1.26.02`, EFM-managed agent class `PlaygroundCpp`, installed from bare `ubuntu:22.04` via the EFM agent-deployer script (no custom image). EFM `2.3.1.0-2` in the `cld-streaming` namespace. |
+| Files | [`minifi-test-efm-cpp.yaml`](https://github.com/cldr-steven-matison/MiNiFi-Kubernetes-Playground/blob/main/minifi-test-efm-cpp.yaml) · [`files/efm/PlaygroundCpp.json`](files/efm/PlaygroundCpp.json) (exported flow) |
+| Chapter | [Chapter 9](ch09-efm-in-the-playground.md) |
 
-  # NiFi side: queue count on from-minifi climbs
-  curl -s --cert /certs/tls.crt --key /certs/tls.key --cacert /certs/ca.crt \
-    "https://nifi-web.<ns>.svc.cluster.local:8443/nifi-api/flow/process-groups/root/status?recursive=true" \
-    | grep -oE '"(flowFilesReceived|queued)":("[^"]*"|[0-9]+)'
-  ```
-- **Status:** ✅ field-validated on playground Minikube. Full walkthrough: [Chapter 11](ch11-site-to-site.md).
+#### Shape
 
-> **⚠️ `flow.json.raw` is authoritative.** Bake only `flow.json.gz` and MiNiFi regenerates an empty default flow, recompresses over your file, and starts **zero** processors. Bake `flow.json.raw` and `flow-identifier` alongside the `.gz`. Also: **don't edit `minifi.properties` directly** — every start regenerates it from `bootstrap.conf`. Set `nifi.minifi.security.*` and `nifi.minifi.flow.use.parent.ssl=true` in `bootstrap.conf`. `PKIX path building failed` means the *client* can't trust the server — chase the SSL context wiring, not the authorization policy.
+```
+GenerateFlowFile (10 sec, Custom Text: "PlaygroundCpp Level 2 heartbeat")
+  ─(success)─→ LogAttribute
+```
+
+#### Verify
+
+```bash
+# confirm the agent reached ONLINE in EFM Monitor → Agents
+# (check EFM UI at http://127.0.0.1:10090/efm/ui)
+
+# confirm LogAttribute output in pod logs
+kubectl logs minifi-test-efm-cpp -n default | grep LogAttribute
+# expected: LogAttribute -- filename: <uuid>, content: PlaygroundCpp Level 2 heartbeat
+```
+
+> **⚠️ EFM health poll required.** On a cold start EFM takes up to two minutes to bind its Jetty listener. Both manifests poll `/efm/actuator/health` in a loop before running the deployer command. Skip the poll and the agent never enrolls. Both `flowId` and `pgId` are required in the processor-create API path. Using only `pgId` returns a misleading Spring 404.
 
 ---
 
-## Entry 7 — TensorRT Inference on Jetson (MiNiFi C++, EFM-Managed)
+## 4. EFM-Managed Smoke Flow (MiNiFi Java, Level 2)
 
-- **Name:** `jetson-tensorrt-cpp`
-- **Purpose:** Accept an HTTP POST on a Jetson Orin Nano, run TensorRT inference via `ExecuteScript`, and publish the enriched payload to Kafka. Proves EFM-managed flow delivery to real aarch64 edge hardware and on-device GPU execution.
-- **Agent:** MiNiFi **C++** `1.26.02`, EFM-managed agent class `NvidiaNano`, enrolled on a Jetson Orin Nano (`tunastreet`, aarch64). Extra-extensions injection enables `ExecuteScript`. EFM `2.3.1.0-2` on WindowsDesktop.
-- **Shape:**
-  ```
-  ListenHTTP (port 8080, /contentListener)
-    ─(success)─→ ExecuteScript (gpu_nifi_tensorRT-3.py, Script Engine: python)
-    ─(success)─→ PublishKafka  (topic agent-nvidia-tensorRT, bootstrap gaming-pc-lan-ip:31623)
-  ```
-- **Files:**
-  - EFM flow export: [`files/efm/NvidiaNano-TensorRT.json`](files/efm/NvidiaNano-TensorRT.json)
-  - TensorRT script: [`files/gpu_nifi_tensorRT-3.py`](files/gpu_nifi_tensorRT-3.py)
-  - Companion flows: [`WindowsDesktop-TensorRT.json`](files/efm/WindowsDesktop-TensorRT.json), [`KubernetesPod-TensorRT.json`](files/efm/KubernetesPod-TensorRT.json)
-- **Verification:**
-  ```bash
-  # POST to the Jetson's ListenHTTP
-  curl -X POST http://localhost:8080/contentListener \
-    -H "Content-Type: application/json" \
-    -d '{"sensor":"jetson-test","value":42}'
+| Field | Value |
+|---|---|
+| Name | `efm-level2-playground-java` |
+| Purpose | The Java counterpart to Entry 3. Exercises EFM C2 enrollment and flow delivery to a MiNiFi Java agent with the same bare-pod bootstrap pattern. |
+| Agent | MiNiFi Java `2.24.08.0-19`, EFM-managed agent class `PlaygroundJava`, installed from bare `ubuntu:22.04` via the EFM agent-deployer script (requires `openjdk-11-jre-headless`). EFM `2.3.1.0-2` in the `cld-streaming` namespace. |
+| Files | [`minifi-test-efm-java.yaml`](https://github.com/cldr-steven-matison/MiNiFi-Kubernetes-Playground/blob/main/minifi-test-efm-java.yaml) · [`files/efm/PlaygroundJava.json`](files/efm/PlaygroundJava.json) (exported flow) |
+| Chapter | [Chapter 9](ch09-efm-in-the-playground.md) |
 
-  # Consume from the Kafka topic (external bootstrap NodePort)
-  kafka-console-consumer.sh --bootstrap-server gaming-pc-lan-ip:31623 \
-    --topic agent-nvidia-tensorRT --from-beginning --max-messages 1
-  # expected: {"sensor": "jetson-test", "value": 42, "tensorrt": {"version": "10.16.2.10", "status": "Active"}}
-  ```
-- **Status:** ✅ field-validated on real Jetson Orin Nano hardware; `tensorrt` block appended live on-device. Full walkthrough: [Chapter 19](ch19-efm-and-nvidia-jetson.md).
+#### Shape
 
-> **⚠️ Execute bit.** EFM delivers resources to `asset/` without the execute bit. Run `chmod +x ~/nifi-minifi-cpp-1.26.02/asset/gpu_nifi_tensorRT-3.py` on the Jetson after the resource syncs — `ExecuteScript` silently fails without it. `NvidiaNano` is the current class assignment and may change; check the current class before building dependent tooling.
+```
+GenerateFlowFile (10 sec, Custom Text: "PlaygroundJava Level 2 heartbeat")
+  ─(success)─→ LogAttribute
+```
+
+#### Verify
+
+```bash
+kubectl logs minifi-test-efm-java -n default | grep LogAttribute
+# expected: LogAttribute -- filename: <uuid>, content: PlaygroundJava Level 2 heartbeat
+```
 
 ---
 
-## Entry 8 — ExecuteScript Python Smoke (MiNiFi C++, EFM-Managed)
+## 5. S2S Source (MiNiFi C++, EFM-Managed, K8s to NiFi)
 
-- **Name:** `executescript-python-smoke-cpp`
-- **Purpose:** Prove `ExecuteScript` with the Python engine is live and executing on a C++ agent. The script stamps a `python.smoke` attribute on every FlowFile; `LogAttribute` confirms delivery. This is the minimal validation pattern before wiring any real script logic.
-- **Agent:** MiNiFi **C++** `1.26.02`, EFM-managed (any class with extra-extensions injection applied — `KubernetesPod`, `WindowsDesktopCpp`, `NvidiaNano`). `ExecuteScript` is not in the stock binary; see [Chapter 5](ch05-executescript-availability.md) for the injection paths.
-- **Shape:**
-  ```
-  ListenHTTP (port 18080, /contentListener, Batch Size: 1, Buffer Size: 1)
-    ─(success)─→ ExecuteScript (Script Engine: python)
-    ─(success)─→ LogAttribute  (Log Payload: true)
-  ```
-- **Script body:**
-  ```python
-  def onTrigger(context, session):
-      flow_file = session.get()
-      if flow_file:
-          session.putAttribute(flow_file, "python.smoke", "edge-executescript-ok")
-          session.transfer(flow_file, REL_SUCCESS)
-  ```
-- **Files:** Script delivered via EFM Resource Manager API (`POST /efm/api/resource-manager/resources/file`, then `PUT /efm/api/agent-class-resource-manager/{agentClass}/save` with `{"resourceIdsToBeAssigned":[...],"resourceIdsToBeUnassigned":[]}`). Flow exported to `files/efm/` per agent class.
-- **Verification:**
-  ```bash
-  curl -X POST http://127.0.0.1:18080/contentListener \
-       -H "Content-Type: application/json" \
-       -d '{"test":"smoke1"}'
-  # pass: LogAttribute shows python.smoke=edge-executescript-ok with the payload
-  # fail indicator: "Could not instantiate: PythonScriptExecutor" repeating in minifi-app.log
-  ```
-- **Status:** ✅ field-validated on C++ K8s pods (Linux x86_64) and Jetson aarch64 (extra-extensions path); on WindowsDesktop C++ via `ADDLOCAL=ALL` MSI. Full breakdown: [Chapter 5](ch05-executescript-availability.md), [Chapter 16](ch16-how-to-ai-with-minifi.md).
+| Field | Value |
+|---|---|
+| Name | `s2s-cpp-to-nifi-k8s` |
+| Purpose | Transmit FlowFiles from a MiNiFi C++ agent running in Kubernetes to a CFM-operator-managed NiFi in the same cluster over secure HTTP Site-to-Site. Covers the full C++ S2S path, an EFM-authored flow, a cert-mounted client identity, and `User` CR authorization on NiFi. |
+| Agent | MiNiFi C++ `1.26.02`, EFM-managed (any C++ agent class with the S2S properties in `minifi.properties`). Client SSL is global, set as `nifi.security.client.certificate/private.key/ca.certificate` in `minifi.properties`. There is no per-RPG SSL context service field in C++. |
+| Files | No committed C++-specific flow file. The EFM-authored flow is built in the Designer and published per agent class. [`files/site-to-site/`](files/site-to-site/) holds the shared S2S reference assets and [`files/site-to-site/SITE_TO_SITE.md`](files/site-to-site/SITE_TO_SITE.md) is the directory guide. NiFi-side manifests (cert, user CR, web service) live in [`files/site-to-site/ch11-java/`](files/site-to-site/ch11-java/) and apply unchanged to the C++ leg. |
+| Chapter | [Chapter 11](ch11-site-to-site.md) |
 
-> **⚠️ `ListenHTTP` Batch Size/Buffer Size default to 5/5.** A single request never fills the buffer and is silently dropped. Set both to `1` (MINIFICPP-2243). Also: the C++ FQCN in EFM Designer is `org.apache.nifi.minifi.processors.ExecuteScript` — the `minifi` segment is required; the Java NiFi FQCN fails.
+#### Shape
 
----
+```
+GenerateFlowFile
+  ─(success)─→ RemoteProcessGroup  (targetUris: https://nifi-web.<ns>.svc.cluster.local:8443,
+                                    transportProtocol: HTTP,
+                                    destination: from-minifi input port UUID)
+```
 
-## Entry 9 — Edge-AI Router (MiNiFi Java, EFM-Managed)
+#### Verify
 
-- **Name:** `starlinkai-lemonade-router-java`
-- **Purpose:** Front a local Lemonade Server (AMD OpenAI-compatible inference, port 13305) with a three-processor MiNiFi Java flow that proxies all five Lemonade endpoints synchronously. The agent is tiny; the GPU model runs on the adjacent box. All five endpoints work end to end; transcription needs a multipart-reassembly branch ahead of `InvokeHTTP`.
-- **Agent:** MiNiFi **Java** `2.24.08.0-19`, EFM-managed agent class `StarlinkAIJava`, running on StarlinkAI Beelink SER9 (`TunaStarlink`, Windows). `HandleHttpRequest`/`HandleHttpResponse` — the Java-only synchronous response pair — are why this is a Java flow, not C++.
-- **Shape:**
-  ```
-  HandleHttpRequest-Lemonade  (port 8090, any path)
-    ─(success)─→ InvokeHTTP-Lemonade  (POST http://localhost:13305${http.request.uri}, Read/Write Timeout: 10 min)
-    ─(Response)─→ HandleHttpResponse-Lemonade  (Status Code: ${invokehttp.status.code:replaceEmpty('502')})
-  ```
-  `Retry`, `No Retry`, and `Failure` from `InvokeHTTP` also wire to `HandleHttpResponse` (and `LogAttribute-Error`) — not to `Original`, which would double-respond the HTTP context.
-- **Files:** Flow export lives in `files/efm/` per the StarlinkAI agent class.
-- **Verification:**
-  ```bash
-  # Chat
-  curl -X POST http://localhost:8090/api/v1/chat/completions \
-       -H "Content-Type: application/json" \
-       -d @chat_body.json
+```bash
+# agent log confirms each transaction
+grep "Site to Site transaction" /path/to/minifi-app.log
+# expected: "sent flow 1 flow records, with total size <N>"
+# expected: "peer finished transaction"
 
-  # Embeddings
-  curl -X POST http://localhost:8090/api/v1/embeddings \
-       -H "Content-Type: application/json" \
-       -d '{"model":"Qwen3-Embedding-0.6B-GGUF","input":["test sentence"]}'
-  ```
-  Expected: real synchronous response from Lemonade, `invokehttp.status.code=200` on `LogAttribute`.
-- **Status:** ✅ all 5 endpoints work (chat, embeddings, reranking, TTS, transcription). Transcription needs a multipart-reassembly branch ahead of `InvokeHTTP`. Full walkthrough: [Chapter 17](ch17-edge-ai-router.md).
+# NiFi side: queued count climbs on the from-minifi input port
+curl -s --cert /certs/tls.crt --key /certs/tls.key --cacert /certs/ca.crt \
+  "https://nifi-web.<ns>.svc.cluster.local:8443/nifi-api/flow/process-groups/root/status?recursive=true" \
+  | grep -oE '"(flowFilesReceived|queued)":("[^"]*"|[0-9]+)'
+```
 
-> **⚠️ `InvokeHTTP` socket timeouts.** LLM inference routinely takes 10–25s; the framework default `Socket Read Timeout` of 15 secs fails every real call. Set Read and Write timeouts to `10 mins`. `HTTP Method` silently defaults to `GET` — set it to `POST` explicitly.
+> **⚠️ C++ S2S client SSL is global, not per-processor.** Set `nifi.security.client.certificate`, `nifi.security.client.private.key`, and `nifi.security.client.ca.certificate` in `minifi.properties`. The EFM deployer may overwrite `minifi.properties` on pod restart, so bake the keys into your boot script. The `from-minifi` input port must be RUNNING, and the `User` CR must reference the cert's SAN (not the subject DN) and the exact port UUID, before the agent can complete its first transaction.
 
 ---
 
-## Entry 10 — SparkPlug / MQTT Two-Leg Ingest (MicroFi ESP32 → NiFi → Kafka)
+## 6. S2S Source (MiNiFi Java, Standalone K8s to NiFi)
 
-- **Name:** `sparkplug-mqtt-to-kafka`
-- **Purpose:** Ingest both kinds of edge MQTT publisher at once — plain-JSON telemetry and spec-compliant Sparkplug B (`NBIRTH`/`NDATA`, protobuf) — through one Mosquitto broker into per-kind Kafka topics, keyed by the device's agent-class identity.
-- **Agent:** **MicroFi** (ESP32-S3 XIAO, compile-time processor registry, EFM-managed) — class `MicroFi-1` publishes the JSON leg; class `MicroFi-3` publishes real Sparkplug B via the unified firmware's native `PublishSparkplug` processor (branch `feature/publish-sparkplug`, wrapping the field-proven `EmbeddedSparkplugNode`/nanopb stack). NiFi side is the `SparkPlug` PG on the CFM-operator NiFi (`cfm-streaming`/`mynifi`). EFM `2.3.1.0-2`.
-- **Shape:**
-  ```
-  # device side (EFM-pushed)
-  MicroFi-1:  GenerateFlowFile ({"device_id":"MicroFi-1"}) ─(success)─→ PublishMQTT   (test/sensor/data)
-  MicroFi-3:  GenerateFlowFile-SpbTick ─(success)─→ PublishSparkplug  (spBv1.0/MicroFi/…/MicroFi-3)
+| Field | Value |
+|---|---|
+| Name | `s2s-java-to-nifi-k8s` |
+| Purpose | Transmit FlowFiles from a MiNiFi Java agent running as a standalone Kubernetes pod to a CFM-operator-managed NiFi in the same cluster over secure HTTP Site-to-Site. The agent runs without EFM. Flow and config are baked into a custom image. Covers the Java S2S path, `bootstrap.conf` SSL wiring, the `flow.json.raw` bake-in, and `User` CR authorization on NiFi. |
+| Agent | MiNiFi Java `2.24.08.0-19`, standalone (no EFM). Client SSL is set in `bootstrap.conf` with `nifi.minifi.flow.use.parent.ssl=true`. MiNiFi Java regenerates `minifi.properties` from `bootstrap.conf` on every start, so direct edits to `minifi.properties` are wiped. |
+| Chapter | [Chapter 11](ch11-site-to-site.md) |
 
-  # NiFi side (SparkPlug PG)
-  ConsumeMQTT     (test/sensor/data) ─(Message)─→ ExtractDeviceId (EvaluateJsonPath $.device_id)
-                                     ─(matched…)─→ PublishKafka-XiaoTelemetry      (topic xiao_telemetry, key ${device_id})
-  ConsumeMQTTIIoT (spBv1.0/#)        ─(Message)─→ PublishKafka-SparkplugTelemetry  (topic sparkplug_telemetry)
-  ```
-- **Files:** [`files/SparkPlug.json`](files/SparkPlug.json) (NiFi PG export, current with live) · device flow exports and proof log in [DesktopShare `files/issue-164/`](https://github.com/cldr-steven-matison/DesktopShare/tree/issue-164-sparkplug-kafka/files/issue-164)
-- **Verification:**
-  ```bash
-  # broker: both payload kinds arriving
-  kubectl exec -n mqtt deploy/mosquitto -- mosquitto_sub -v -t 'test/sensor/data' -t 'spBv1.0/#'
+#### Files
 
-  # Kafka: JSON leg keyed by device class
-  kubectl exec -n cld-streaming my-cluster-combined-0 -- \
-    /opt/kafka/bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 \
-    --topic xiao_telemetry --property print.key=true --property key.separator=" | " --timeout-ms 15000
-  # expected: MicroFi-1 | {"device_id":"MicroFi-1"}
+| File | What it is |
+|---|---|
+| [`files/site-to-site/ch11-java/bootstrap.conf`](files/site-to-site/ch11-java/bootstrap.conf) | SSL config with `use.parent.ssl=true` |
+| [`files/site-to-site/ch11-java/Dockerfile`](files/site-to-site/ch11-java/Dockerfile) | Bakes `flow.json.raw`, `flow.json.gz`, `flow-identifier`, `bootstrap.conf`, and the truststore |
+| [`files/site-to-site/ch11-java/minifi-java-unmanaged.yaml`](files/site-to-site/ch11-java/minifi-java-unmanaged.yaml) | Pod manifest, mounts the client keystore from a Secret |
+| [`files/site-to-site/ch11-java/minifi-s2s-cert.yaml`](files/site-to-site/ch11-java/minifi-s2s-cert.yaml) | cert-manager Certificate for the agent client identity (SAN `minifi-s2s`) |
+| [`files/site-to-site/ch11-java/minifi-s2s-user.yaml`](files/site-to-site/ch11-java/minifi-s2s-user.yaml) | `User` CR granting write on the `from-minifi` input port and read on `/site-to-site` |
+| [`files/site-to-site/ch11-java/nifi-web-svc.yaml`](files/site-to-site/ch11-java/nifi-web-svc.yaml) | The `nifi-web` ClusterIP service (the operator does not create this) |
+| [`files/site-to-site/ch11-java/README.md`](files/site-to-site/ch11-java/README.md) | Build and apply sequence |
 
-  # Kafka: Sparkplug B leg (binary protobuf records — NBIRTH then NDATA)
-  kubectl exec -n cld-streaming my-cluster-combined-0 -- \
-    /opt/kafka/bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 \
-    --topic sparkplug_telemetry --timeout-ms 15000
-  ```
-- **Status:** ✅ field-validated live 2026-08-14 ([#164](https://github.com/cldr-steven-matison/DesktopShare/issues/164)) with real device traffic on both legs. Protocol mechanics: [Chapter 13](ch13-efm-and-sparkplug-mqtt.md); demo narrative: [Chapter 20](ch20-sparkplug-demo.md).
+#### Shape
 
-> **⚠️ Sparkplug B needs a real encoder, not a topic convention.** Publishing JSON to an `spBv1.0/#` topic is not Sparkplug B — the payload must be the protobuf `Payload` with `bdSeq`/`seq` lifecycle semantics, which is exactly what the MicroFi `PublishSparkplug` processor (or the retired Arduino sketch it absorbed) provides, and why `ConsumeMQTT` + `EvaluateJsonPath` can't decode this leg.
+```
+GenerateFlowFile
+  ─(success)─→ RemoteProcessGroup  (targetUris: https://nifi-web.<ns>.svc.cluster.local:8443,
+                                    transportProtocol: HTTP,
+                                    destination: from-minifi input port UUID)
+```
 
----
+#### Verify
 
-## Entry 11 — Sparkplug B Publish from MiNiFi Java (`PublishSparkplug` NAR)
+```bash
+# Java agent log — peer refresh and each send
+kubectl logs <minifi-java-pod> | grep -E "Successfully refreshed|Successfully sent"
+# expected: "Successfully refreshed Flow Contents for RemoteProcessGroup[https://nifi-web…]"
+# expected: "Successfully sent [...] (32 bytes) to …/nifi-api in <N> milliseconds"
 
-- **Name:** `minifi-java-publish-sparkplug`
-- **Purpose:** Originate spec-compliant Sparkplug B from a MiNiFi **Java** edge agent — the publish side the CDF IIoT NAR doesn't ship. One FlowFile of flat JSON metrics becomes NBIRTH-then-NDATA with `bdSeq`/`seq` and an NDEATH will, all managed by the processor.
-- **Agent:** MiNiFi Java `2.24.08.0-19`, EFM-managed (class `SparkplugJavaLab`), the custom [`nifi-sparkplug-nar`](https://github.com/cldr-steven-matison/NiFi2-Processor-Playground/tree/main/nifi-sparkplug-bundle) (Eclipse Tahu + Paho, self-contained) side-loaded into `extensions/`. Consumer/validator is the live `SparkPlug` PG's `ConsumeMQTTIIoT`.
-- **Shape:**
-  ```
-  # device side (EFM Designer, class SparkplugJavaLab)
-  GenerateFlowFile ({"Sensors/Temperature": 22.5, "Sensors/Count": 1013, "Sensors/Online": true})
-    ─(success)─→ PublishSparkplug (tcp://mosquitto.mqtt.svc:1883, group SparkplugLab, node MiNiFi-Java-1)
+# NiFi side: queue count on from-minifi climbs
+curl -s --cert /certs/tls.crt --key /certs/tls.key --cacert /certs/ca.crt \
+  "https://nifi-web.<ns>.svc.cluster.local:8443/nifi-api/flow/process-groups/root/status?recursive=true" \
+  | grep -oE '"(flowFilesReceived|queued)":("[^"]*"|[0-9]+)'
+```
 
-  # wire: spBv1.0/SparkplugLab/NBIRTH/MiNiFi-Java-1 (seq=0), then NDATA seq 1,2,3…
-  # NiFi side: the existing ConsumeMQTTIIoT (spBv1.0/#) decodes it into sparkplug_telemetry
-  ```
-- **Files:** flow export + agent pod spec + Designer-API build script + wire/log/Kafka evidence in [DesktopShare `files/issue-138/`](https://github.com/cldr-steven-matison/DesktopShare/tree/main/files/issue-138) · processor source: [`nifi-sparkplug-bundle`](https://github.com/cldr-steven-matison/NiFi2-Processor-Playground/tree/main/nifi-sparkplug-bundle)
-- **Verification:**
-  ```bash
-  # wire: birth-first then advancing seq
-  mosquitto_sub -h <broker-lan-ip> -v -t 'spBv1.0/SparkplugLab/#'
-
-  # decode validates: Message-not-parse.failure into Kafka, metric names present
-  kubectl exec -n cld-streaming my-cluster-combined-0 -c kafka -- \
-    /opt/kafka/bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 \
-    --topic sparkplug_telemetry --timeout-ms 15000
-  ```
-- **Status:** ✅ field-validated live 2026-09-01 ([#138](https://github.com/cldr-steven-matison/DesktopShare/issues/138)/[#248](https://github.com/cldr-steven-matison/DesktopShare/issues/248)). Publish-side how-to: [`minifi-sparkplug-publish.md`](https://github.com/cldr-steven-matison/DesktopShare/blob/main/minifi-sparkplug-publish.md); mechanics + gotchas: [Chapter 13](ch13-efm-and-sparkplug-mqtt.md).
-
-> **⚠️ A hot-loaded NAR doesn't refresh the agent's C2 manifest.** The extension loads in seconds, but the Designer palette only sees the new processor after an agent restart re-heartbeats the manifest (then pin it: `POST /efm/api/agent-class-manifest-config`, field `agentClassName`).
+> **⚠️ `flow.json.raw` is authoritative.** Bake only `flow.json.gz` and MiNiFi regenerates an empty default flow, recompresses over your file, and starts zero processors. Bake `flow.json.raw` and `flow-identifier` alongside the `.gz`. Do not edit `minifi.properties` directly, since every start regenerates it from `bootstrap.conf`. Set `nifi.minifi.security.*` and `nifi.minifi.flow.use.parent.ssl=true` in `bootstrap.conf`. `PKIX path building failed` means the client cannot trust the server. Chase the SSL context wiring, not the authorization policy.
 
 ---
 
-## Entry 12 — LED Actuation Round-Trip (NiFi → MicroFi `ListenHTTP` → `SetGPIO`)
+## 7. TensorRT Inference on Jetson (MiNiFi C++, EFM-Managed)
 
-- **Name:** `microfi-led-actuation`
-- **Purpose:** The minimal flow-to-physical-world round trip: a FlowFile on the central NiFi canvas turns a physical LED on or off on an ESP32 across the room. The teachable core of every actuation leg in this guide.
-- **Agent:** **MicroFi** (ESP32-S3 XIAO, class `MicroFi-1`), plus the `MicroFiLedActuation` PG on central NiFi.
-- **Shape:**
-  ```
-  # device side (EFM-pushed class flow, 2 nodes)
-  ListenHTTP (:8095, base path /led) ─(success)─→ SetGPIO (pin 21, level from-content, Invert)
+| Field | Value |
+|---|---|
+| Name | `jetson-tensorrt-cpp` |
+| Purpose | Accept an HTTP POST on a Jetson Orin Nano, run TensorRT inference via `ExecuteScript`, and publish the enriched payload to Kafka. EFM-managed flow delivery to aarch64 edge hardware with on-device GPU execution. |
+| Agent | MiNiFi C++ `1.26.02`, EFM-managed agent class `NvidiaNano`, enrolled on a Jetson Orin Nano (aarch64). Extra-extensions injection enables `ExecuteScript`. EFM `2.3.1.0-2`. |
+| Files | EFM flow export [`files/efm/NvidiaNano-TensorRT.json`](files/efm/NvidiaNano-TensorRT.json) · TensorRT script [`files/gpu_nifi_tensorRT-3.py`](files/gpu_nifi_tensorRT-3.py) · companion flows [`WindowsDesktop-TensorRT.json`](files/efm/WindowsDesktop-TensorRT.json), [`KubernetesPod-TensorRT.json`](files/efm/KubernetesPod-TensorRT.json) |
+| Chapter | [Chapter 19](ch19-efm-and-nvidia-jetson.md) |
 
-  # NiFi side (MicroFiLedActuation PG)
-  GenerateFlowFile (content "1" or "0") ─(success)─→ InvokeHTTP (POST http://<device-ip>:8095/led)
-                                                      └─(Failure/Retry/No Retry)─→ LogAttribute
-  ```
-- **Files:** device flow shape: [DesktopShare `files/issue-164/microfi3-led-flow-backup.json`](https://github.com/cldr-steven-matison/DesktopShare/blob/main/files/issue-164/microfi3-led-flow-backup.json) · Designer-API swap script + run evidence: [`files/issue-138/`](https://github.com/cldr-steven-matison/DesktopShare/tree/main/files/issue-138)
-- **Verification:** POST content `1`/`0` (directly or via the PG) → HTTP 200, the user LED visibly toggles, and the InvokeHTTP failure legs stay empty. FlowFile content *is* the pin level — no attributes survive the HTTP hop (MiNiFi `ListenHTTP` is fire-and-forget, Ch16's trap list).
-- **Status:** ✅ field-validated 2026-08 on MicroFi-3 ([#164](https://github.com/cldr-steven-matison/DesktopShare/issues/164)), re-fielded live 2026-09-01 on MicroFi-1 driven from central NiFi ([#138](https://github.com/cldr-steven-matison/DesktopShare/issues/138)). Demo narrative: [Chapter 20](ch20-sparkplug-demo.md).
+#### Shape
+
+```
+ListenHTTP (port 8080, /contentListener)
+  ─(success)─→ ExecuteScript (gpu_nifi_tensorRT-3.py, Script Engine: python)
+  ─(success)─→ PublishKafka  (topic agent-nvidia-tensorRT, bootstrap gaming-pc-lan-ip:31623)
+```
+
+#### Verify
+
+```bash
+# POST to the Jetson's ListenHTTP
+curl -X POST http://localhost:8080/contentListener \
+  -H "Content-Type: application/json" \
+  -d '{"sensor":"jetson-test","value":42}'
+
+# Consume from the Kafka topic (external bootstrap NodePort)
+kafka-console-consumer.sh --bootstrap-server gaming-pc-lan-ip:31623 \
+  --topic agent-nvidia-tensorRT --from-beginning --max-messages 1
+# expected: {"sensor": "jetson-test", "value": 42, "tensorrt": {"version": "10.16.2.10", "status": "Active"}}
+```
+
+> **⚠️ Execute bit.** EFM delivers resources to `asset/` without the execute bit. Run `chmod +x ~/nifi-minifi-cpp-1.26.02/asset/gpu_nifi_tensorRT-3.py` on the Jetson after the resource syncs. `ExecuteScript` silently fails without it. The class assignment may change over time, so check the current class before building dependent tooling.
 
 ---
 
-## Pending Entries
+## 8. ExecuteScript Python Smoke (MiNiFi C++, EFM-Managed)
 
-These flows are planned but don't yet have a folded, field-validated chapter behind them. Each becomes a full card above once its chapter lands.
+| Field | Value |
+|---|---|
+| Name | `executescript-python-smoke-cpp` |
+| Purpose | Show that `ExecuteScript` with the Python engine is live and executing on a C++ agent. The script stamps a `python.smoke` attribute on every FlowFile and `LogAttribute` shows delivery. This is the minimal check before wiring any script logic. |
+| Agent | MiNiFi C++ `1.26.02`, EFM-managed, any class with extra-extensions injection applied (`KubernetesPod`, `WindowsDesktopCpp`, `NvidiaNano`). `ExecuteScript` is not in the stock binary. [Chapter 5](ch05-executescript-availability.md) has the injection paths. |
+| Files | Script delivered via the EFM Resource Manager API (`POST /efm/api/resource-manager/resources/file`, then `PUT /efm/api/agent-class-resource-manager/{agentClass}/save` with `{"resourceIdsToBeAssigned":[...],"resourceIdsToBeUnassigned":[]}`). Flow exported to `files/efm/` per agent class. |
+| Chapter | [Chapter 5](ch05-executescript-availability.md), [Chapter 16](ch16-how-to-ai-with-minifi.md) |
 
-- *(none currently pending)*
+#### Shape
+
+```
+ListenHTTP (port 18080, /contentListener, Batch Size: 1, Buffer Size: 1)
+  ─(success)─→ ExecuteScript (Script Engine: python)
+  ─(success)─→ LogAttribute  (Log Payload: true)
+```
+
+#### Script body
+
+```python
+def onTrigger(context, session):
+    flow_file = session.get()
+    if flow_file:
+        session.putAttribute(flow_file, "python.smoke", "edge-executescript-ok")
+        session.transfer(flow_file, REL_SUCCESS)
+```
+
+#### Verify
+
+```bash
+curl -X POST http://127.0.0.1:18080/contentListener \
+     -H "Content-Type: application/json" \
+     -d '{"test":"smoke1"}'
+# pass: LogAttribute shows python.smoke=edge-executescript-ok with the payload
+# fail indicator: "Could not instantiate: PythonScriptExecutor" repeating in minifi-app.log
+```
+
+This runs on C++ Kubernetes pods (Linux x86_64) and on the Jetson (aarch64) through the extra-extensions path, and on a Windows C++ agent installed with the `ADDLOCAL=ALL` MSI.
+
+> **⚠️ `ListenHTTP` Batch Size and Buffer Size default to 5/5.** A single request never fills the buffer and is silently dropped. Set both to `1` (MINIFICPP-2243). The C++ FQCN in EFM Designer is `org.apache.nifi.minifi.processors.ExecuteScript`. The `minifi` segment is required, and the Java NiFi FQCN fails.
+
+---
+
+## 9. Edge-AI Router (MiNiFi Java, EFM-Managed)
+
+| Field | Value |
+|---|---|
+| Name | `starlinkai-lemonade-router-java` |
+| Purpose | Front a local Lemonade Server (AMD OpenAI-compatible inference, port 13305) with a three-processor MiNiFi Java flow that proxies all five Lemonade endpoints synchronously. The agent is tiny and the GPU model runs on the adjacent box. All five endpoints work end to end. Transcription needs a multipart-reassembly branch ahead of `InvokeHTTP`. |
+| Agent | MiNiFi Java `2.24.08.0-19`, EFM-managed agent class `StarlinkAIJava`, running on a Beelink SER9 (Windows). `HandleHttpRequest`/`HandleHttpResponse`, the Java-only synchronous response pair, are why this is a Java flow and not C++. |
+| Files | Flow export [`files/efm/StarlinkAIJava.json`](files/efm/StarlinkAIJava.json) |
+| Chapter | [Chapter 17](ch17-edge-ai-router.md) |
+
+#### Shape
+
+```
+HandleHttpRequest-Lemonade  (port 8090, any path)
+  ─(success)─→ InvokeHTTP-Lemonade  (POST http://localhost:13305${http.request.uri}, Read/Write Timeout: 10 min)
+  ─(Response)─→ HandleHttpResponse-Lemonade  (Status Code: ${invokehttp.status.code:replaceEmpty('502')})
+```
+
+`Retry`, `No Retry`, and `Failure` from `InvokeHTTP` also wire to `HandleHttpResponse` (and `LogAttribute-Error`), not to `Original`, which would double-respond the HTTP context.
+
+#### Verify
+
+```bash
+# Chat
+curl -X POST http://localhost:8090/api/v1/chat/completions \
+     -H "Content-Type: application/json" \
+     -d @chat_body.json
+
+# Embeddings
+curl -X POST http://localhost:8090/api/v1/embeddings \
+     -H "Content-Type: application/json" \
+     -d '{"model":"Qwen3-Embedding-0.6B-GGUF","input":["test sentence"]}'
+```
+
+Expected. A synchronous response from Lemonade, with `invokehttp.status.code=200` on `LogAttribute`.
+
+> **⚠️ `InvokeHTTP` socket timeouts.** LLM inference routinely takes 10 to 25 seconds, and the framework default `Socket Read Timeout` of 15 secs fails every call. Set Read and Write timeouts to `10 mins`. `HTTP Method` silently defaults to `GET`, so set it to `POST` explicitly.
+
+---
+
+## 10. Sparkplug / MQTT Two-Leg Ingest (MicroFi ESP32 to NiFi to Kafka)
+
+| Field | Value |
+|---|---|
+| Name | `sparkplug-mqtt-to-kafka` |
+| Purpose | Ingest both kinds of edge MQTT publisher at once, plain-JSON telemetry and spec-compliant Sparkplug B (`NBIRTH`/`NDATA`, protobuf), through one Mosquitto broker into per-kind Kafka topics keyed by the device's agent-class identity. |
+| Agent | MicroFi (ESP32-S3 XIAO, compile-time processor registry, EFM-managed). Class `MicroFi-1` publishes the JSON leg. Class `MicroFi-3` publishes Sparkplug B via the firmware's native `PublishSparkplug` processor, built on the `EmbeddedSparkplugNode`/nanopb stack. The NiFi side is the `SparkPlug` process group on the CFM-operator NiFi (`cfm-streaming`/`mynifi`). EFM `2.3.1.0-2`. |
+| Files | [`files/SparkPlug.json`](files/SparkPlug.json) (NiFi PG export) · device flows [`files/microfi/microfi-1-telemetry.json`](files/microfi/microfi-1-telemetry.json) and [`files/microfi/microfi-3-sparkplug.json`](files/microfi/microfi-3-sparkplug.json) |
+| Chapter | Protocol mechanics in [Chapter 13](ch13-efm-and-sparkplug-mqtt.md), demo narrative in [Chapter 20](ch20-sparkplug-demo.md) |
+
+#### Shape
+
+```
+# device side (EFM-pushed)
+MicroFi-1:  GenerateFlowFile ({"device_id":"MicroFi-1"}) ─(success)─→ PublishMQTT   (test/sensor/data)
+MicroFi-3:  GenerateFlowFile-SpbTick ─(success)─→ PublishSparkplug  (spBv1.0/MicroFi/…/MicroFi-3)
+
+# NiFi side (SparkPlug PG)
+ConsumeMQTT     (test/sensor/data) ─(Message)─→ ExtractDeviceId (EvaluateJsonPath $.device_id)
+                                   ─(matched…)─→ PublishKafka-XiaoTelemetry      (topic xiao_telemetry, key ${device_id})
+ConsumeMQTTIIoT (spBv1.0/#)        ─(Message)─→ PublishKafka-SparkplugTelemetry  (topic sparkplug_telemetry)
+```
+
+#### Verify
+
+```bash
+# broker: both payload kinds arriving
+kubectl exec -n mqtt deploy/mosquitto -- mosquitto_sub -v -t 'test/sensor/data' -t 'spBv1.0/#'
+
+# Kafka: JSON leg keyed by device class
+kubectl exec -n cld-streaming my-cluster-combined-0 -- \
+  /opt/kafka/bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 \
+  --topic xiao_telemetry --property print.key=true --property key.separator=" | " --timeout-ms 15000
+# expected: MicroFi-1 | {"device_id":"MicroFi-1"}
+
+# Kafka: Sparkplug B leg (binary protobuf records — NBIRTH then NDATA)
+kubectl exec -n cld-streaming my-cluster-combined-0 -- \
+  /opt/kafka/bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 \
+  --topic sparkplug_telemetry --timeout-ms 15000
+```
+
+> **⚠️ Sparkplug B needs an encoder, not a topic convention.** Publishing JSON to an `spBv1.0/#` topic is not Sparkplug B. The payload must be the protobuf `Payload` with `bdSeq`/`seq` lifecycle semantics, which is what the MicroFi `PublishSparkplug` processor provides and why `ConsumeMQTT` plus `EvaluateJsonPath` cannot decode this leg.
+
+---
+
+## 11. Sparkplug B Publish from MiNiFi Java (`PublishSparkplug` NAR)
+
+| Field | Value |
+|---|---|
+| Name | `minifi-java-publish-sparkplug` |
+| Purpose | Originate spec-compliant Sparkplug B from a MiNiFi Java edge agent, the publish side the CDF IIoT NAR does not ship. One FlowFile of flat JSON metrics becomes NBIRTH then NDATA with `bdSeq`/`seq` and an NDEATH will, all managed by the processor. |
+| Agent | MiNiFi Java `2.24.08.0-19`, EFM-managed (class `SparkplugJavaLab`), with the custom [`nifi-sparkplug-nar`](https://github.com/cldr-steven-matison/NiFi2-Processor-Playground/tree/main/nifi-sparkplug-bundle) (Eclipse Tahu plus Paho, self-contained) side-loaded into `extensions/`. The consumer and validator is the live `SparkPlug` PG's `ConsumeMQTTIIoT`. |
+| Files | Processor source [`nifi-sparkplug-bundle`](https://github.com/cldr-steven-matison/NiFi2-Processor-Playground/tree/main/nifi-sparkplug-bundle). The agent flow is the two-node Designer flow in Shape below, built per class. |
+| Chapter | Mechanics and gotchas in [Chapter 13](ch13-efm-and-sparkplug-mqtt.md) |
+
+#### Shape
+
+```
+# device side (EFM Designer, class SparkplugJavaLab)
+GenerateFlowFile ({"Sensors/Temperature": 22.5, "Sensors/Count": 1013, "Sensors/Online": true})
+  ─(success)─→ PublishSparkplug (tcp://mosquitto.mqtt.svc:1883, group SparkplugLab, node MiNiFi-Java-1)
+
+# wire: spBv1.0/SparkplugLab/NBIRTH/MiNiFi-Java-1 (seq=0), then NDATA seq 1,2,3…
+# NiFi side: the existing ConsumeMQTTIIoT (spBv1.0/#) decodes it into sparkplug_telemetry
+```
+
+#### Verify
+
+```bash
+# wire: birth-first then advancing seq
+mosquitto_sub -h <broker-lan-ip> -v -t 'spBv1.0/SparkplugLab/#'
+
+# decode validates: Message-not-parse.failure into Kafka, metric names present
+kubectl exec -n cld-streaming my-cluster-combined-0 -c kafka -- \
+  /opt/kafka/bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 \
+  --topic sparkplug_telemetry --timeout-ms 15000
+```
+
+> **⚠️ A hot-loaded NAR does not refresh the agent's C2 manifest.** The extension loads in seconds, but the Designer palette only sees the new processor after an agent restart re-heartbeats the manifest. Then pin it with `POST /efm/api/agent-class-manifest-config`, field `agentClassName`.
+
+---
+
+## 12. LED Actuation Round Trip (NiFi to MicroFi `ListenHTTP` to `SetGPIO`)
+
+| Field | Value |
+|---|---|
+| Name | `microfi-led-actuation` |
+| Purpose | The minimal flow-to-physical-world round trip. A FlowFile on the central NiFi canvas turns an LED on or off on an ESP32 across the room. The teachable core of every actuation leg in this guide. |
+| Agent | MicroFi (ESP32-S3 XIAO, class `MicroFi-1`), plus the `MicroFiLedActuation` PG on central NiFi. |
+| Files | Device flow [`files/microfi/microfi-3-led-flow-backup.json`](files/microfi/microfi-3-led-flow-backup.json) |
+| Chapter | Demo narrative in [Chapter 20](ch20-sparkplug-demo.md) |
+
+#### Shape
+
+```
+# device side (EFM-pushed class flow, 2 nodes)
+ListenHTTP (:8095, base path /led) ─(success)─→ SetGPIO (pin 21, level from-content, Invert)
+
+# NiFi side (MicroFiLedActuation PG)
+GenerateFlowFile (content "1" or "0") ─(success)─→ InvokeHTTP (POST http://<device-ip>:8095/led)
+                                                    └─(Failure/Retry/No Retry)─→ LogAttribute
+```
+
+#### Verify
+
+POST content `1` or `0`, directly or via the PG. Expect HTTP 200, the user LED toggles, and the `InvokeHTTP` failure legs stay empty. The FlowFile content is the pin level. No attributes survive the HTTP hop, because MiNiFi `ListenHTTP` is fire-and-forget (see the Ch16 trap list).
 
 ---
 
 ## How This Gallery Grows
 
-A flow earns a card here after three things are true: (1) its chapter is field-validated, (2) the config or flow export is committed to the Playground repo or `files/efm/`, and (3) the card is added both here and to `sample-gallery/README.md` in the Playground.
+A flow earns a card here after three things are true. Its chapter is complete, the config or flow export is committed to the Playground repo or `files/efm/`, and the card is added both here and to `sample-gallery/README.md` in the Playground.
 
-The gallery's runnable index: [`sample-gallery/README.md`](https://github.com/cldr-steven-matison/MiNiFi-Kubernetes-Playground/blob/main/sample-gallery/README.md).
+The gallery's runnable index is [`sample-gallery/README.md`](https://github.com/cldr-steven-matison/MiNiFi-Kubernetes-Playground/blob/main/sample-gallery/README.md).
