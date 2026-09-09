@@ -130,6 +130,31 @@ The Designer validates against the agent class to manifest mapping, not against 
 
 **Deliver resources the way that matches the job.** Restart-durable delivery is the EFM Resource Manager (needs the `efm-resources` PVC). Fast-iteration delivery is `kubectl cp` (gone on the next pod restart). Pick per whether you are shipping or still iterating, the same split as scripts above.
 
+## Let the AI Drive the Flow: MCP Servers
+
+Everything in this chapter so far treats the AI as the thing inside the flow. There is a second seat. The AI can also be the operator of the flow, reading live state and building components through the same APIs a person uses, and the Model Context Protocol is how it gets there. An MCP server is a thin process that wraps an API you already own and exposes it as named tools an assistant (Claude Code, Claude Desktop, LangChain, Agent Studio) can call. The assistant stops guessing from stale docs and starts asking the running system.
+
+Cloudera ships one for NiFi. The [NiFi MCP Server](https://github.com/cloudera/NiFi-MCP-Server) wraps the NiFi REST API with automatic 1.x/2.x detection and Knox authentication, and exposes 24 read-only tools out of the box (`list_processors`, `get_processor_details`, `check_connection_queue`, `get_bulletins`, `get_flow_health_status`, `search_flow`, and the rest). Set `NIFI_READONLY=false` and another 42 write tools switch on, enough to create processors, connections, controller services and parameter contexts and to start or stop them. It installs the same way as the other Cloudera MCP servers ([Iceberg](https://github.com/cloudera/iceberg-mcp-server), [AI Workbench](https://github.com/cloudera/CAI_Workbench_MCP_Server), [Data Visualization](https://github.com/cloudera/CDV-MCP-Server)). `uvx` pulls it straight from the git source, the transport is stdio, and the credentials ride in environment variables. With it wired into Claude Code, "show me every queue over 10,000 FlowFiles on the NiFi side of the edge router" is one tool call instead of five API reads.
+
+### The Gap at the Edge
+
+Point the same assistant at EFM and there is nothing to call. Every surface this chapter used by hand is a plain REST endpoint under `/efm/api/`, and none of it has an MCP server yet.
+
+| EFM surface | What an agent would ask it |
+|---|---|
+| `/efm/api/agent-classes`, `/efm/api/agents` | Which classes exist, which agents are enrolled, when each last heartbeated |
+| `/efm/api/agent-manifests/{id}` | Which processor types a class can run, so a flow is built against the manifest and not a guess |
+| `/efm/api/designer/flows/{flowId}/...` | Read the live canvas, add a processor, add a connection, validate, publish |
+| `/efm/api/resource-manager/...` | Which scripts and assets are assigned to a class |
+
+MiNiFi itself has no REST API to wrap. The agent talks to EFM over C2 heartbeats and its state lives in EFM, so a server over EFM covers the agents too. The read side alone would answer most of the questions that send you into `minifi-app.log` today. "Which agents in this class have not heartbeated in an hour" is one read of `/agents` and a timestamp. "Does this class's manifest contain `ExecuteScript`" is one read of the manifest, and it is the check the Availability section above tells you to do by hand. On the write side, the component-by-component build loop from the previous section (one POST per processor, one per connection, validate, publish) is already the shape an MCP tool set wants. Each step is a single narrow call with a checkable result.
+
+### Build It the Way the Cloudera Manager One Was Built
+
+The pattern exists. The [Cloudera Manager MCP Server](https://github.com/cldr-steven-matison/cloudera-manager-mcp-server) wraps the CM, YARN, Ranger and Atlas REST APIs on FastMCP, every tool GET-only, one `*_BASE_URL` per surface so an estate with only one of them exposes only that surface's tools, and it runs under `uvx` from the git URL with no clone. An EFM server is the same build with different endpoints.
+
+What it needs beyond the CM one is a single decision, whether to expose the write side of the Designer at all. Start read-only. A tool that publishes a flow to a class pushes it onto every agent in that class on their next heartbeat, and the Traps section below lists the ways a bad publish goes silent. Add `efm_publish_flow` last, behind a flag that defaults off, after the read tools have earned trust the same way the custom processors did. That server is the next thing to build in this series, and it is where the edge-AI story turns from "the agent does AI work" to "the AI runs the agents."
+
 ## Traps: The Ones That Drop Data Silently
 
 These error nowhere. They quietly do nothing, which is worse.
@@ -151,6 +176,7 @@ These error nowhere. They quietly do nothing, which is worse.
 - Don't `PUT` a whole flow to the Designer. There is no whole-flow PUT (`405`). Build component by component.
 - Don't publish onto a class whose manifest does not match the agent's runtime. C++ FQCNs on a Java-mapped class get rejected.
 - Don't leave `ListenHTTP` at `5/5` or `InvokeHTTP` at `GET`. Those two defaults drop or neuter more edge flows than anything else.
+- Don't hand an assistant a write-enabled MCP server over EFM before its read tools have been in use. A published flow lands on every agent in the class on the next heartbeat, and nothing in the tool call tells you which agents it broke.
 
 ## Related Chapters
 
