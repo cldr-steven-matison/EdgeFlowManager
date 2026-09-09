@@ -1,11 +1,11 @@
 # Chapter 1: EFM on Kubernetes
 
-EFM — Cloudera Edge Flow Manager — is the central manager that turns a bare MiNiFi binary into a
+EFM, Cloudera Edge Flow Manager, is the central manager that turns a bare MiNiFi binary into a
 managed agent. It owns agent Classes, Resources, and Edge Flows, and it pushes configuration down
 to every registered agent on heartbeat. Without EFM there is no central place to author a flow,
 upload a Python script, or watch an agent's status. This chapter covers deploying EFM 2.3.1.0-2 on
-minikube in namespace `cld-streaming` and making its full state survive a pod restart. It folds in
-what was originally a separate persistence chapter — the two topics are inseparable in practice.
+minikube in namespace `cld-streaming` and making its full state survive a pod restart. Deploy and
+persistence are one topic here because in practice they are inseparable.
 
 ---
 
@@ -13,26 +13,28 @@ what was originally a separate persistence chapter — the two topics are insepa
 
 EFM exposes a UI at `http://127.0.0.1:10090/efm/ui/` where I author flows for each agent Class, stage
 agent installers, and upload Resources (Python scripts, JARs) that get pushed to agents on their next
-heartbeat. The agent side — MiNiFi C++ or Java — polls EFM, downloads the flow, and runs it. EFM is
-not in the data path; it is the control plane.
+heartbeat. The agent side, MiNiFi C++ or Java, polls EFM, downloads the flow, and runs it. EFM is
+not in the data path. It is the control plane.
 
-Three kinds of state need to survive a pod restart for EFM to be useful day-to-day:
+Three kinds of state need to survive a pod restart for EFM to be useful day to day.
 
-1. **Metadata** (agent classes, manifests, flows, agents) — PostgreSQL
-2. **Agent binaries** (C++ and Java installers) — a dedicated PVC
-3. **Uploaded resources / assets** (Python scripts, JARs) — a second PVC
+| State | Examples | Backing store |
+|---|---|---|
+| Metadata | agent classes, manifests, flows, agents | PostgreSQL |
+| Agent binaries | C++ and Java installers | a dedicated PVC |
+| Uploaded resources and assets | Python scripts, JARs | a second PVC |
 
 The third one is the trap. A bare EFM install has no PVC for resources. The DB rows survive, but the
-actual file bytes live on ephemeral disk and disappear on restart. Every flow that references an
-uploaded script silently breaks.
+file bytes sit on ephemeral disk and disappear on restart. Every flow that references an uploaded
+script silently breaks.
 
 ---
 
-## Storage Layout — What Lives Where
+## Storage Layout, What Lives Where
 
 | State | Backing store | Path in pod | Survives restart? |
 |---|---|---|---|
-| Agent classes, manifests, flows, agents | Postgres `efm` DB (`ssb-postgresql`) | — | Yes (via `ssb-postgresql-db` PVC) |
+| Agent classes, manifests, flows, agents | Postgres `efm` DB (`ssb-postgresql`) | | Yes (via `ssb-postgresql-db` PVC) |
 | Uploaded agent binaries | PVC `efm-agent-binaries` (2 Gi) | `/opt/efm/efm-2.3.1.0-2/agent-deployer/binaries` | Yes |
 | Uploaded resources / assets | PVC `efm-resources` (1 Gi) | `/opt/efm/efm-2.3.1.0-2/resources` | Yes |
 | EFM properties | ConfigMap `efm-config` | `/opt/efm/efm-2.3.1.0-2/conf/efm.properties` (subPath) | Yes |
@@ -44,16 +46,16 @@ The property that governs where resources land is `efm.resourcemanager.repositor
 to `./resources`, which resolves to `/opt/efm/efm-2.3.1.0-2/resources` given EFM's working directory.
 Mounting `efm-resources` at that exact path is all it takes to persist those bytes.
 
-All three YAMLs live in `~/ClouderaStreamingOperators/`: `efm-configMap.yaml`, `efm-pvc.yaml`, and
+All three YAMLs are in `~/ClouderaStreamingOperators/`. `efm-configMap.yaml`, `efm-pvc.yaml`, and
 `efm-deployment-persisted.yaml`.
 
 ---
 
-## The 8-Phase Deploy
+## The Deploy in Nine Steps
 
-This section keeps the key command per phase.
+Each step keeps its key command.
 
-### Phase 0 — Cluster Up Check
+### 0. Cluster Up Check
 
 ```bash
 kubectl get pods -n cld-streaming | grep -E "postgres|kafka|efm"
@@ -61,7 +63,7 @@ kubectl get pods -n cld-streaming | grep -E "postgres|kafka|efm"
 
 `ssb-postgresql-*` must be Running before proceeding. Kafka pods only matter if flows publish there.
 
-### Phase 1 — PostgreSQL One-Time Setup
+### 1. PostgreSQL One-Time Setup
 
 Skip if the `efm` DB and user already exist.
 
@@ -73,9 +75,9 @@ kubectl exec $PG -n cld-streaming -- psql -U postgres -c "GRANT ALL PRIVILEGES O
 kubectl exec $PG -n cld-streaming -- psql -U postgres -c "ALTER DATABASE efm OWNER TO efm;"
 ```
 
-Verify with `psql -U postgres -c "\l" | grep efm`.
+Check with `psql -U postgres -c "\l" | grep efm`.
 
-### Phase 2 — Secrets
+### 2. Secrets
 
 ```bash
 kubectl create secret generic efm-db-pass \
@@ -96,7 +98,7 @@ kubectl create secret docker-registry cloudera-registry \
 
 `already exists` errors from a prior session are fine.
 
-### Phase 3 — Pull Image into Minikube
+### 3. Pull the Image into Minikube
 
 ```bash
 eval $(minikube docker-env)
@@ -106,7 +108,7 @@ docker pull container.repo.cloudera.com/cloudera/efm:2.3.1.0-2
 
 Match the tag to your CSO / CEM entitlement.
 
-### Phase 4 — Deploy with Persistence
+### 4. Deploy with Persistence
 
 ```bash
 cd ~/ClouderaStreamingOperators
@@ -116,7 +118,7 @@ kubectl apply -f efm-deployment-persisted.yaml -n cld-streaming
 kubectl rollout status deployment/efm -n cld-streaming --timeout=180s
 ```
 
-Spot-check after rollout:
+Spot-check after rollout.
 
 ```bash
 EFM_POD=$(kubectl get pod -n cld-streaming -l app=efm -o jsonpath='{.items[0].metadata.name}')
@@ -124,12 +126,12 @@ kubectl exec $EFM_POD -n cld-streaming -- mount | grep efm-2.3.1.0-2
 # Expect two ext4 lines: agent-deployer/binaries and resources
 ```
 
-If `grep db.url` shows `h2`, the ConfigMap didn't mount — re-apply `efm-configMap.yaml` and restart.
+If `grep db.url` shows `h2`, the ConfigMap did not mount. Re-apply `efm-configMap.yaml` and restart.
 
-### Phase 5 — Stage Agent Binaries (One-Time per PVC)
+### 5. Stage Agent Binaries (One-Time per PVC)
 
 If the binaries directory is already populated, skip this. Otherwise see [Chapter 2 (EFM Binaries)](ch02-efm-binaries.md) for the
-full build. The streaming copy:
+full build. The streaming copy.
 
 ```bash
 EFM_POD=$(kubectl get pod -n cld-streaming -l app=efm -o jsonpath='{.items[0].metadata.name}')
@@ -138,24 +140,24 @@ cd ~/efm-binaries/staging/ && tar -cf - binaries/ | \
 kubectl rollout restart deployment/efm -n cld-streaming
 ```
 
-### Phase 6 — Reach the UI
+### 6. Reach the UI
 
 ```bash
 kubectl port-forward -n cld-streaming svc/efm 10090:10090
 ```
 
-Open `http://127.0.0.1:10090/efm/ui/`. Check for a stale port-forward first (`lsof -iTCP:10090 -sTCP:LISTEN`)
-— a forward bound to a dead pod after a rollout returns HTTP 000 silently.
+Open `http://127.0.0.1:10090/efm/ui/`. Check for a stale port-forward first (`lsof -iTCP:10090 -sTCP:LISTEN`).
+A forward bound to a dead pod after a rollout returns HTTP 000 silently.
 
 > **⚠️ Check before port-forwarding.** The canonical port-forwards run as zellij panes (`kube-service-ports-efm.kdl`). A duplicate forward on the same target silently orphans or hangs.
 
-### Phase 7 — Upload Resources
+### 7. Upload Resources
 
 EFM UI → **Resources** → Upload. Set **File / Name** to match whatever the flow's `Script File`
-property expects (e.g. `cpu_nifi_tensorRT.py`). Set **Agent Class** to the target class
+property expects (for example `cpu_nifi_tensorRT.py`). Set **Agent Class** to the target class
 (`KubernetesPod`, `WindowsDesktop`, `NvidiaNano`). Leave relative path blank.
 
-Verify both DB row and file on the PVC:
+Check both the DB row and the file on the PVC.
 
 ```bash
 kubectl exec $PG -n cld-streaming -- psql -U postgres -d efm -c \
@@ -166,7 +168,7 @@ kubectl exec $EFM_POD -n cld-streaming -- ls -la /opt/efm/efm-2.3.1.0-2/resource
 
 Both should exist. The file syncs to `<minifi-install>/asset/<file_name>` on the agent's next heartbeat.
 
-### Phase 8 — Persistence Test
+### 8. Persistence Test
 
 ```bash
 kubectl rollout restart deployment/efm -n cld-streaming
@@ -184,28 +186,28 @@ kubectl exec $EFM_POD -n cld-streaming -- ls -la /opt/efm/efm-2.3.1.0-2/resource
 Refresh EFM UI → **Resources**. The upload should still be there. Counts should match pre-restart.
 
 After the YAMLs are applied once, a cold `minikube stop` / `minikube start` only needs
-`kubectl rollout status` and a port-forward — everything reloads from Postgres + PVCs automatically.
+`kubectl rollout status` and a port-forward. Everything reloads from Postgres and the PVCs automatically.
 
 ---
 
-## Postgres + 2-PVC Persistence
+## Postgres plus Two PVCs
 
-The two PVCs exist for different reasons:
+The two PVCs exist for different reasons.
 
-- **`efm-agent-binaries` (2 Gi)** backs `agent-deployer/binaries/`. EFM serves the C++ and Java
-  installers from here to agents that request an upgrade. Without it, I re-stage four platform
-  tarballs every time the pod restarts.
+`efm-agent-binaries` (2 Gi) backs `agent-deployer/binaries/`. EFM serves the C++ and Java
+installers from here to agents that request an upgrade. Without it, I re-stage four platform
+tarballs every time the pod restarts.
 
-- **`efm-resources` (1 Gi)** backs the `resources/` directory governed by
-  `efm.resourcemanager.repositoryPath`. This is the trap a bare install hits: the DB tables
-  `resource_metadata` and `asset` track names and UUIDs, but the actual bytes live at whatever
-  `repositoryPath` resolves to. Without the PVC mounted there, the DB says the file exists but the
-  bytes are gone after a restart, and the next agent heartbeat gets a 404 for the script it was
-  told to download.
+`efm-resources` (1 Gi) backs the `resources/` directory governed by
+`efm.resourcemanager.repositoryPath`. This is the trap a bare install hits. The DB tables
+`resource_metadata` and `asset` track names and UUIDs, but the bytes sit at whatever
+`repositoryPath` resolves to. Without the PVC mounted there, the DB says the file exists but the
+bytes are gone after a restart, and the next agent heartbeat gets a 404 for the script it was
+told to download.
 
-Postgres (`ssb-postgresql`) handles everything else: agent class registrations, flow definitions,
+Postgres (`ssb-postgresql`) handles everything else. Agent class registrations, flow definitions,
 flow content, manifests, agent heartbeat metadata. That state is already durable because
-`ssb-postgresql` itself has its own PVC (`ssb-postgresql-db`). EFM just needs to point at it via
+`ssb-postgresql` itself has its own PVC (`ssb-postgresql-db`). EFM only needs to point at it via
 the `efm.db.url` property in `efm-configMap.yaml`.
 
 ---
@@ -214,38 +216,38 @@ the `efm.db.url` property in `efm-configMap.yaml`.
 
 | Symptom | Cause | Fix |
 |---|---|---|
-| EFM pod crashes on startup | `efm-encryption` or `efm-db-pass` secret missing | Recreate secrets (Phase 2) |
-| EFM logs `Connection refused` to PostgreSQL | `ssb-postgresql` not running | Phase 0 — wait for Postgres |
-| EFM UI shows H2-style URLs (no persistence) | ConfigMap not mounted at correct subPath | Verify `volumeMount subPath: efm.properties`, re-apply ConfigMap, restart |
-| Uploaded resource disappears after restart | `efm-resources` PVC not mounted | `kubectl describe pod efm-... \| grep -A1 Volumes` — confirm both PVCs present |
+| EFM pod crashes on startup | `efm-encryption` or `efm-db-pass` secret missing | Recreate secrets (step 2) |
+| EFM logs `Connection refused` to PostgreSQL | `ssb-postgresql` not running | Step 0, wait for Postgres |
+| EFM UI shows H2-style URLs (no persistence) | ConfigMap not mounted at correct subPath | Check `volumeMount subPath: efm.properties`, re-apply ConfigMap, restart |
+| Uploaded resource disappears after restart | `efm-resources` PVC not mounted | `kubectl describe pod efm-... \| grep -A1 Volumes`, confirm both PVCs present |
 | Agent: `Script File ... does not exist` | Resource `file_name` in EFM doesn't match `Script File` in flow | Rename resource in EFM to match, or fix the flow property |
 | Port-forward returns HTTP 000 / RST | Stale forward bound to dead pod after rollout | `lsof -iTCP:10090 -sTCP:LISTEN`, kill, re-forward |
 | Postgres: `remaining connection slots are reserved` | Too many idle EFM connections | `SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE state='idle' AND datname='efm';` |
-| EFM UI dashboard keeps showing "N agents failed to update" after you deleted the failing agent | `bulk_operation` row for that class stuck at `current_state='FAILED'` — not cleaned up by deleting the agent or its `operation` rows | `DELETE FROM bulk_operation WHERE agent_class_id = '<class>' AND current_state != 'DONE';` (only after confirming the class's real agent(s) are healthy) |
+| EFM UI dashboard keeps showing "N agents failed to update" after you deleted the failing agent | `bulk_operation` row for that class stuck at `current_state='FAILED'`, not cleaned up by deleting the agent or its `operation` rows | `DELETE FROM bulk_operation WHERE agent_class_id = '<class>' AND current_state != 'DONE';` (only after confirming the class's live agents are healthy) |
 
 ---
 
 ## What NOT to Do
 
-**Don't deploy from `efm-deployment.yaml` (the non-persisted variant).** It's in
+**Don't deploy from `efm-deployment.yaml` (the non-persisted variant).** It is in
 `~/ClouderaStreamingOperators/` too and looks identical to `efm-deployment-persisted.yaml` at a
 glance. The difference is the two `volumeMounts` and `volumes` blocks for the PVCs. Deploy the
-wrong one and EFM runs fine — right up until the first restart, when all uploaded resources vanish
+wrong one and EFM runs fine, right up until the first restart, when all uploaded resources vanish
 and the agents start failing to download scripts with no obvious error in the EFM UI.
 
-**Don't skip the `efm-resources` PVC.** The `efm-agent-binaries` PVC failure is obvious — agents
-can't download their installer. The `efm-resources` failure is silent: the DB rows are there, the
+**Don't skip the `efm-resources` PVC.** The `efm-agent-binaries` PVC failure is obvious. Agents
+cannot download their installer. The `efm-resources` failure is silent. The DB rows are there, the
 UI shows the upload, but the bytes are gone from disk. The only symptom shows up on the agent side
-as a missing file on the next heartbeat. The fix is `efm-pvc.yaml` + remounting, not a re-upload
+as a missing file on the next heartbeat. The fix is `efm-pvc.yaml` plus remounting, not a re-upload
 (though a re-upload after fixing the mount is the quickest way to repopulate).
 
-**Don't start a port-forward without checking for an existing one.** See Phase 6 above.
+**Don't start a port-forward without checking for an existing one.** See step 6 above.
 
-**`DELETE /efm/api/agents/{id}` doesn't clean up that agent's history — check two more tables, not one.** Removing a stale/`MISSING` agent leaves its rows behind in both `operation` (per-operation log — clean with `DELETE FROM operation WHERE target_agent_id = '<id>' AND state = 'FAILED'`, terminal states only) and, separately, `bulk_operation` (a **class-scoped rollup row**, not per-agent, that the dashboard's "N agents received the last update" widget reads directly — `DELETE FROM bulk_operation WHERE agent_class_id = '<class>' AND current_state != 'DONE'`). Deleting only the `operation` row is not enough: the `bulk_operation` row is a separate table and isn't recomputed when the agent or its operation history is cleaned up, so the UI alert keeps showing a failure that no longer exists.
+**`DELETE /efm/api/agents/{id}` doesn't clean up that agent's history. Check two more tables, not one.** Removing a stale or `MISSING` agent leaves its rows behind in two places. `operation`, the per-operation log, which you clean with `DELETE FROM operation WHERE target_agent_id = '<id>' AND state = 'FAILED'` (terminal states only). And, separately, `bulk_operation`, a class-scoped rollup row that the dashboard's "N agents received the last update" widget reads directly, which you clean with `DELETE FROM bulk_operation WHERE agent_class_id = '<class>' AND current_state != 'DONE'`. Deleting only the `operation` row is not enough. The `bulk_operation` row is a separate table and is not recomputed when the agent or its operation history is cleaned up, so the UI alert keeps showing a failure that no longer exists.
 
 ---
 
 ## Related Chapters
 
-- Ch2 — [EFM Binaries & staging tree](ch02-efm-binaries.md): stocking the agent-binary tree that the
+- [EFM Binaries & staging tree](ch02-efm-binaries.md) (Ch2): stocking the agent-binary tree that the
   deploy above expects, so the `Deploy Agent` button stops returning `400`.
