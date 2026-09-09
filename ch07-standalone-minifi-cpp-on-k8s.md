@@ -2,7 +2,7 @@
 
 This chapter runs plain Apache MiNiFi C++ v1.26.02 in minikube on macOS with no EFM involvement at all. The flow is `ListenHTTP (8080)` → `PublishKafka` (in-cluster Strimzi topic `test-minifi`) plus `PutFile` (`/tmp/minifi-test-output`). Everything here comes from the [MiNiFi Kubernetes Playground](https://github.com/cldr-steven-matison/MiNiFi-Kubernetes-Playground) repo, the scripts and the YAML as they run.
 
-The MiNiFi Kubernetes Playground is where this whole guide started. A public repo I opened to play with open-source MiNiFi, installing the C++ and Java agents, building flows by hand, and eventually bringing EFM in to manage them. It is the seed that grew into everything here. Each chapter in this part maps to a runnable scenario in that repo, so you can pull it and run the exact flow instead of reassembling it from prose.
+The MiNiFi Kubernetes Playground is where this whole guide started. A public repo I opened to play with open-source MiNiFi, installing the C++ and Java agents, building flows by hand, and eventually bringing EFM in to manage them. It is the seed that grew into everything here. Each chapter in this part maps to a runnable scenario in that repo, so you can pull it and run the exact flow without reassembling it from prose.
 
 ## What This Scenario Shows
 
