@@ -1,14 +1,14 @@
 # Chapter 7: Standalone MiNiFi C++ on Kubernetes (no EFM)
 
-This chapter proves plain Apache MiNiFi C++ v1.26.02 running in minikube on macOS with no EFM involvement at all. The flow is `ListenHTTP (8080)` → `PublishKafka` (in-cluster Strimzi topic `test-minifi`) plus `PutFile` (`/tmp/minifi-test-output`). Everything here comes from the [MiNiFi Kubernetes Playground](https://github.com/cldr-steven-matison/MiNiFi-Kubernetes-Playground) repo — actual scripts, actual YAML, run clean and verified.
+This chapter runs plain Apache MiNiFi C++ v1.26.02 in minikube on macOS with no EFM involvement at all. The flow is `ListenHTTP (8080)` → `PublishKafka` (in-cluster Strimzi topic `test-minifi`) plus `PutFile` (`/tmp/minifi-test-output`). Everything here comes from the [MiNiFi Kubernetes Playground](https://github.com/cldr-steven-matison/MiNiFi-Kubernetes-Playground) repo, the scripts and the YAML as they run.
 
-The **MiNiFi Kubernetes Playground** is where this whole guide started: a public repo I opened to play with open-source MiNiFi — installing the C++ and Java agents, building flows by hand, and eventually bringing EFM in to manage them. It is the seed that grew into everything here. Each chapter in this part maps to a runnable scenario in that repo, so you can pull it and run the exact flow rather than reassemble it from prose.
+The MiNiFi Kubernetes Playground is where this whole guide started. A public repo I opened to play with open-source MiNiFi, installing the C++ and Java agents, building flows by hand, and eventually bringing EFM in to manage them. It is the seed that grew into everything here. Each chapter in this part maps to a runnable scenario in that repo, so you can pull it and run the exact flow instead of reassembling it from prose.
 
-## What This Scenario Proves
+## What This Scenario Shows
 
-Running MiNiFi C++ standalone, with `config.yml` baked into the image, is the fastest iteration loop for flow development. No EFM, no agent registration, no class reconciliation. You edit `config.yml`, run the nuclear script, and the pod restarts with the new flow in under two minutes. It also confirms the in-cluster Kafka path works before you wire EFM into it: if `PublishKafka` delivers to `test-minifi` here, you know the broker address, topic, and `Client Name` are right — and you carry that exact config into the EFM flow designer.
+Running MiNiFi C++ standalone, with `config.yml` baked into the image, is the fastest iteration loop for flow development. No EFM, no agent registration, no class reconciliation. You edit `config.yml`, run the nuclear script, and the pod restarts with the new flow in under two minutes. It also exercises the in-cluster Kafka path before you wire EFM into it. If `PublishKafka` delivers to `test-minifi` here, you know the broker address, topic, and `Client Name` are right, and you carry that exact config into the EFM flow designer.
 
-The image is `container.repo.cloudera.com/cloudera/apacheminificpp:latest` = v1.26.02. `MINIFI_HOME=/opt/minifi/nifi-minifi-cpp-1.26.02`, verified from running-instance logs.
+The image is `container.repo.cloudera.com/cloudera/apacheminificpp:latest`, v1.26.02. `MINIFI_HOME=/opt/minifi/nifi-minifi-cpp-1.26.02`, as the running instance's logs report it.
 
 ## The "Nuclear" Rebuild Script
 
@@ -46,11 +46,11 @@ kubectl apply -f minifi-test.yaml
 kubectl get pods -w
 ```
 
-Step 2 — `eval $(minikube docker-env)` — is mandatory. It is the single most common failure point. Skip it and the image builds on your Mac's Docker daemon, the minikube node never sees it, and the pod stays in `ImagePullBackOff` or `ErrImageNeverPull` indefinitely.
+Step 2, `eval $(minikube docker-env)`, is mandatory. It is the single most common failure point. Skip it and the image builds on your Mac's Docker daemon, the minikube node never sees it, and the pod stays in `ImagePullBackOff` or `ErrImageNeverPull` indefinitely.
 
-## config.yml — The Three Requirements
+## config.yml, the Three Requirements
 
-The full working config for this flow:
+The full working config for this flow.
 
 ```yaml
 Flow Controller:
@@ -94,15 +94,15 @@ Connections:
 Remote Processing Groups: []
 ```
 
-Three requirements that catch everyone the first time:
+Three requirements that catch everyone the first time.
 
-**1. Explicit UUID `id` fields on every component.** The C++ agent does not generate IDs for you. Every processor and every connection needs its own `id` field. Copy real UUIDs — generate them with `uuidgen` if you need fresh ones. Omit `id` and the agent fails to load the config silently.
+**1. Explicit UUID `id` fields on every component.** The C++ agent does not generate IDs for you. Every processor and every connection needs its own `id` field. Copy in UUIDs, and generate them with `uuidgen` if you need fresh ones. Omit `id` and the agent fails to load the config silently.
 
-**2. C++ short class names, not Java FQCNs.** `class: ListenHTTP`, `class: PublishKafka`, `class: PutFile` — these are the C++ short names. `org.apache.nifi.processors.standard.ListenHTTP` is the Java NiFi FQCN. It does not work here. Using a Java FQCN produces a silent no-op: the processor fails to instantiate and nothing flows through it.
+**2. C++ short class names, not Java FQCNs.** `class: ListenHTTP`, `class: PublishKafka`, `class: PutFile` are the C++ short names. `org.apache.nifi.processors.standard.ListenHTTP` is the Java NiFi FQCN. It does not work here. Using a Java FQCN produces a silent no-op. The processor fails to instantiate and nothing flows through it.
 
-**3. `Client Name` is mandatory for `PublishKafka`.** Without it, Kafka rejects the connection. `minifi-test-client` is the value here; any non-empty string works. The in-cluster broker address for Strimzi in the `cld-streaming` namespace is `my-cluster-kafka-bootstrap.cld-streaming.svc:9092` — that address is only reachable from inside the cluster, which is where this pod runs.
+**3. `Client Name` is mandatory for `PublishKafka`.** Without it, Kafka rejects the connection. `minifi-test-client` is the value here, and any non-empty string works. The in-cluster broker address for Strimzi in the `cld-streaming` namespace is `my-cluster-kafka-bootstrap.cld-streaming.svc:9092`. That address is only reachable from inside the cluster, which is where this pod runs.
 
-## Dockerfile — MINIFI_HOME and the Readiness Probe
+## Dockerfile, MINIFI_HOME and the Readiness Probe
 
 ```dockerfile
 FROM container.repo.cloudera.com/cloudera/apacheminificpp:latest
@@ -122,9 +122,9 @@ EXPOSE 8080
 CMD ["/opt/minifi/nifi-minifi-cpp-1.26.02/bin/minifi.sh", "run"]
 ```
 
-`MINIFI_HOME=/opt/minifi/nifi-minifi-cpp-1.26.02` is verified from running-instance logs. If you pull a different version of the image, that path changes — the version number is part of the directory name.
+`MINIFI_HOME=/opt/minifi/nifi-minifi-cpp-1.26.02` comes from the running instance's logs. If you pull a different version of the image, that path changes. The version number is part of the directory name.
 
-The Kubernetes manifest (`minifi-test.yaml`) includes a Service and Deployment. The `readinessProbe` path must be `/contentListener`, not `/`, not `/health`. That is the endpoint `ListenHTTP` registers internally:
+The Kubernetes manifest (`minifi-test.yaml`) includes a Service and Deployment. The `readinessProbe` path must be `/contentListener`, not `/`, not `/health`. That is the endpoint `ListenHTTP` registers internally.
 
 ```yaml
 apiVersion: v1
@@ -170,11 +170,11 @@ spec:
           periodSeconds: 5
 ```
 
-`serviceAccountName: minifi-controller` is required for the pod to reach other cluster services. `imagePullPolicy: IfNotPresent` is correct here because the image was built directly into minikube's daemon — there is no registry to pull from.
+`serviceAccountName: minifi-controller` is required for the pod to reach other cluster services. `imagePullPolicy: IfNotPresent` is correct here because the image was built directly into minikube's daemon. There is no registry to pull from.
 
-## Verifying Kafka Delivery and PutFile
+## Checking Kafka Delivery and PutFile
 
-**Step 1 — Open the network tunnel.** On macOS, minikube NodePorts are not directly reachable from `localhost`. Run this in a dedicated terminal and leave it open:
+**1. Open the network tunnel.** On macOS, minikube NodePorts are not directly reachable from `localhost`. Run this in a dedicated terminal and leave it open.
 
 ```bash
 minikube service minifi-test-service --url
@@ -182,7 +182,7 @@ minikube service minifi-test-service --url
 
 It prints something like `http://127.0.0.1:53314`. That is your endpoint.
 
-**Step 2 — POST a test message.** Use the tunnel URL from step 1:
+**2. POST a test message.** Use the tunnel URL from step 1.
 
 ```bash
 curl -i -X POST http://127.0.0.1:<TUNNEL_PORT>/contentListener \
@@ -190,9 +190,9 @@ curl -i -X POST http://127.0.0.1:<TUNNEL_PORT>/contentListener \
      -d '{"test_id": "integration-success", "message": "Flow is functional"}'
 ```
 
-You get an immediate HTTP 200. `ListenHTTP` is fire-and-forget — the 200 means the FlowFile was accepted, not that Kafka received it.
+You get an immediate HTTP 200. `ListenHTTP` is fire-and-forget. The 200 means the FlowFile was accepted, not that Kafka received it.
 
-**Step 3 — Verify Kafka delivery.** Run a temporary consumer pod against the in-cluster Strimzi broker:
+**3. Check Kafka delivery.** Run a temporary consumer pod against the in-cluster Strimzi broker.
 
 ```bash
 kubectl run kafka-viewer -it --rm \
@@ -205,28 +205,28 @@ kubectl run kafka-viewer -it --rm \
   --timeout-ms 10000
 ```
 
-The JSON body you POSTed appears as a Kafka message. If nothing appears, the broker address or topic name is wrong — check both against your Strimzi cluster resources.
+The JSON body you POSTed appears as a Kafka message. If nothing appears, the broker address or topic name is wrong. Check both against your Strimzi cluster resources.
 
-**Step 4 — Verify PutFile.** Check the internal pod storage:
+**4. Check PutFile.** Look at the internal pod storage.
 
 ```bash
 kubectl exec -it deployment/minifi-test -- /bin/sh -c "cat /tmp/minifi-test-output/*"
 ```
 
-The same payload appears here. Both sinks receiving the same message confirms the fan-out connection wiring in `config.yml` is correct.
+The same payload appears here. Both sinks receiving the same message shows the fan-out connection wiring in `config.yml` is correct.
 
 ## What NOT to Do
 
-**Skip `eval $(minikube docker-env)` and you build on the wrong daemon.** The image lands in your Mac's Docker cache. The minikube node has no copy. The pod goes `ErrImageNeverPull` immediately. Run `eval $(minikube docker-env)` before every `docker build` in this workflow — it does not persist across terminal sessions.
+**Skip `eval $(minikube docker-env)` and you build on the wrong daemon.** The image lands in your Mac's Docker cache. The minikube node has no copy. The pod goes `ErrImageNeverPull` immediately. Run `eval $(minikube docker-env)` before every `docker build` in this workflow. It does not persist across terminal sessions.
 
 **Omit UUID `id` fields and the agent silently rejects the config.** There is no parse error, no crash, no log line that says "missing id." The agent either fails to start or starts with an empty flow. Every processor and every connection needs its own UUID.
 
-**Use Java FQCNs in `config.yml` and the processor never instantiates.** `org.apache.nifi.processors.standard.PublishKafka` is not a C++ class name. The agent reports no error — the processor just never starts. Use `PublishKafka`, `ListenHTTP`, `PutFile`.
+**Use Java FQCNs in `config.yml` and the processor never instantiates.** `org.apache.nifi.processors.standard.PublishKafka` is not a C++ class name. The agent reports no error. The processor just never starts. Use `PublishKafka`, `ListenHTTP`, `PutFile`.
 
-**Set the `readinessProbe` path to `/` or `/health` and the pod never reaches `Ready`.** Kubernetes marks the pod `NotReady` indefinitely. The correct path is `/contentListener` — that is the path `ListenHTTP` registers.
+**Set the `readinessProbe` path to `/` or `/health` and the pod never reaches `Ready`.** Kubernetes marks the pod `NotReady` indefinitely. The correct path is `/contentListener`. That is the path `ListenHTTP` registers.
 
 **Omit `Client Name` from `PublishKafka` and Kafka rejects the connection.** The property is not marked required in the schema but the broker refuses the connection without a client identifier. Every `PublishKafka` instance needs a non-empty `Client Name`.
 
 ## Source
 
-Source doc: `MiNiFi Kubernetes Playground` repo `readme.md` (196 lines) — all scripts, config, Dockerfile, and verification steps in this chapter are drawn verbatim or adapted from that file.
+The `MiNiFi Kubernetes Playground` repo `readme.md`. All scripts, config, Dockerfile, and verification steps in this chapter are drawn verbatim or adapted from that file.
