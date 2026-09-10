@@ -5,89 +5,97 @@
 ![Cloudera Data in Motion — MiNiFi edge devices feeding NiFi, Kafka, and Flink for ingest and transform, into data-at-rest and AI/analytics, over the SDX security and governance layer](images/efm-cloudera-edge-management.png)
 
 Edge Flow Management is the central manager for organizing agent **Classes**, **Resources**, and
-**Edge Flows**. NiFi in the datacenter is well documented; EFM is not — until now. What happens out
-at the edge — a MiNiFi agent on a Jetson, a Windows box over Tailscale, a Kubernetes pod with no
-persistent identity — is where the real problems live: binary delivery, agent enrollment, which
-processors actually exist in which build, managing custom processors and resources, and how to get a
-flow from a designer canvas onto a device that keeps changing its IP. This guide is the map I wish
+**Edge Flows**. NiFi in the datacenter is well documented. EFM is not, until now. What happens out
+at the edge is where the hard problems live: a MiNiFi agent on a Jetson, a Windows box over
+Tailscale, a Kubernetes pod with no persistent identity. Binary delivery, agent enrollment, which
+processors exist in which build, managing custom processors and resources, and how to get a flow
+from a designer canvas onto a device that keeps changing its IP. This guide is the map I wish
 I'd had when I first installed [EFM on Kubernetes](https://cldr-steven-matison.github.io/blog/Cloudera-Edge-Flow-Manager-on-Kubernetes/).
 
-Every chapter here is built and run on real hardware — the processor catalogs are the ones counted
-on live agents, not the ones the docs promise, and every flow is one that actually ran.
+Every chapter here is built and run on hardware. The processor catalogs are the ones the agent manifests report, not the ones the docs promise, and every flow is one that ran.
 
 ---
 
 ## Table of Contents
 
-### Part I — EFM Foundations on Kubernetes
+### Part I. EFM Foundations on Kubernetes
+
 Get EFM running and persisted, and fed with agent binaries. The infrastructure everything else rides on.
 
-- **Ch1** — [EFM on Kubernetes](ch01-efm-on-kubernetes.md)
-- **Ch2** — [EFM Binaries & Staging Tree](ch02-efm-binaries.md)
+- **Ch1.** [EFM on Kubernetes](ch01-efm-on-kubernetes.md)
+- **Ch2.** [EFM Binaries & Staging Tree](ch02-efm-binaries.md)
 
-### Part II — Processors (C++ & Java)
-Which processors actually exist in each build, how `ExecuteScript` availability differs across builds, and how to author custom Python processors as their own types at the edge.
+### Part II. Processors (C++ & Java)
 
-- **Ch3** — [MiNiFi C++ Processor Catalog](ch03-cpp-processor-catalog.md)
-- **Ch4** — [MiNiFi Java Processor Catalog](ch04-java-processor-catalog.md)
-- **Ch5** — [ExecuteScript Availability](ch05-executescript-availability.md)
-- **Ch6** — [MiNiFi Custom Python Processors](ch06-minifi-custom-python-processors.md)
+Which processors exist in each build, how `ExecuteScript` availability differs across builds, and how to author custom Python processors as their own types at the edge.
 
-### Part III — MiNiFi Playground Repo
+- **Ch3.** [MiNiFi C++ Processor Catalog](ch03-cpp-processor-catalog.md)
+- **Ch4.** [MiNiFi Java Processor Catalog](ch04-java-processor-catalog.md)
+- **Ch5.** [ExecuteScript Availability](ch05-executescript-availability.md)
+- **Ch6.** [MiNiFi Custom Python Processors](ch06-minifi-custom-python-processors.md)
+
+### Part III. MiNiFi Playground Repo
+
 Install and use plain MiNiFi (C++ and Java), then bring EFM in to manage the agents and resources.
 
-- **Ch7** — [Standalone MiNiFi C++ on Kubernetes](ch07-standalone-minifi-cpp-on-k8s.md)
-- **Ch8** — [Standalone MiNiFi Java on Kubernetes](ch08-minifi-java-setup.md)
-- **Ch9** — [Introduce EFM into the Playground](ch09-efm-in-the-playground.md)
+- **Ch7.** [Standalone MiNiFi C++ on Kubernetes](ch07-standalone-minifi-cpp-on-k8s.md)
+- **Ch8.** [Standalone MiNiFi Java on Kubernetes](ch08-minifi-java-setup.md)
+- **Ch9.** [Introduce EFM into the Playground](ch09-efm-in-the-playground.md)
 
-### Part IV — MiNiFi on Kubernetes
+### Part IV. MiNiFi on Kubernetes
+
 Running both MiNiFi runtimes as EFM-managed Kubernetes pods, then moving their FlowFiles into NiFi over secure Site-to-Site.
 
-- **Ch10** — [MiNiFi C++ and Java as Kubernetes Pods](ch10-minifi-on-k8s.md)
-- **Ch11** — [Site-to-Site — MiNiFi to NiFi on Kubernetes](ch11-site-to-site.md)
+- **Ch10.** [MiNiFi C++ and Java as Kubernetes Pods](ch10-minifi-on-k8s.md)
+- **Ch11.** [Site-to-Site, MiNiFi to NiFi on Kubernetes](ch11-site-to-site.md)
 
-### Part V — EFM at the Edge
-Two real-hardware edge legs: a from-scratch ESP32 C2 agent enrolled directly in EFM, and Sparkplug B over MQTT.
+### Part V. EFM at the Edge
 
-- **Ch12** — [EFM and MicroFi](ch12-efm-and-microfi.md) — the ESP32 C2 agent is Chris Burns's open-source [MicroFi](https://github.com/Christopheraburns/MicroFi)
-- **Ch13** — [EFM and SparkPlug MQTT](ch13-efm-and-sparkplug-mqtt.md)
+Two edge legs on physical hardware. A from-scratch ESP32 C2 agent enrolled directly in EFM, and Sparkplug B over MQTT.
 
-### Part VI — AI at the Edge
-The `nifi-and-ai` skill and its EFM machinery as the grounding lead-in, then NiFi + Python, the same idea pushed to a MiNiFi agent, and the StarlinkAI/Lemonade edge-AI router as a worked case study.
+- **Ch12.** [EFM and MicroFi](ch12-efm-and-microfi.md). The ESP32 C2 agent is Chris Burns's open-source [MicroFi](https://github.com/Christopheraburns/MicroFi)
+- **Ch13.** [EFM and SparkPlug MQTT](ch13-efm-and-sparkplug-mqtt.md)
 
-- **Ch14** — [The NiFi and AI Skill — EFM Portion](ch14-nifi-and-ai-skill-efm-portion.md)
-- **Ch15** — [How to AI with NiFi and Python](ch15-how-to-ai-with-nifi-and-python.md)
-- **Ch16** — [How to AI with MiNiFi](ch16-how-to-ai-with-minifi.md)
-- **Ch17** — [Edge-AI Router Case Study](ch17-edge-ai-router.md)
+### Part VI. AI at the Edge
 
-### Part VII — Sample Gallery
-Curated, runnable flows accumulated as the guide is built.
+The `nifi-and-ai` skill and its EFM machinery as the grounding lead-in, then NiFi + Python, the same idea pushed to a MiNiFi agent, and the StarlinkAI/Lemonade edge-AI router as a case study.
 
-- **Ch18** — [Sample gallery of MiNiFi flows](ch18-sample-gallery.md)
+- **Ch14.** [The NiFi and AI Skill, EFM Portion](ch14-nifi-and-ai-skill-efm-portion.md)
+- **Ch15.** [How to AI with NiFi and Python](ch15-how-to-ai-with-nifi-and-python.md)
+- **Ch16.** [How to AI with MiNiFi](ch16-how-to-ai-with-minifi.md)
+- **Ch17.** [Edge-AI Router Case Study](ch17-edge-ai-router.md)
 
-### Part VIII — Real-World Demos
-EFM + NVIDIA Jetson, and the SparkPlug/IIoT demos — the final output and story (NvidiaNano, StarlinkAI, SparkPlug).
+### Part VII. Sample Gallery
 
-- **Ch19** — [EFM + NVIDIA Jetson Use Case](ch19-efm-and-nvidia-jetson.md)
-- **Ch20** — [SparkPlug B — MQTT/IIoT Edge Demo](ch20-sparkplug-demo.md)
+Runnable flows collected as the guide was built.
 
-### Part IX — Observability
-The layer that watches all of the above — EFM's own metrics, the C++ agent's Prometheus publisher, and the smallest agents' heartbeat metrics, all into one CSO Prometheus/Grafana stack.
+- **Ch18.** [Sample gallery of MiNiFi flows](ch18-sample-gallery.md)
 
-- **Ch21** — [Metrics & Observability](ch21-metrics-and-observability.md)
+### Part VIII. Real-World Demos
+
+EFM + NVIDIA Jetson, and the SparkPlug/IIoT demos. The final output and story (NvidiaNano, StarlinkAI, SparkPlug).
+
+- **Ch19.** [EFM + NVIDIA Jetson Use Case](ch19-efm-and-nvidia-jetson.md)
+- **Ch20.** [SparkPlug B, MQTT/IIoT Edge Demo](ch20-sparkplug-demo.md)
+
+### Part IX. Observability
+
+The layer that watches all of the above. EFM's own metrics, the C++ agent's Prometheus publisher, and the smallest agents' heartbeat metrics, all into one CSO Prometheus/Grafana stack.
+
+- **Ch21.** [Metrics & Observability](ch21-metrics-and-observability.md)
 
 ---
 
 ## What you have here
 
-Read this end to end and you have the map I wish I'd had the first time I tried to run a real flow
-at the edge: EFM stood up and persisted on Kubernetes, the actual processor catalogs for the C++ and
-Java builds, the four ways `ExecuteScript` does and doesn't exist, how to author custom Python
+Read this end to end and you have the map I wish I'd had the first time I tried to run a flow
+at the edge. EFM stood up and persisted on Kubernetes, the processor catalogs for the C++ and
+Java builds, the four ways `ExecuteScript` does and does not exist, how to author custom Python
 processors as first-class edge types, the Site-to-Site legs, a from-scratch ESP32 C2 agent and
-Sparkplug B over MQTT, the AI-at-the-edge patterns, a gallery of runnable flows, two real-world
+Sparkplug B over MQTT, the AI-at-the-edge patterns, a gallery of runnable flows, two end-to-end
 demos, and the observability layer that watches all of it.
 
-**This is the published guide** — the chapter files in this directory, read through this index on
+**This is the published guide.** The chapter files in this directory, read through this index on
 GitHub. There is no separate document to assemble and no other site to go to.
 
 ---
@@ -97,4 +105,4 @@ GitHub. There is no separate document to assemble and no other site to go to.
 The ESP32 edge agent in [Chapter 12](ch12-efm-and-microfi.md) is **MicroFi**, Chris Burns's
 open-source clean-room MiNiFi C2 implementation for microcontrollers:
 [**github.com/Christopheraburns/MicroFi**](https://github.com/Christopheraburns/MicroFi). The
-firmware and its design are his; this guide only documents fielding it as an EFM agent.
+firmware and its design are his. This guide only documents fielding it as an EFM agent.
