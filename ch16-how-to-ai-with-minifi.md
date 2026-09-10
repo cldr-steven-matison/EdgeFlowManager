@@ -142,18 +142,18 @@ Point the same assistant at EFM and there is nothing to call. Every surface this
 
 | EFM surface | What an agent would ask it |
 |---|---|
-| `/efm/api/agent-classes`, `/efm/api/agents` | Which classes exist, which agents are enrolled, when each last heartbeated |
+| `/efm/api/agent-classes`, `/efm/api/agents/page` | Which classes exist, which agents are enrolled, when each last heartbeated |
 | `/efm/api/agent-manifests/{id}` | Which processor types a class can run, so a flow is built against the manifest and not a guess |
 | `/efm/api/designer/flows/{flowId}/...` | Read the live canvas, add a processor, add a connection, validate, publish |
 | `/efm/api/resource-manager/...` | Which scripts and assets are assigned to a class |
 
-MiNiFi itself has no REST API to wrap. The agent talks to EFM over C2 heartbeats and its state lives in EFM, so a server over EFM covers the agents too. The read side alone would answer most of the questions that send you into `minifi-app.log` today. "Which agents in this class have not heartbeated in an hour" is one read of `/agents` and a timestamp. "Does this class's manifest contain `ExecuteScript`" is one read of the manifest, and it is the check the Availability section above tells you to do by hand. On the write side, the component-by-component build loop from the previous section (one POST per processor, one per connection, validate, publish) is already the shape an MCP tool set wants. Each step is a single narrow call with a checkable result.
+MiNiFi itself has no REST API to wrap. The agent talks to EFM over C2 heartbeats and its state lives in EFM, so a server over EFM covers the agents too. The read side alone would answer most of the questions that send you into `minifi-app.log` today. "Which agents in this class have not heartbeated in an hour" is one read of `/agents/page` and a timestamp. "Does this class's manifest contain `ExecuteScript`" is one read of the manifest, and it is the check the Availability section above tells you to do by hand. On the write side, the component-by-component build loop from the previous section (one POST per processor, one per connection, validate, publish) is already the shape an MCP tool set wants. Each step is a single narrow call with a checkable result.
 
 ### Build It the Way the Cloudera Manager One Was Built
 
 The pattern exists. The [Cloudera Manager MCP Server](https://github.com/cldr-steven-matison/cloudera-manager-mcp-server) wraps the CM, YARN, Ranger and Atlas REST APIs on FastMCP, every tool GET-only, one `*_BASE_URL` per surface so an estate with only one of them exposes only that surface's tools, and it runs under `uvx` from the git URL with no clone. An EFM server is the same build with different endpoints.
 
-What it needs beyond the CM one is a single decision, whether to expose the write side of the Designer at all. Start read-only. A tool that publishes a flow to a class pushes it onto every agent in that class on their next heartbeat, and the Traps section below lists the ways a bad publish goes silent. Add `efm_publish_flow` last, behind a flag that defaults off, after the read tools have earned trust the same way the custom processors did. That server is the next thing to build in this series, and it is where the edge-AI story turns from "the agent does AI work" to "the AI runs the agents."
+What it needs beyond the CM one is a single decision, whether to expose the write side of the Designer at all. Start read-only. A tool that publishes a flow to a class pushes it onto every agent in that class on their next heartbeat, and the Traps section below lists the ways a bad publish goes silent. Add `efm_publish_flow` last, behind a flag that defaults off, after the read tools have earned trust the same way the custom processors did. That server now exists: the [Edge Flow Manager MCP Server](https://github.com/cldr-steven-matison/edge-flow-manager-mcp-server) ships twelve read-only tools over exactly these surfaces, on the Cloudera Manager server's build shape, with the write side behind a flag that defaults off. It is where the edge-AI story turns from "the agent does AI work" to "the AI runs the agents."
 
 ## Traps: The Ones That Drop Data Silently
 

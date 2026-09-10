@@ -238,7 +238,7 @@ When the validation work is done, tear down in this order to avoid orphaned EFM 
 # 1. Delete pods first to stop heartbeats
 kubectl delete pod minifi-test-efm-cpp minifi-test-efm-java -n default
 
-# 2. Delete agent records (get IDs from GET /efm/api/agents)
+# 2. Delete agent records (get IDs from GET /efm/api/agents/page)
 curl -s -X DELETE "http://efm.cld-streaming.svc:10090/efm/api/agents/<cpp-agent-id>"
 curl -s -X DELETE "http://efm.cld-streaming.svc:10090/efm/api/agents/<java-agent-id>"
 

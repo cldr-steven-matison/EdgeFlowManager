@@ -86,14 +86,14 @@ Three lines in both scripts are there on purpose. `set -eux` makes the pod fail 
 Once a pod is enrolled, confirm it from EFM, which is the source of truth for enrollment state, and not from the pod's own logs.
 
 ```bash
-GET /efm/api/agents                    # the agent row: state ONLINE, its class, last heartbeat
+GET /efm/api/agents/page               # the agent row: state ONLINE, its class, last heartbeat
 GET /efm/api/agent-classes             # the class exists with a manifest id
 GET /efm/api/agent-manifests/{id}      # exactly the processors compiled/loaded into that build
 ```
 
 A C++ pod reports the stock catalog ([Chapter 3](ch03-cpp-processor-catalog.md)) plus whatever extension bundles are loaded. A stock Java pod reports 114 processors, 122 after the Kafka/scripting NAR drop-in ([Chapter 4](ch04-java-processor-catalog.md)). The manifest is what the Designer offers to place, so a mismatch between "what the agent loaded" and "what the palette shows" is almost always a class-manifest mapping that needs re-pointing.
 
-Check that mapping directly. The manifest the agent reports in its own row (`agentManifestId` on `GET /efm/api/agents`) and the manifest the class is mapped to (`GET /efm/api/agent-class-manifest-config`) can drift apart, for example after a manifest change or when a class was re-pointed at a manifest that came from a different agent. The agent stays `ONLINE` and its flow keeps running, so nothing flags it. The palette is built from the class mapping. When a processor you know the agent has is missing from the palette, or the palette offers one the agent rejects, compare the two ids and re-point the class.
+Check that mapping directly. The manifest the agent reports in its own row (`agentManifestId` on `GET /efm/api/agents/page`) and the manifest the class is mapped to (`GET /efm/api/agent-class-manifest-config`) can drift apart, for example after a manifest change or when a class was re-pointed at a manifest that came from a different agent. The agent stays `ONLINE` and its flow keeps running, so nothing flags it. The palette is built from the class mapping. When a processor you know the agent has is missing from the palette, or the palette offers one the agent rejects, compare the two ids and re-point the class.
 
 What a production pair looks like once flows are applied. The C++ class runs a flow of three `ListenHTTP` listeners feeding `PublishKafka` and `ExecuteScript` shell launchers, with `PublishKafka`'s connection properties inlined on the processor and no controller services, the structural difference [Chapter 4](ch04-java-processor-catalog.md) documents. The Java class runs `HandleHttpRequest`/`HandleHttpResponse` pairs around `InvokeHTTP`, a `StandardHttpContextMap` and a `Kafka3ConnectionService` as controller services, and an `ExecuteScript`, which is the NAR drop-in doing its job in production.
 
