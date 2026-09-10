@@ -160,6 +160,8 @@ The working contract, recovered this way:
 
 > **There is no whole-flow-document `PUT`. Don't guess one.** `PUT /efm/api/designer/flows/{flowId}` with the full modified `flowContent` fails at the routing layer (`HttpRequestMethodNotSupportedException: Request method 'PUT' is not supported`, a `500` before any business logic, nothing written). The only write path is one `POST` per processor and one `POST` per connection, each returning the identifier you use to wire the next. There is no batch or bulk create. This is the same contract Ch16 and Ch17 build against.
 
+A read-only MCP server now wraps this same Designer API, along with the agent-class, manifest, and resource endpoints. The [Edge Flow Manager MCP Server](https://github.com/cldr-steven-matison/edge-flow-manager-mcp-server) exposes twelve GET-only tools over the surfaces above, and [Ch16](ch16-how-to-ai-with-minifi.md#let-the-ai-drive-the-flow-mcp-servers) covers it and the NiFi-side companion. It is a client of this contract, not part of the skill.
+
 **The Designer validates against the agent class to manifest mapping, not against whatever agent is online.** Put a Java agent on a class whose flow was authored for C++ and the processors are rejected because the FQCNs differ (`org.apache.nifi.minifi.processors.ListenHTTP` vs the Java equivalent). Keep mixed runtimes as parallel classes, a C++ class separate from its Java sibling, so a Java agent never lands on a C++ canvas.
 
 ### Layout at the Designer Pitch
