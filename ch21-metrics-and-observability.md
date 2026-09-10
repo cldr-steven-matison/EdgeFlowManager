@@ -169,9 +169,11 @@ Three semantics that will bite if unlearned.
 
 ### The Fleet Dashboard
 
-Those series drive the **EFM Fleet - All Devices** Grafana dashboard ([`files/efm-fleet-dashboard.json`](files/efm-fleet-dashboard.json)). A seconds-since-heartbeat stat tile per device (green under 120s, yellow under 600s, red beyond), an all-device sawtooth graph (a healthy device saws between 0 and its heartbeat interval, a dying one just climbs), and a host row (scrape status, CPU, memory) for each device with a Layer-2 exporter (the Jetson, the Windows desktop, and the StarlinkAI Beelink below). Devices without an exporter get a Layer-1 row (sawtooth, heartbeats per minute, average heartbeat size) instead.
+Those series drive the **EFM Fleet - All Devices** Grafana dashboard ([`files/efm-fleet-dashboard.json`](files/efm-fleet-dashboard.json)). A seconds-since-heartbeat stat tile per device (green under 120s, yellow under 600s, red beyond), an all-device sawtooth graph (a healthy device saws between 0 and its heartbeat interval, a dying one just climbs), and a host row (scrape status, CPU, memory) for each device with a Layer-2 exporter (the Jetson, the Windows desktop, the StarlinkAI Beelink below, and the DGX Spark). Devices without an exporter get a Layer-1 row (sawtooth, heartbeats per minute, average heartbeat size) instead.
 
-All six device tiles green and all three Layer-2 host rows UP.
+The board carries seven device tiles and four Layer-2 host rows. The DGX Spark row is the one that goes further: it pairs the flow-level exporter on `:9936` with a dedicated host exporter on `:9835`, so the same row reads agent health and box health side by side.
+
+The capture below predates the DGX Spark row and shows the first six tiles.
 
 ![EFM Fleet - All Devices: six green seconds-since-heartbeat tiles, the all-device sawtooth, and Layer-2 host rows for the Jetson, StarlinkAI, and WindowsDesktop](images/ch21-efm-fleet-dashboard.png)
 
