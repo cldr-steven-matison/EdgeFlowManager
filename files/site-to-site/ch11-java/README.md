@@ -192,7 +192,7 @@ doesn't regenerate config from `bootstrap.conf` the same way.
 Once the transport above works, the *same* secure channel relays the **agent's own metrics** to NiFi:
 a `SiteToSiteMetricsReportingTask` in the agent flow POSTs metrics to the `from-minifi` input port over
 the identical mTLS S2S path (no new port, no new authz — reuses the proven peer). This is the
-[#41](https://github.com/cldr-steven-matison/DesktopShare/issues/41) transport leg (no Prometheus).
+[#41](https://github.com/cldr-steven-matison/BrainShare/issues/41) transport leg (no Prometheus).
 
 Two gotchas, each cost a rebuild:
 

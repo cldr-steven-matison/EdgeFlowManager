@@ -22,7 +22,7 @@ Description=TensorRT inference daemon (MobileNetV2 FP16, loopback :5910)
 
 [Service]
 Type=simple
-ExecStart=/usr/bin/python3 %h/DesktopShare/files/trt_infer_server.py
+ExecStart=/usr/bin/python3 %h/BrainShare/files/trt_infer_server.py
 Restart=always
 RestartSec=5
 
