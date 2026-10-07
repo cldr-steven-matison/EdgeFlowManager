@@ -2,7 +2,7 @@
 
 Chapter 16 introduced the four AI-at-edge options and used the StarlinkAI router as its canonical "route to a nearby inference server" example. This chapter is the full build of that node. The hardware, why it runs the stack it does, how it joins the array, and every functional leg the single agent carries.
 
-One `StarlinkAI` Java agent handles both the Lemonade inference router (five endpoints on port `:8090`) and the screen/matrix control endpoint (port `:8096`). Where Chapter 16 states the shape, this chapter is the build, including the two problems that needed engineering, the error routing and the multipart reassembly.
+One `StarlinkAI` Java agent handles the Lemonade inference router (five endpoints on port `:8090`), the screen/matrix control endpoint (port `:8096`), an OBS overlay chat relay (`:8089` in, `:8097` out) and a Prometheus metrics door (`:9936`). Where Chapter 16 states the shape, this chapter is the build, including the two problems that needed engineering, the error routing and the multipart reassembly.
 
 > **⚠️ Read Chapter 16 first for the generalized patterns.** The "why MiNiFi Java, not C++" reasoning, the EFM Designer write contract (no whole-flow PUT), and the edge traps are covered there and only summarized here. This chapter is the case study. Chapter 16 is the playbook.
 
@@ -48,7 +48,7 @@ EFM / MiNiFi Java agent  (StarlinkAI class, Windows-native process)
         │      - HandleHttpResponse-Lemonade  : returns Lemonade's real answer
         │                                       synchronously
         │
-        └─── Screen/matrix control  (port :8096, JSON body)
+        ├─── Screen/matrix control  (port :8096, JSON body)
                - HandleHttpRequest-ScreenControl : accepts JSON with action/screen/
                                                    streamer fields
                - EvaluateJsonPath                : extracts action, screen, streamer
@@ -57,14 +57,21 @@ EFM / MiNiFi Java agent  (StarlinkAI class, Windows-native process)
                                                    per request (no persistent listener)
                - HandleHttpResponse-ScreenControl: returns result synchronously
         │
+        ├─── OBS overlay chat relay  (:8089 POST /chat-in, :8097 GET /chat)
+        │      - ExecuteStreamCommand → overlay_chat_buffer.py append / serve
+        │
+        └─── Metrics  (:9936 /metrics)
+               - ExecuteStreamCommand → powershell CIM read → Prometheus text
+        │
         ▼
 Lemonade Server  (Windows-native, localhost:13305)
   - iGPU inference via llamacpp:vulkan backend
-  - OpenAI-compatible API: /v1/chat/completions, /v1/embeddings,
-    /v1/reranking, /v1/audio/speech, /v1/audio/transcriptions
+  - OpenAI-compatible API: /api/v1/chat/completions, /api/v1/embeddings,
+    /api/v1/reranking, /api/v1/audio/speech, /api/v1/audio/transcriptions
+  - chat LLM: Qwen3-30B-A3B-Instruct-2507 in a llama-server child on :8001
 ```
 
-One agent, two endpoint groups, no Kafka, no `request_id` correlation. Callers get responses directly and synchronously on both legs. Everything in the serving path runs natively on Windows. No containers, no WSL2 (WSL2 on this box is only used for repo and doc access).
+One agent, four endpoint groups, no Kafka, no `request_id` correlation. Callers get responses directly and synchronously on every leg. Everything in the serving path runs natively on Windows. No containers, no WSL2 (WSL2 on this box is only used for repo and doc access).
 
 ![HandleHttpRequest-Lemonade → InvokeHTTP-Lemonade → HandleHttpResponse-Lemonade, live per-processor throughput in the EFM Flow Designer](images/efm-starlink-ai-unified-lemonade-flow.png)
 
@@ -94,11 +101,13 @@ Five models loaded, one concurrent per category.
 
 | Category | Model |
 |---|---|
-| Chat | `Qwen3-4B-GGUF` |
+| Chat | `Qwen3-30B-A3B-Instruct-2507-GGUF` (MoE, ~3B active, Q4_0) |
 | Embeddings | `Qwen3-Embedding-0.6B-GGUF` |
 | Reranking | `jina-reranker-v1-tiny-en-GGUF` |
 | Transcription | `Whisper-Large-v3-Turbo` |
 | TTS | `kokoro-v1` (`device: cpu`, the backend installed only as `kokoro:cpu`) |
+
+The chat model is a local MoE, and on a bandwidth-bound iGPU the active parameter count sets the speed: it generates at about 33 tok/s, as fast as `Qwen3-4B` and twice the dense `Qwen3-8B`. Its load options are saved (`lemonade load … --save-options`): `ctx_size 131072` with `-np 2 -no-kvu -fa on --cache-ram 0 -sps 0.5`, which gives **two independent 64K slots**. A long conversation keeps its KV cache in one slot while short side requests use the other. With unified KV and the RAM prompt cache, every side request cost a ~122 s cache restore on this iGPU. Lemonade keeps one model per category, so a request naming a different LLM evicts it. Router clients should name `Qwen3-30B-A3B-Instruct-2507-GGUF`.
 
 Manage with `lemonade list` / `lemonade pull <model>`. Once a model is loaded, check that Vulkan GPU offload is active. `GET /api/v1/health` should return `"device": "gpu"`, not a silent CPU fallback.
 
@@ -204,7 +213,21 @@ Screen and matrix control on this node predates the Lemonade router. Twitch-chat
 | `ExecuteStreamCommand` | Invokes `starlinkai_screen_control.py` directly per request. No persistent listener |
 | `HandleHttpResponse-ScreenControl` | Returns result synchronously |
 
-The `:8096` endpoint shares the same `StarlinkAI` class canvas as the Lemonade router leg. One MiNiFi process on the host, two endpoint groups, all EFM-managed.
+The `:8096` endpoint shares the same `StarlinkAI` class canvas as the Lemonade router leg. One MiNiFi process on the host, four endpoint groups, all EFM-managed.
+
+---
+
+## Chat Relay and Metrics (Ports :8089/:8097, :9936)
+
+Two smaller legs ride the same agent, each a `HandleHttpRequest → ExecuteStreamCommand → HandleHttpResponse` chain with no persistent listener.
+
+| Port | Request | What runs |
+|---|---|---|
+| `:8089` | `POST /chat-in` | `overlay_chat_buffer.py append`: adds a chat line to a rolling last-50 JSON buffer on the host |
+| `:8097` | `GET /chat` | `overlay_chat_buffer.py serve`: returns the buffer. `UpdateAttribute-ChatCors` sets `Access-Control-Allow-Origin:*` so the OBS browser-source overlay can poll it |
+| `:9936` | `GET /metrics` | `powershell.exe -EncodedCommand`, a CIM read of host CPU and memory, printed as Prometheus gauges (`minifi_java_host_cpu_percent`, `minifi_java_host_mem_total_kb`, `minifi_java_host_mem_free_kb`) and scraped over Tailscale (Chapter 21) |
+
+Windows Defender's `OpenJDK Platform binary` rule covers the agent's inbound traffic, so no new port needs its own firewall rule.
 
 ---
 
